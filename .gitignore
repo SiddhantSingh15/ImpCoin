@@ -3,6 +3,10 @@
 #ignore temp files
 *~
 
+#ignore CLion files
+*.idea
+*.DS_Store
+
 #ignore pdf files (just keep source files)
 *.pdf
 

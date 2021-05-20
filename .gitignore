@@ -3,9 +3,10 @@
 #ignore temp files
 *~
 
-#ignore CLion files
+#ignore CLion/ VSCode files
 *.idea
 *.DS_Store
+*.vscode
 
 #ignore pdf files (just keep source files)
 *.pdf

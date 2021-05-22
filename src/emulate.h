@@ -40,6 +40,13 @@ typedef struct branch_t {
 
 enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH };
 
+/*
+ * This contains raw data, one of the 4 decoded structs.
+ *
+ * We store the instruction as raw data in the fetch stage,
+ * and replace it with the decoded struct in the decode stage.
+ *
+ */
 union instr_data {
   uint32_t raw_data;
   dataproc_t dataproc;
@@ -48,6 +55,12 @@ union instr_data {
   branch_t branch;
 };
 
+/*
+ * The instruction type contains a union type for instructions, and
+ * an enum (instr_type) to tag which of the union types is currently
+ * being held.
+ *
+ */
 typedef struct instruction_t {
   union instr_data data;
   enum instr_type tag;

@@ -38,9 +38,7 @@ typedef struct branch_t {
   uint32_t offset : 24;
 } branch_t;
 
-enum instr_type {
-  RAW, DATAPROC, MULTIPLY, SDT, BRANCH
-};
+enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH };
 
 union instr_data {
   uint32_t raw_data;
@@ -65,6 +63,6 @@ typedef struct arm11_state_t {
   uint32_t main_memory[65535];
   uint32_t register_file[16];
   pipeline_t *pipeline;
-} machine_state_t;
+} arm11_state_t;
 
 #endif

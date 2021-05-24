@@ -1,4 +1,5 @@
 #include "emulate.h"
+#include "definitions.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -28,13 +29,13 @@ instruction_t *decode_dataproc(instruction_t *instr) {
 
   uint32_t raw_data = instr->data.raw_data;
 
-  instr->data.dataproc.cond = EXTRACT_BITS(raw_data, 28, 4);
-  instr->data.dataproc.is_immediate = EXTRACT_BIT(raw_data, 25);
-  instr->data.dataproc.opcode = EXTRACT_BITS(raw_data, 21, 4);
-  instr->data.dataproc.set_cond = EXTRACT_BIT(raw_data, 21);
-  instr->data.dataproc.rn = EXTRACT_BITS(raw_data, 16, 4);
-  instr->data.dataproc.rd = EXTRACT_BITS(raw_data, 12, 4);
-  instr->data.dataproc.op2 = EXTRACT_BITS(raw_data, 0, 12);
+  instr->data.dataproc.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
+  instr->data.dataproc.is_immediate = EXTRACT_BIT(raw_data, I_POS);
+  instr->data.dataproc.opcode = EXTRACT_BITS(raw_data, OPCODE_POS, OPCODE_SIZE);
+  instr->data.dataproc.set_cond = EXTRACT_BIT(raw_data, SET_COND_POS);
+  instr->data.dataproc.rn = EXTRACT_BITS(raw_data, RN_POS, REG_SIZE);
+  instr->data.dataproc.rd = EXTRACT_BITS(raw_data, RD_POS, REG_SIZE);
+  instr->data.dataproc.op2 = EXTRACT_BITS(raw_data, OP2_POS, OP2_SIZE);
 
   instr->tag = DATAPROC;
   return instr;
@@ -46,12 +47,13 @@ instruction_t *decode_multiply(instruction_t *instr) {
 
   uint32_t raw_data = instr->data.raw_data;
 
-  instr->data.multiply.cond = EXTRACT_BITS(raw_data, 28, 4);
-  instr->data.multiply.accumulate = EXTRACT_BIT(raw_data, 21);
-  instr->data.multiply.set_cond = EXTRACT_BIT(raw_data, 20);
-  instr->data.multiply.rd = EXTRACT_BITS(raw_data, 16, 4);
-  instr->data.multiply.rn = EXTRACT_BITS(raw_data, 12, 4);
-  instr->data.multiply.rs = EXTRACT_BITS(raw_data, 0, 12);
+  instr->data.multiply.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
+  instr->data.multiply.accumulate = EXTRACT_BIT(raw_data, A_POS);
+  instr->data.multiply.set_cond = EXTRACT_BIT(raw_data, SET_COND_POS);
+  instr->data.multiply.rd = EXTRACT_BITS(raw_data, MULTIPLY_RD_POS, REG_SIZE);
+  instr->data.multiply.rn = EXTRACT_BITS(raw_data, MULTIPLY_RN_POS, REG_SIZE);
+  instr->data.multiply.rs = EXTRACT_BITS(raw_data, RS_POS, REG_SIZE);
+  instr->data.multiply.rm = EXTRACT_BITS(raw_data, RM_POS, REG_SIZE);
 
   instr->tag = MULTIPLY;
   return instr;
@@ -63,13 +65,13 @@ instruction_t *decode_sdt(instruction_t *instr) {
 
   uint32_t raw_data = instr->data.raw_data;
 
-  instr->data.sdt.cond = EXTRACT_BITS(raw_data, 28, 4);
-  instr->data.sdt.is_offset = EXTRACT_BIT(raw_data, 25);
-  instr->data.sdt.is_preindexed = EXTRACT_BIT(raw_data, 24);
-  instr->data.sdt.load = EXTRACT_BIT(raw_data, 20);
-  instr->data.sdt.rn = EXTRACT_BITS(raw_data, 16, 4);
-  instr->data.sdt.rd = EXTRACT_BITS(raw_data, 12, 4);
-  instr->data.sdt.offset = EXTRACT_BITS(raw_data, 0, 12);
+  instr->data.sdt.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
+  instr->data.sdt.is_shift_R = EXTRACT_BIT(raw_data, I_POS);
+  instr->data.sdt.is_preindexed = EXTRACT_BIT(raw_data, P_POS);
+  instr->data.sdt.load = EXTRACT_BIT(raw_data, L_POS);
+  instr->data.sdt.rn = EXTRACT_BITS(raw_data, RN_POS, REG_SIZE);
+  instr->data.sdt.rd = EXTRACT_BITS(raw_data, RD_POS, REG_SIZE);
+  instr->data.sdt.offset = EXTRACT_BITS(raw_data, OFFSET_POS, SDT_OFFSET_SIZE);
 
   instr->tag = SDT;
   return instr;
@@ -81,8 +83,8 @@ instruction_t *decode_branch(instruction_t *instr) {
 
   uint32_t raw_data = instr->data.raw_data;
 
-  instr->data.branch.cond = EXTRACT_BITS(raw_data, 28, 4);
-  instr->data.branch.offset = EXTRACT_BITS(raw_data, 0, 24);
+  instr->data.branch.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
+  instr->data.branch.offset = EXTRACT_BITS(raw_data, OFFSET_POS, THREE_B);
 
   instr->tag = BRANCH;
   return instr;

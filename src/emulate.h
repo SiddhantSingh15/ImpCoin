@@ -1,44 +1,45 @@
 #ifndef EMULATE_H
 #define EMULATE_H
 #include <stdint.h>
+#include <definitions.h>
 
 typedef struct dataproc_t {
-  uint16_t op2 : 12;
-  uint8_t cond : 4;
-  uint8_t rn : 4;
-  uint8_t opcode : 4;
-  uint8_t rd : 4;
-  uint8_t is_immediate : 1;
-  uint8_t set_cond : 1;
+  uint16_t op2 : OP2_SIZE;
+  uint8_t cond : COND_SIZE;
+  uint8_t rn : REG_SIZE;
+  uint8_t opcode : REG_SIZE;
+  uint8_t rd : REG_SIZE;
+  uint8_t is_immediate : SET;
+  uint8_t set_cond : SET;
 } dataproc_t;
 
 typedef struct multiply_t {
-  uint8_t cond : 4;
-  uint8_t rd : 4;
-  uint8_t rn : 4;
-  uint8_t rs : 4;
-  uint8_t rm : 4;
-  uint8_t accumulate : 1;
-  uint8_t set_cond : 1;
+  uint8_t cond : COND_SIZE;
+  uint8_t rd : REG_SIZE;
+  uint8_t rn : REG_SIZE;
+  uint8_t rs : REG_SIZE;
+  uint8_t rm : REG_SIZE;
+  uint8_t accumulate : SET;
+  uint8_t set_cond : SET;
 } multiply_t;
 
 typedef struct sdt_t {
-  uint16_t offset : 12;
-  uint8_t cond : 4;
-  uint8_t rn : 4;
-  uint8_t rd : 4;
-  uint8_t is_offset : 1;
-  uint8_t is_preindexed : 1;
-  uint8_t up_bit : 1;
-  uint8_t load : 1;
+  uint16_t offset : SDT_OFFSET_SIZE;
+  uint8_t cond : COND_SIZE;
+  uint8_t rn : REG_SIZE;
+  uint8_t rd : REG_SIZE;
+  uint8_t is_shift_R : SET;
+  uint8_t is_preindexed : SET;
+  uint8_t up_bit : SET;
+  uint8_t load : SET;
 } sdt_t;
 
 typedef struct branch_t {
-  uint32_t offset : 24;
-  uint8_t cond : 4;
+  uint32_t offset : THREE_B;
+  uint8_t cond : COND_SIZE;
 } branch_t;
 
-enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH };
+enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH, HALT };
 
 /*
  * This contains raw data, one of the 4 decoded structs.
@@ -73,8 +74,8 @@ typedef struct pipeline_t {
 } pipeline_t;
 
 typedef struct arm11_state_t {
-  uint8_t main_memory[65535];
-  uint32_t register_file[16];
+  uint8_t main_memory[MEM_SIZE];
+  uint32_t register_file[NUM_REGS];
   pipeline_t *pipeline;
 } arm11_state_t;
 

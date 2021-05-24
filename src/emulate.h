@@ -9,8 +9,8 @@ typedef struct dataproc_t {
   uint8_t rn : REG_SIZE;
   uint8_t opcode : REG_SIZE;
   uint8_t rd : REG_SIZE;
-  uint8_t is_immediate : 1;
-  uint8_t set_cond : 1;
+  uint8_t is_immediate : SET;
+  uint8_t set_cond : SET;
 } dataproc_t;
 
 typedef struct multiply_t {
@@ -19,8 +19,8 @@ typedef struct multiply_t {
   uint8_t rn : REG_SIZE;
   uint8_t rs : REG_SIZE;
   uint8_t rm : REG_SIZE;
-  uint8_t accumulate : 1;
-  uint8_t set_cond : 1;
+  uint8_t accumulate : SET;
+  uint8_t set_cond : SET;
 } multiply_t;
 
 typedef struct sdt_t {
@@ -28,10 +28,10 @@ typedef struct sdt_t {
   uint8_t cond : COND_SIZE;
   uint8_t rn : REG_SIZE;
   uint8_t rd : REG_SIZE;
-  uint8_t is_shift_R : 1;
-  uint8_t is_preindexed : 1;
-  uint8_t up_bit : 1;
-  uint8_t load : 1;
+  uint8_t is_shift_R : SET;
+  uint8_t is_preindexed : SET;
+  uint8_t up_bit : SET;
+  uint8_t load : SET;
 } sdt_t;
 
 typedef struct branch_t {

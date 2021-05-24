@@ -27,7 +27,7 @@ typedef struct sdt_t {
   uint8_t cond : 4;
   uint8_t rn : 4;
   uint8_t rd : 4;
-  uint8_t is_offset : 1;
+  uint8_t is_shift_R : 1;
   uint8_t is_preindexed : 1;
   uint8_t up_bit : 1;
   uint8_t load : 1;
@@ -38,7 +38,7 @@ typedef struct branch_t {
   uint8_t cond : 4;
 } branch_t;
 
-enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH };
+enum instr_type { RAW, DATAPROC, MULTIPLY, SDT, BRANCH, HALT };
 
 /*
  * This contains raw data, one of the 4 decoded structs.

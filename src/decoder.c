@@ -1,7 +1,8 @@
-#include "emulate.h"
 #include "definitions.h"
+#include "emulate.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #define EXTRACT_BITS(raw, from, size)                                          \
   (uint32_t)(                                                                  \
@@ -90,7 +91,34 @@ instruction_t *decode_branch(instruction_t *instr) {
   return instr;
 }
 
-instruction_t *decode(instruction_t *raw) {
+instruction_t *decode(instruction_t *instr) {
   // the instruction to be decoded must be raw
-  assert(raw->tag == RAW);
+  assert(instr->tag == RAW);
+
+  uint32_t raw = instr->data.raw_data;
+
+  // Halt
+  if (raw == 0) {
+    instr->tag = HALT;
+    return instr;
+  }
+
+  // Multiply
+  if (EXTRACT_BITS(raw, 22, 6) == 0 && EXTRACT_BITS(raw, 4, 4) == 0x9) {
+    return decode_multiply(instr);
+  }
+
+  switch (EXTRACT_BITS(raw, 26, 2)) {
+  case 0x0: // Data Process
+    return decode_dataproc(instr);
+  case 0x1: // Single Data Transfer
+    return decode_sdt(instr);
+  case 0x2: // Branch
+    return decode_branch(instr);
+  }
+
+  // Cannot decode the instruction
+  fprintf(stderr, "0x%08x is a bad instruction. Halting emulator.", raw);
+  instr->tag = HALT;
+  return instr;
 }

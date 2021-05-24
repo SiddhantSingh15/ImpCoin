@@ -53,3 +53,21 @@ void free_state_memory(arm11_state_t *state) {
   free(state->pipeline);
   free(state);
 }
+
+void print_all_regs(arm11_state_t *state) {
+
+  /* Looping through 17 registers */
+  printf("Registers: \n");
+  for (int i = 0; i < NUM_GENERAL; i++) {
+    printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i]);
+  }
+
+  /* Printing PC and CPSR */
+  printf("PC  :          %d (0x%08x)\n", state->register_file[PC]);
+  printf("CPSR  :          %d (0x%08x)\n", state->register_file[CPSR]);
+
+  /* Looping through non-0 locations */
+  for (int i = 0; i < MEM_SIZE; i++) {
+    
+  }
+}

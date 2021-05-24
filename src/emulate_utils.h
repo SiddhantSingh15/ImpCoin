@@ -7,5 +7,7 @@ void read_file(char* filename, arm11_state_t* state);
 void printSize(void);
 arm11_state_t *init_state();
 void free_state_memory(arm11_state_t *state);
+void fetch_next(arm11_state_t *state);
+void free_all_pipeline(pipeline_t *pipeline);
 
 #endif

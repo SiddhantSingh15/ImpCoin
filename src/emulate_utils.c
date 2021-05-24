@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "emulate.h"
 
 /**
@@ -52,4 +53,33 @@ arm11_state_t *init_state() {
 void free_state_memory(arm11_state_t *state) {
   free(state->pipeline);
   free(state);
+}
+
+void fetch_next(arm11_state_t *state) {
+  instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
+  // Set the incoming 32 byte data to be all 0s
+  uint32_t incoming = 0;
+  int curr = (state->register_file)[15];
+
+  // Shift and insert the 4 pieces of data into curr 8 bytes at a time
+  incoming |= (state->main_memory)[curr];
+  for (int i = 1; i < 4; i++) {
+    incoming <<= 8;
+    incoming |= (state->main_memory)[curr + i];
+  }
+  // Set up the union data
+  union instr_data incoming_instruction_data = { incoming };
+  *fetched_instruction = (instruction_t) {
+    .data = incoming_instruction_data,
+    .tag = RAW
+  };
+  // Insert into pipeline for fetched
+  state->pipeline->fetched = fetched_instruction;
+}
+
+// Free all of pipeline, used for branch command
+void free_all_pipeline(pipeline_t *pipeline) {
+  free(pipeline->fetched);
+  free(pipeline->decoded);
+  free(pipeline->executed);
 }

@@ -24,6 +24,8 @@
 #define S_POS 20
 #define I_pos 25
 #define OFFSET_POS 0
+#define RD_POS 12
+#define RN_POS 16
 #define V_COND 28
 #define C_COND 29
 #define Z_COND 30
@@ -31,8 +33,6 @@
 
 /* DataProc  */
 #define OP2_SIZE 12
-#define RD_POS 12
-#define RN_POS 16
 #define OPCODE_POS 21
 
 #define AND 0
@@ -49,13 +49,11 @@
 /* Multiply  */
 #define RM_POS 0
 #define RS_POS 8
-#define RN_POS 12
-#define RD_POS 16
+#define MULTIPLY_RN_POS 12
+#define MULTIPLY_RD_POS 16
 #define A_POS 21
 
 /* SDT  */
-#define RD_POS 12
-#define RN_POS 16
 #define L_POS 20
 #define U_POS 23
 #define P_POS 24

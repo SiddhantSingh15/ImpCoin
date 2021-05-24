@@ -11,8 +11,11 @@
 /* OTHER FLAGS */
 #define SET 1
 #define NOT_SET 0
+
+/* Different byte sizes to use somewhere */
 #define ONE_B 8
 #define TWO_B 16
+#define THREE_B 24
 
 /* Common register sizes */
 #define REG_SIZE 4
@@ -54,6 +57,7 @@
 #define A_POS 21
 
 /* SDT  */
+#define SDT_OFFSET_SIZE 12
 #define L_POS 20
 #define U_POS 23
 #define P_POS 24

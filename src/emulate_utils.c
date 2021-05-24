@@ -54,7 +54,7 @@ void free_state_memory(arm11_state_t *state) {
   free(state);
 }
 
-void print_all_regs(arm11_state_t *state) {
+void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through 17 registers */
   printf("Registers: \n");
@@ -68,6 +68,6 @@ void print_all_regs(arm11_state_t *state) {
 
   /* Looping through non-0 locations */
   for (int i = 0; i < MEM_SIZE; i++) {
-    
+
   }
 }

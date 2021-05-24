@@ -1,19 +1,24 @@
 #include "emulate.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "emulate_utils.h"
 
 int main(int argc, char **argv) {
-  return EXIT_SUCCESS;
-}
+	if (argc != 2) {
+		printf("Please provide only 1 argument\n");
+		return EXIT_FAILURE;
+	}
+	char *file = argv[1];
 
-/*
-void print_size(void) {
-  printf("size of dataproc_t: %ld\n", sizeof(dataproc_t));
-  printf("size of multiply_t: %ld\n", sizeof(multiply_t));
-  printf("size of sdt_t: %ld\n", sizeof(sdt_t));
-  printf("size of branch_t: %ld\n", sizeof(branch_t));
-  printf("size of instruction_t: %ld\n", sizeof(instruction_t));
-  printf("size of pipeline_t: %ld\n", sizeof(pipeline_t));
-  printf("size of arm11_state_t: %ld\n", sizeof(arm11_state_t));
+	// Create variable and set it to return of init_state,
+	// initialise based on the spec (use malloc)
+	// Anything thats a pointer needs to mallocated (start_state needs to be
+	// mallocated)
+	
+	arm11_state_t *start_state = init_state();
+
+	read_file(file, start_state);
+  
+  // Once everything is done, free state memory
+  free_state_memory(start_state);
 }
-*/

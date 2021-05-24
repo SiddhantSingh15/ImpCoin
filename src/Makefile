@@ -13,7 +13,9 @@ all: assemble emulate
 
 assemble: assemble.o
 
-emulate: emulate.o
+emulate: emulate.o emulate_utils.o
+
+emulate_ioutils.o: emulate_utils.h
 
 clean:
 	rm -f $(wildcard *.o)

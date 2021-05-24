@@ -79,8 +79,12 @@ void print_arm11_state(arm11_state_t *state) {
   }
 }
 
-/* EXPERIMENTAL PIECE OF CODE (maybe we could pass the ARM state 
-and check through that) */
+/* 
+ * EXPERIMENTAL PIECE OF CODE (maybe we could pass the ARM state 
+ * and check through that) 
+ * 
+ */
+
 uint32_t get_contents(uint8_t *mem) {
   uint32_t word; 
   word = mem[0];

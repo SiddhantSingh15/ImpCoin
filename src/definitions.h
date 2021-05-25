@@ -4,6 +4,7 @@
 #define MEM_SIZE 65536
 #define NUM_REGS 17
 #define NUM_GENERAL 12
+#define WORD_SIZE_IN_BYTES 4
 
 #define PC 15
 #define CPSR 16
@@ -11,7 +12,7 @@
 /* OTHER FLAGS */
 #define SET 1
 #define NOT_SET 0
-#define V_FLAG 28 
+#define V_FLAG 28
 #define C_FLAG 29
 #define Z_FLAG 30
 #define N_FLAG 31

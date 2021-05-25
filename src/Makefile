@@ -21,7 +21,7 @@ emulate_utils.o: emulate_utils.h
 
 decoder: decoder.h
 
-testrunner: testrunner.o decoder.o test_utils.o
+testrunner: testrunner.o test_utils.o decoder.o emulate_utils.o
 
 test_utils: test_utils.h
 

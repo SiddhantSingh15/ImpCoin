@@ -84,20 +84,42 @@ void free_all_pipeline(pipeline_t *pipeline) {
   free(pipeline->executed);
 }
 
+/*
+ * EXPERIMENTAL PIECE OF CODE (maybe we could pass the ARM state
+ * and check through that)
+ *
+ */
+
+uint32_t get_contents(uint8_t *mem) {
+  uint32_t word;
+  word = mem[0];
+  word = (word << 8) | mem[1];
+  word = (word << 8) | mem[2];
+  word = (word << 8) | mem[3];
+  return word;
+}
+
 void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through 17 registers */
   printf("Registers: \n");
   for (int i = 0; i < NUM_GENERAL; i++) {
-    printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i]);
+    printf("$%d  :          %d (0x%08x)\n",
+    i, state->register_file[i], state->register_file[i]);
   }
 
   /* Printing PC and CPSR */
-  printf("PC  :          %d (0x%08x)\n", state->register_file[PC]);
-  printf("CPSR  :          %d (0x%08x)\n", state->register_file[CPSR]);
+  printf("PC  :          %d (0x%08x)\n",
+  state->register_file[PC], state->register_file[PC]);
+  printf("CPSR  :          %d (0x%08x)\n",
+  state->register_file[CPSR], state->register_file[CPSR]);
 
   /* Looping through non-0 locations */
-  for (int i = 0; i < MEM_SIZE; i++) {
-
+  printf("Non-zero memory: \n");
+  for (int i = 0; i < MEM_SIZE; i+=4) {
+    uint32_t word = get_contents(state->main_memory + i);
+    if (word == 0) {
+      printf("0x%08x: 0x%08x", i, word);
+    }
   }
 }

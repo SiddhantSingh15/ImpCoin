@@ -25,7 +25,7 @@
 #define COND_POS 28
 #define SET_COND_POS 20
 #define S_POS 20
-#define I_pos 25
+#define I_POS 25
 #define OFFSET_POS 0
 #define RD_POS 12
 #define RN_POS 16
@@ -35,8 +35,10 @@
 #define N_COND 31
 
 /* DataProc  */
+#define OP2_POS 0
 #define OP2_SIZE 12
 #define OPCODE_POS 21
+#define OPCODE_SIZE 4
 
 #define AND 0
 #define EOR 1
@@ -62,7 +64,8 @@
 #define U_POS 23
 #define P_POS 24
 
-/* Branch: None required, theyre all covered */
+/* Branch */
+#define BRANCH_OFFSET 24
 
 
 

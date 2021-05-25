@@ -43,6 +43,6 @@ int main(int argc, char **argv) {
 
 
   // Once everything is done, free state memory and pipeline
-  free_all_pipeline(start_state->pipeline);
+  flush_pipeline(start_state->pipeline);
   free_state_memory(start_state);
 }

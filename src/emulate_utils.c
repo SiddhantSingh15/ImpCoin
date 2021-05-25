@@ -45,8 +45,7 @@ arm11_state_t *init_state() {
   pipeline_t *pipeline = calloc(1, sizeof(pipeline_t));
 
   *new_state = (arm11_state_t) {
-    .pipeline = pipeline,
-    .main_memory = {0}
+    .pipeline = pipeline
   };
 
   return new_state;
@@ -82,10 +81,13 @@ void fetch_next(arm11_state_t *state) {
 }
 
 // Free all of pipeline, used for branch command
-void free_all_pipeline(pipeline_t *pipeline) {
+void flush_pipeline(pipeline_t *pipeline) {
   free(pipeline->fetched);
   free(pipeline->decoded);
   free(pipeline->executed);
+  pipeline->fetched = NULL;
+  pipeline->decoded = NULL;
+  pipeline->executed = NULL;
 }
 
 /*

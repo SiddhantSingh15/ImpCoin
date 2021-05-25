@@ -13,9 +13,11 @@ all: assemble emulate
 
 assemble: assemble.o
 
-emulate: emulate.o emulate_utils.o
+emulate: emulate.o emulate_utils.o decoder.o
 
 emulate_ioutils.o: emulate_utils.h
+
+decoder: decoder.h
 
 clean:
 	rm -f $(wildcard *.o)

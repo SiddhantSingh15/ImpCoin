@@ -10,6 +10,11 @@
 #define GREEN "\033[32m"  /* Green */
 #define YELLOW "\033[33m" /* Yellow */
 #define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+
 
 #define PASSED "OK"
 #define FAILED "FAIL"

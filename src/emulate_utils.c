@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <assert.h>
 #include "emulate.h"
 
 /**
@@ -43,7 +45,7 @@ arm11_state_t *init_state() {
   pipeline_t *pipeline = calloc(1, sizeof(pipeline_t));
 
   *new_state = (arm11_state_t) {
-    .pipeline = pipeline,
+    .pipeline = pipeline
   };
 
   return new_state;
@@ -52,6 +54,40 @@ arm11_state_t *init_state() {
 void free_state_memory(arm11_state_t *state) {
   free(state->pipeline);
   free(state);
+}
+
+void fetch_next(arm11_state_t *state) {
+  instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
+  // Set the incoming 32 byte data to be all 0s
+  uint32_t incoming = 0;
+  int curr = (state->register_file)[PC];
+
+  assert (curr < MEM_SIZE - 1);
+
+  // Shift and insert the 4 pieces of data into curr 8 bytes at a time
+  incoming |= (state->main_memory)[curr];
+  for (int i = 1; i < REG_SIZE; i++) {
+    incoming <<= ONE_B;
+    incoming |= (state->main_memory)[curr + i];
+  }
+  // Set up the union data
+  union instr_data incoming_instruction_data = { incoming };
+  *fetched_instruction = (instruction_t) {
+    .data = incoming_instruction_data,
+    .tag = RAW
+  };
+  // Insert into pipeline for fetched
+  state->pipeline->fetched = fetched_instruction;
+}
+
+// Free all of pipeline, used for branch command
+void flush_pipeline(pipeline_t *pipeline) {
+  free(pipeline->fetched);
+  free(pipeline->decoded);
+  free(pipeline->executed);
+  pipeline->fetched = NULL;
+  pipeline->decoded = NULL;
+  pipeline->executed = NULL;
 }
 
 /*

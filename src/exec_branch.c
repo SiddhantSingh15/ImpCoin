@@ -2,7 +2,7 @@
 
 void exec_branch (branch_t instr) {
   //offset, cond
-  if (!is_CSPR)
+  if (!cpsr_checker())
     then
       return;
   instr.offset = int32_t (instr.offset << 2);
@@ -10,7 +10,7 @@ void exec_branch (branch_t instr) {
 }
 
 void exec_sdt (sdt_t instr) {
-  if (!is_CSPR)
+  if (!cpsr_checker())
     then
       return;
   if (instr.is_shift == 1)

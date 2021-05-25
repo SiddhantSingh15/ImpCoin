@@ -1,7 +1,7 @@
 #ifndef EMULATE_H
 #define EMULATE_H
 #include <stdint.h>
-#include <definitions.h>
+#include "definitions.h"
 
 typedef struct dataproc_t {
   uint16_t op2 : OP2_SIZE;

@@ -2,6 +2,7 @@
 #define SRC_IOUTILS_H
 
 #include <stdio.h>
+#include "emulate.h"
 
 void read_file(char* filename, arm11_state_t* state);
 void print_size(void);

@@ -4,18 +4,19 @@
 #include <assert.h>
 #include <stdint.h>
 
-// take data proc steps when offset must be interpreted as shifted register
+// TODO: take data proc steps when offset must be interpreted as shifted
+// register
 uint16_t as_shifted_register(uint16_t offset);
 
 void exec_branch(branch_t instr, arm11_state_t *state) {
-  if (!cpsr_checker(instr.cond, state->register_file))
+  if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
   state->register_file[PC] =
       state->register_file[PC] - 8 + (int32_t)(instr.offset << 2);
 }
 
 void exec_sdt(sdt_t instr, arm11_state_t *state) {
-  if (!is_CSPR(instr.cond))
+  if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
   uint8_t pc = state->register_file[PC];

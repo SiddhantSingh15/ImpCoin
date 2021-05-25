@@ -20,9 +20,7 @@ int main(int argc, char **argv) {
 
 	read_file(file, start_state);
   
-  // TODO: Remove i and set condition to check if execute is HALT
-  int i = 0;
-  while (i < 100) {
+  while (start_state->pipeline->executed->tag == HALT) {
     // Execute an instruction
     if (start_state->pipeline->executed != 0) {
       // execute()
@@ -40,8 +38,7 @@ int main(int argc, char **argv) {
     fetch_next(start_state);
 
     // Increment the PC
-    start_state->register_file[15] += 4;
-    i++;
+    start_state->register_file[PC] += 4;
   }
 
 

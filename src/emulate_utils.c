@@ -59,12 +59,12 @@ void fetch_next(arm11_state_t *state) {
   instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
   // Set the incoming 32 byte data to be all 0s
   uint32_t incoming = 0;
-  int curr = (state->register_file)[15];
+  int curr = (state->register_file)[PC];
 
   // Shift and insert the 4 pieces of data into curr 8 bytes at a time
   incoming |= (state->main_memory)[curr];
-  for (int i = 1; i < 4; i++) {
-    incoming <<= 8;
+  for (int i = 1; i < REG_SIZE - 1; i++) {
+    incoming <<= ONE_B;
     incoming |= (state->main_memory)[curr + i];
   }
   // Set up the union data
@@ -82,4 +82,22 @@ void free_all_pipeline(pipeline_t *pipeline) {
   free(pipeline->fetched);
   free(pipeline->decoded);
   free(pipeline->executed);
+}
+
+void print_arm11_state(arm11_state_t *state) {
+
+  /* Looping through 17 registers */
+  printf("Registers: \n");
+  for (int i = 0; i < NUM_GENERAL; i++) {
+    printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i]);
+  }
+
+  /* Printing PC and CPSR */
+  printf("PC  :          %d (0x%08x)\n", state->register_file[PC]);
+  printf("CPSR  :          %d (0x%08x)\n", state->register_file[CPSR]);
+
+  /* Looping through non-0 locations */
+  for (int i = 0; i < MEM_SIZE; i++) {
+
+  }
 }

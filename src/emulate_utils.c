@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "emulate.h"
 
 /**
@@ -45,6 +46,7 @@ arm11_state_t *init_state() {
 
   *new_state = (arm11_state_t) {
     .pipeline = pipeline,
+    .main_memory = {0}
   };
 
   return new_state;
@@ -61,9 +63,11 @@ void fetch_next(arm11_state_t *state) {
   uint32_t incoming = 0;
   int curr = (state->register_file)[PC];
 
+  assert (curr < MEM_SIZE - 1);
+
   // Shift and insert the 4 pieces of data into curr 8 bytes at a time
   incoming |= (state->main_memory)[curr];
-  for (int i = 1; i < REG_SIZE - 1; i++) {
+  for (int i = 1; i < REG_SIZE; i++) {
     incoming <<= ONE_B;
     incoming |= (state->main_memory)[curr + i];
   }

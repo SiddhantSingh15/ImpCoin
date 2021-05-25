@@ -10,5 +10,6 @@ void free_state_memory(arm11_state_t *state);
 void fetch_next(arm11_state_t *state);
 void free_all_pipeline(pipeline_t *pipeline);
 void print_arm11_state(arm11_state_t *state);
+uint32_t get_contents(uint8_t *mem);
 
 #endif

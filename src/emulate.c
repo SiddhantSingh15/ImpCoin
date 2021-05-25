@@ -20,15 +20,15 @@ int main(int argc, char **argv) {
 
 	read_file(file, start_state);
   
-  while (start_state->pipeline->executed->tag == HALT) {
+  while (start_state->pipeline->executed == NULL || start_state->pipeline->executed->tag != HALT) {
     // Execute an instruction
-    if (start_state->pipeline->executed != 0) {
+    if (start_state->pipeline->executed != NULL) {
       // execute()
       free(start_state->pipeline->executed);
     }
 
     // Decode an instruction
-    if (start_state->pipeline->decoded != 0) {
+    if (start_state->pipeline->decoded != NULL) {
       // decode()
     }
     start_state->pipeline->executed = start_state->pipeline->decoded;

@@ -9,17 +9,24 @@ endif
 
 .PHONY: all clean
 
-all: assemble emulate
+all: assemble emulate testrunner
+
+tests: testrunner
 
 assemble: assemble.o
 
 emulate: emulate.o emulate_utils.o decoder.o
 
-emulate_ioutils.o: emulate_utils.h
+emulate_utils.o: emulate_utils.h
 
 decoder: decoder.h
+
+testrunner: testrunner.o decoder.o test_utils.o
+
+test_utils: test_utils.h
 
 clean:
 	rm -f $(wildcard *.o)
 	rm -f assemble
 	rm -f emulate
+	rm -f testrunner

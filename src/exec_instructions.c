@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "emulate.h"
+#include "emulate_utils.h"
 #include "exec_utils.h"
 #include <assert.h>
 #include <stdint.h>
@@ -19,8 +20,6 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
-  uint8_t pc = state->register_file[PC];
-
   if (instr.rn == PC)
     state->register_file[instr.rn] += 8;
 
@@ -39,12 +38,18 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
   }
 
-  if (instr.load == SET)
-    state->register_file[instr.rd] = state->main_memory[mem_address];
-  else
-    state->main_memory[mem_address] = state->register_file[instr.rd];
+  if (instr.load == SET) {
+    // Loads the memory to R[instr.rd], after converting it to word size
+    state->register_file[instr.rd] =
+        to_uint32(&state->main_memory[mem_address]);
+  } else {
+    // Stores the value at instr.rd, after converting it to a byte array
+    to_uint8_array(state->register_file[instr.rd],
+                   &state->main_memory[mem_address]);
+  }
 
   if (instr.is_preindexed == 0) {
+    // TODO: check the R_m != PC condition, add this after doing dataproc
     state->register_file[instr.rn] +=
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
   }

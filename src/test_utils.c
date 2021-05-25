@@ -1,10 +1,10 @@
+#include "test_utils.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
   printf("TEST - %s : %s%s%s\n", testname, cond ? GREEN : RED,
@@ -89,5 +89,12 @@ bool test_uint8_array(uint8_t *expected, uint8_t *got, size_t length,
 void print_uint8_array(uint8_t *array, size_t length) {
   for (int i = 0; i < length; i++) {
     printf("%02x ", array[i]);
+  }
+}
+
+void track_test(bool test, int *passing, int *total) {
+  (*total)++;
+  if (test) {
+    (*passing)++;
   }
 }

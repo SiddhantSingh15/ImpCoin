@@ -6,18 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct tuple {
-  int passing;
-  int total;
-} tuple;
-
-void track_test(bool cond, int *passing, int *total) {
-  (*total)++;
-  if (cond) {
-    (*passing)++;
-  }
-}
-
 void test_decoder_halt(int *passing, int *total) {
   // tests for HALT
   instruction_t raw = {.tag = RAW, .data = {.raw_data = 0x0}};
@@ -156,7 +144,7 @@ void test_decoder_sdt(int *passing, int *total) {
 void test_decoder_branch(int *passing, int *total) {
   // tests for BRANCH
   const instruction_t expected = {
-      .tag = SDT, .data = {.branch = {.cond = 0x1, .offset = 0x463ce9}}};
+      .tag = BRANCH, .data = {.branch = {.cond = 0x1, .offset = 0x463ce9}}};
   instruction_t raw = {.tag = RAW, .data = {.raw_data = 0x1a463ce9}};
   instruction_t *decoded = decode(&raw);
   branch_t expected_data = expected.data.branch;

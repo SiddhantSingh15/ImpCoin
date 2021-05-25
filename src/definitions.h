@@ -4,6 +4,7 @@
 #define MEM_SIZE 65536
 #define NUM_REGS 17
 #define NUM_GENERAL 12
+#define WORD_SIZE_IN_BYTES 4
 
 #define PC 15
 #define CPSR 16
@@ -11,11 +12,16 @@
 /* OTHER FLAGS */
 #define SET 1
 #define NOT_SET 0
+#define V_FLAG 28
+#define C_FLAG 29
+#define Z_FLAG 30
+#define N_FLAG 31
 
 /* Different byte sizes to use somewhere */
 #define ONE_B 8
 #define TWO_B 16
 #define THREE_B 24
+
 
 /* Common register sizes */
 #define REG_SIZE 4
@@ -67,6 +73,14 @@
 /* Branch */
 #define BRANCH_OFFSET 24
 
+/* Condition codes suffixes */
+#define EQ 0x0
+#define NE 0x1
+#define GE 0xA
+#define LT 0xB
+#define GT 0xC
+#define LE 0xD
+#define AL 0xE
 
 
 #endif // DEFINITIONS_H

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 #include "definitions.h"
+#include "emulate.h"
 #include "exec_utils.h"
 
 #define EXTRACT_BIT(raw, pos)                                                  \
@@ -30,5 +32,48 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
       return true;
     default:
       return false;
+  }
+}
+
+bool overflow(uint32_t x, uint32_t y) {
+  return (x > (INT_MAX - y) || y > (INT_MAX - x));
+}
+
+uint32_t twos_comp(uint8_t x) {
+  return ~x + 1;
+}
+
+void set_flag(uint32_t *reg_file, int set, int flag) {
+  if (set) { 
+    reg_file[CPSR] |= set << flag;
+  } else {
+    reg_file[CPSR] &= ~(set << flag);
+  }
+}
+
+bool is_logic(int val) {
+  return 
+    (val == AND 
+    || val == EOR 
+    || val == TST 
+    || val == TEQ 
+    || val == ORR 
+    || val == MOV);
+}
+
+bool is_arithmetic(int val) {
+  return 
+    (val == SUB 
+    || val == RSB 
+    || val == ADD 
+    || val == CMP);
+}
+
+//TODO: finish this...
+void rotate(dataproc_t instr, uint32_t *reg_file) {
+  uint32_t rotate_amt = 2 * EXTRACT_BITS(instr.op2, 8, 4);
+
+  if (is_logic(instr.opcode)) {
+
   }
 }

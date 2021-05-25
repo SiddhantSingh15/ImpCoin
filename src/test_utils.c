@@ -6,14 +6,6 @@
 #include <string.h>
 #include "test_utils.h"
 
-#define RESET "\033[0m"
-#define RED "\033[31m"    /* Red */
-#define GREEN "\033[32m"  /* Green */
-#define YELLOW "\033[33m" /* Yellow */
-
-#define PASSED "OK"
-#define FAILED "FAIL"
-
 bool test_bool(bool cond, char *testname) {
   printf("TEST - %s : %s%s%s\n", testname, cond ? GREEN : RED,
          cond ? PASSED : FAILED, RESET);

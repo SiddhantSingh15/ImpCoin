@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "decoder.h"
 #include "emulate.h"
 #include "emulate_utils.h"
 
@@ -15,34 +16,34 @@ int main(int argc, char **argv) {
 	// initialise based on the spec (use malloc)
 	// Anything thats a pointer needs to mallocated (start_state needs to be
 	// mallocated)
-	
-	arm11_state_t *start_state = init_state();
 
-	read_file(file, start_state);
-  
-  while (start_state->pipeline->executed == NULL || start_state->pipeline->executed->tag != HALT) {
+	arm11_state_t *state = init_state();
+
+	read_file(file, state);
+
+  while (state->pipeline->executed == NULL || state->pipeline->executed->tag != HALT) {
     // Execute an instruction
-    if (start_state->pipeline->executed != NULL) {
+    if (state->pipeline->executed != NULL) {
       // execute()
-      free(start_state->pipeline->executed);
+      free(state->pipeline->executed);
     }
 
     // Decode an instruction
-    if (start_state->pipeline->decoded != NULL) {
-      // decode()
+    if (state->pipeline->decoded != NULL) {
+      decode(state->pipeline->decoded);
     }
-    start_state->pipeline->executed = start_state->pipeline->decoded;
-    start_state->pipeline->decoded = start_state->pipeline->fetched;
+    state->pipeline->executed = state->pipeline->decoded;
+    state->pipeline->decoded = state->pipeline->fetched;
 
     // Fetch an instruction
-    fetch_next(start_state);
+    fetch_next(state);
 
     // Increment the PC
-    start_state->register_file[PC] += 4;
+    state->register_file[PC] += 4;
   }
 
 
   // Once everything is done, free state memory and pipeline
-  flush_pipeline(start_state->pipeline);
-  free_state_memory(start_state);
+  flush_pipeline(state->pipeline);
+  free_state_memory(state);
 }

@@ -1,6 +1,7 @@
-#include "emulate.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "emulate.h"
 #include "emulate_utils.h"
 
 int main(int argc, char **argv) {
@@ -19,6 +20,29 @@ int main(int argc, char **argv) {
 
 	read_file(file, start_state);
   
-  // Once everything is done, free state memory
+  while (start_state->pipeline->executed == NULL || start_state->pipeline->executed->tag != HALT) {
+    // Execute an instruction
+    if (start_state->pipeline->executed != NULL) {
+      // execute()
+      free(start_state->pipeline->executed);
+    }
+
+    // Decode an instruction
+    if (start_state->pipeline->decoded != NULL) {
+      // decode()
+    }
+    start_state->pipeline->executed = start_state->pipeline->decoded;
+    start_state->pipeline->decoded = start_state->pipeline->fetched;
+
+    // Fetch an instruction
+    fetch_next(start_state);
+
+    // Increment the PC
+    start_state->register_file[PC] += 4;
+  }
+
+
+  // Once everything is done, free state memory and pipeline
+  flush_pipeline(start_state->pipeline);
   free_state_memory(start_state);
 }

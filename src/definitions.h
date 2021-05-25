@@ -82,5 +82,16 @@
 #define LE 0xD
 #define AL 0xE
 
+/* DP OpCodes  */
+#define AND 0x0
+#define EOR 0x1
+#define SUB 0x2
+#define RSB 0x3
+#define ADD 0x4
+#define TST 0x8
+#define TEQ 0x9
+#define CMP 0xA
+#define ORR 0xC
+#define MOV 0xD
 
 #endif // DEFINITIONS_H

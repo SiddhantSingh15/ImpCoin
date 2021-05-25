@@ -9,9 +9,37 @@
 // register
 uint16_t as_shifted_register(uint16_t offset);
 
+void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
+  if (!satisfies_cpsr(instr.cond, state->register_file))
+    return;
+  
+  uint32_t result;
+
+  if (instr.is_immediate) {
+
+  } else {
+
+  }
+
+  switch (instr.opcode) {
+    case AND:
+      
+  }
+
+  if (instr.set_cond) {
+    if (result == 0) {
+
+    } else {
+
+    }
+  }
+
+}
+
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
+
   state->register_file[PC] =
       state->register_file[PC] - 8 + (int32_t)(instr.offset << 2);
 }

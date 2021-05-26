@@ -4,6 +4,7 @@
 #include "exec_utils.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 // TODO: take data proc steps when offset must be interpreted as shifted
 // register
@@ -52,5 +53,53 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
     // TODO: check the R_m != PC condition, add this after doing dataproc
     state->register_file[instr.rn] +=
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
+  }
+}
+
+void exec_mult(multiply_t instr, arm11_state_t *state) {
+  if (!satisfies_cpsr(instr.cond, state->register_file))
+    return;
+
+  // Assumptions
+  assert (instr.rm != PC && instr.rn != PC && instr.rd != PC && instr.rs != PC);
+  assert (instr.rd != instr.rm);
+
+  // Multiplication Procedure
+  uint32_t result = state->register_file[instr.rm] * state->register_file[instr.rs];
+  if (instr.accumulate) {
+    // Multiple-Accumulate - Rd = Rm * Rs + Rn
+    // Add the value in Rn to result (result = Rm * Rs at this point).
+    result += state->register_file[instr.rn];
+  }
+  state->register_file[instr.rd] = result;
+
+  if (instr.set_cond) {
+    // TODO: Use Sid's setflag function to set the flag when the SET bit is 1
+  }
+}
+
+void execute(instruction_t *instr, arm11_state_t *state) {
+  switch(instr->tag) {
+    case DATAPROC:
+      // exec_dataproc
+      break;
+    case MULTIPLY:
+      exec_mult(instr->data.multiply, state);
+      break;
+    case SDT:
+      exec_sdt(instr->data.sdt, state);
+      break;
+    case BRANCH:
+      exec_branch(instr->data.branch, state);
+      break;
+    case RAW:
+    default:
+      // Unexpected Result - Executer encountered a RAW or a HALT instruction
+      fprintf(
+        stderr,
+        "0x%32x is a RAW or a HALT instruction in execute. Halting emulator.",
+        instr->data
+      );
+      exit(EXIT_FAILURE);
   }
 }

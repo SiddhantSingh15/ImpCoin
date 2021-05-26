@@ -69,70 +69,11 @@ bool is_arithmetic(int val) {
     || val == CMP);
 }
 
-void rotate(dataproc_t *instr, uint32_t *reg_file) {
-  uint8_t rotate_amt = 2 * EXTRACT_BITS(instr->op2, 8, 4);
-  uint32_t imm_value = EXTRACT_BITS(instr->op2, 0, 8);
-
-  uint32_t result
-    = (imm_value << rotate_amt) | (imm_value >> (INSTR_SIZE - rotate_amt));
-
-  instr->op2 = result;
-
-  /* Setting the C FLAG in CPSR if the S FLAG is 1. */
-  if (instr->set_cond) {
-    set_flag(&reg_file[CPSR], EXTRACT_BIT(result, 31), C_FLAG);
-  }
-}
-
-void barrel_shifter(dataproc_t *instr, uint32_t *reg_file) {
-  uint32_t rm_addr = EXTRACT_BITS(instr->op2, 0, 4);
-  uint8_t shift = EXTRACT_BITS(instr->op2, 4, 8);
-  uint8_t option_flag = EXTRACT_BIT(shift, 0);
-  uint32_t rm_reg = reg_file[rm_addr];
-  uint8_t shift_amt;
-  uint32_t result;
-
-  if (option_flag) {
-    shift_amt =
-  } else {
-    shift_amt =
-  }
-
-  if (shift_amt) {
-    switch(shift) {
-      case LSL:
-        rm_reg <<= shift_amt - 1;
-        if (instr->set_cond) {
-          set_flag(&reg_file[CPSR], EXTRACT_BIT(rm_reg, 31), C_FLAG);
-        }
-        result = rm_reg >> 1;
-
-      case LSR:
-        rm_reg >>= shift_amt - 1;
-        if (instr->set_cond) {
-          set_flag(&reg_file[CPSR], EXTRACT_BIT(rm_reg, 31), C_FLAG);
-        }
-        result = rm_reg >> 1;
-
-      case ASR:
-
-      case ROR:
-
-      default:
-
-    }
-  }
-
-  instr->op2 = result;
-}
-
-// ----------------------------------------------------------------------------
-
 uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt) {
   return (to_rotate << rotate_amt) | (to_rotate >> (INSTR_SIZE - rotate_amt));
 }
 
-uint32_t barrel_shifter_2(bool is_immediate, uint16_t offset,
+uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
                           uint32_t *register_file) {
 
   uint32_t to_shift;

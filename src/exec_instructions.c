@@ -12,15 +12,11 @@ uint16_t as_shifted_register(uint16_t offset);
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-  uint32_t zero_checker;
   
-  if (instr.is_immediate) {
-    uint32_t new_op2 = EXTRACT_BITS(instr.op2, 0, 8);
-    uint32_t shift_amt = EXTRACT_BITS(instr.op2, 8, 4);
-  } else {
-    uint32_t new_op2 = state->register_file[rm_addr];
-  }
+  uint32_t zero_checker;
 
+  instr.op2 
+    = barrel_shifter(instr.is_immediate, instr.op2, state->register_file);
   
 
   switch (instr.opcode) {
@@ -136,7 +132,8 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
 
   uint32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
-    interpreted_offset = as_shifted_register(instr.offset);
+    interpreted_offset 
+      = barrel_shifter(!instr.is_shift_R, instr.offset, state->register_file);
   }
 
   uint16_t mem_address = state->register_file[instr.rn];

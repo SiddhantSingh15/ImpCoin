@@ -4,6 +4,7 @@
 #define MEM_SIZE 65536
 #define NUM_REGS 17
 #define NUM_GENERAL 12
+#define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
 
 #define PC 15
@@ -35,16 +36,13 @@
 #define OFFSET_POS 0
 #define RD_POS 12
 #define RN_POS 16
-#define V_COND 28
-#define C_COND 29
-#define Z_COND 30
-#define N_COND 31
 
 /* DataProc  */
 #define OP2_POS 0
 #define OP2_SIZE 12
 #define OPCODE_POS 21
 #define OPCODE_SIZE 4
+#define IMM_VALUE_SIZE 8
 
 #define AND 0
 #define EOR 1
@@ -93,5 +91,7 @@
 #define CMP 0xA
 #define ORR 0xC
 #define MOV 0xD
+
+/* Shift  */
 
 #endif // DEFINITIONS_H

@@ -17,9 +17,9 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 
   // TODO: Implement rotate and barrel shifter
   if (instr.is_immediate) {
-    instr.op2 = rotate(instr, state->register_file);
+    rotate(instr, state->register_file);
   } else {  
-    instr.op2 = barrel_shifter(instr, state->register_file);
+    barrel_shifter(instr, state->register_file);
   }
 
   switch (instr.opcode) {

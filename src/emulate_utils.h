@@ -17,7 +17,7 @@ void fetch_next(arm11_state_t *state);
 void flush_pipeline(pipeline_t *pipeline);
 
 // Unit conversion
-uint32_t to_uint32(uint8_t *mem);
+uint32_t to_uint32(uint8_t byte_array[WORD_SIZE_IN_BYTES]);
 void to_uint8_array(uint32_t word, uint8_t byte_array[WORD_SIZE_IN_BYTES]);
 
 #endif

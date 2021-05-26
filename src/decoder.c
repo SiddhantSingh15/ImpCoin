@@ -5,12 +5,10 @@
 #include <stdio.h>
 
 #define EXTRACT_BITS(raw, from, size)                                          \
-  (uint32_t)(                                                                  \
-      ((((1 << (uint8_t)size) - 1) << (uint8_t)from) & (uint32_t)raw) >>       \
-      (uint8_t)from)
+  (uint32_t)((raw >> (uint8_t)from) & ((1 << (uint8_t)size) - 1))
 
 #define EXTRACT_BIT(raw, pos)                                                  \
-  (uint32_t)(((1 << (uint8_t)pos) & (uint8_t)raw) >> (uint8_t)pos)
+  (uint32_t)((raw >> pos) & 1)
 
 // TODO: Macros or functions?
 

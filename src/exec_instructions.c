@@ -5,10 +5,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-// TODO: take data proc steps when offset must be interpreted as shifted
-// register
-uint16_t as_shifted_register(uint16_t offset);
-
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;

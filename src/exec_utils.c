@@ -3,11 +3,9 @@
 #include <limits.h>
 #include "definitions.h"
 #include "emulate.h"
+#include "emulate_utils.h"
 #include "exec_utils.h"
 #include "decoder.h"
-
-#define EXTRACT_BIT(raw, pos)                                                  \
-  (uint32_t)(((1 << (uint8_t)pos) & (uint8_t)raw) >> (uint8_t)pos)
 
 bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
   uint32_t cpsr_register = regs[CPSR];
@@ -45,7 +43,7 @@ uint32_t twos_comp(uint8_t x) {
 }
 
 void set_flag(uint32_t *reg_file, int set, int flag) {
-  if (set) { 
+  if (set) {
     reg_file[CPSR] |= set << flag;
   } else {
     reg_file[CPSR] &= ~(set << flag);
@@ -53,20 +51,20 @@ void set_flag(uint32_t *reg_file, int set, int flag) {
 }
 
 bool is_logic(int val) {
-  return 
-    (val == AND 
-    || val == EOR 
-    || val == TST 
-    || val == TEQ 
-    || val == ORR 
+  return
+    (val == AND
+    || val == EOR
+    || val == TST
+    || val == TEQ
+    || val == ORR
     || val == MOV);
 }
 
 bool is_arithmetic(int val) {
-  return 
-    (val == SUB 
-    || val == RSB 
-    || val == ADD 
+  return
+    (val == SUB
+    || val == RSB
+    || val == ADD
     || val == CMP);
 }
 
@@ -74,7 +72,7 @@ void rotate(dataproc_t *instr, uint32_t *reg_file) {
   uint8_t rotate_amt = 2 * EXTRACT_BITS(instr->op2, 8, 4);
   uint32_t imm_value = EXTRACT_BITS(instr->op2, 0, 8);
 
-  uint32_t result 
+  uint32_t result
     = (imm_value << rotate_amt) | (imm_value >> (INSTR_SIZE - rotate_amt));
 
   instr->op2 = result;
@@ -94,9 +92,9 @@ void barrel_shifter(dataproc_t *instr, uint32_t *reg_file) {
   uint32_t result;
 
   if (option_flag) {
-    shift_amt = 
+    shift_amt =
   } else {
-    shift_amt = 
+    shift_amt =
   }
 
   if (shift_amt) {
@@ -106,7 +104,7 @@ void barrel_shifter(dataproc_t *instr, uint32_t *reg_file) {
         if (instr->set_cond) {
           set_flag(&reg_file[CPSR], EXTRACT_BIT(rm_reg, 31), C_FLAG);
         }
-        result = rm_reg >> 1; 
+        result = rm_reg >> 1;
 
       case LSR:
         rm_reg >>= shift_amt - 1;
@@ -116,10 +114,10 @@ void barrel_shifter(dataproc_t *instr, uint32_t *reg_file) {
         result = rm_reg >> 1;
 
       case ASR:
-        
+
       case ROR:
-      
-      default: 
+
+      default:
 
     }
   }

@@ -1,14 +1,9 @@
 #include "definitions.h"
 #include "emulate.h"
+#include "emulate_utils.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#define EXTRACT_BITS(raw, from, size)                                          \
-  (uint32_t)((raw >> (uint8_t)from) & ((1 << (uint8_t)size) - 1))
-
-#define EXTRACT_BIT(raw, pos)                                                  \
-  (uint32_t)((raw >> pos) & 1)
 
 // TODO: Macros or functions?
 

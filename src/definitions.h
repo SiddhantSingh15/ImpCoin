@@ -44,17 +44,6 @@
 #define OPCODE_SIZE 4
 #define IMM_VALUE_SIZE 8
 
-#define AND 0
-#define EOR 1
-#define SUB 2
-#define RSB 3
-#define ADD 4
-#define TST 8
-#define TEQ 9
-#define CMP 10
-#define ORR 12
-#define MOV 13
-
 /* Multiply  */
 #define RM_POS 0
 #define RS_POS 8
@@ -92,6 +81,11 @@
 #define ORR 0xC
 #define MOV 0xD
 
-/* Shift  */
+/* Shift Types */
+#define LSL 0x0
+#define LSR 0x1
+#define ASR 0x2
+#define ROR 0x3
+
 
 #endif // DEFINITIONS_H

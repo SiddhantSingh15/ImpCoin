@@ -81,12 +81,48 @@ void rotate(dataproc_t *instr, uint32_t *reg_file) {
 
   /* Setting the C FLAG in CPSR if the S FLAG is 1. */
   if (instr->set_cond) {
-    set_flag(reg_file[CPSR], EXTRACT_BIT(result, 31), C_FLAG);
+    set_flag(&reg_file[CPSR], EXTRACT_BIT(result, 31), C_FLAG);
   }
 }
 
 void barrel_shifter(dataproc_t *instr, uint32_t *reg_file) {
   uint32_t rm_addr = EXTRACT_BITS(instr->op2, 0, 4);
   uint8_t shift = EXTRACT_BITS(instr->op2, 4, 8);
-  
+  uint8_t option_flag = EXTRACT_BIT(shift, 0);
+  uint32_t rm_reg = reg_file[rm_addr];
+  uint8_t shift_amt;
+  uint32_t result;
+
+  if (option_flag) {
+    shift_amt = 
+  } else {
+    shift_amt = 
+  }
+
+  if (shift_amt) {
+    switch(shift) {
+      case LSL:
+        rm_reg <<= shift_amt - 1;
+        if (instr->set_cond) {
+          set_flag(&reg_file[CPSR], EXTRACT_BIT(rm_reg, 31), C_FLAG);
+        }
+        result = rm_reg >> 1; 
+
+      case LSR:
+        rm_reg >>= shift_amt - 1;
+        if (instr->set_cond) {
+          set_flag(&reg_file[CPSR], EXTRACT_BIT(rm_reg, 31), C_FLAG);
+        }
+        result = rm_reg >> 1;
+
+      case ASR:
+        
+      case ROR:
+      
+      default: 
+
+    }
+  }
+
+  instr->op2 = result;
 }

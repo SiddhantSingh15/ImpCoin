@@ -12,15 +12,16 @@ uint16_t as_shifted_register(uint16_t offset);
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-  
   uint32_t zero_checker;
-
-  // TODO: Implement rotate and barrel shifter
+  
   if (instr.is_immediate) {
-    rotate(instr, state->register_file);
-  } else {  
-    barrel_shifter(instr, state->register_file);
+    uint32_t new_op2 = EXTRACT_BITS(instr.op2, 0, 8);
+    uint32_t shift_amt = EXTRACT_BITS(instr.op2, 8, 4);
+  } else {
+    uint32_t new_op2 = state->register_file[rm_addr];
   }
+
+  
 
   switch (instr.opcode) {
 

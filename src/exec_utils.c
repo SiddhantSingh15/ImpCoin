@@ -23,7 +23,6 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
   uint32_t cpsr_register = regs[CPSR];
   bool n = EXTRACT_BIT(cpsr_register, N_FLAG);
   bool z = EXTRACT_BIT(cpsr_register, Z_FLAG);
-  bool c = EXTRACT_BIT(cpsr_register, C_FLAG);
   bool v = EXTRACT_BIT(cpsr_register, V_FLAG);
 
   switch (cond) {

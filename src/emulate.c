@@ -4,6 +4,7 @@
 #include "decoder.h"
 #include "emulate.h"
 #include "emulate_utils.h"
+#include "exec_instructions.h"
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
@@ -24,7 +25,7 @@ int main(int argc, char **argv) {
   while (state->pipeline->executed == NULL || state->pipeline->executed->tag != HALT) {
     // Execute an instruction
     if (state->pipeline->executed != NULL) {
-      // execute()
+      execute(state->pipeline->executed, state);
       free(state->pipeline->executed);
     }
 

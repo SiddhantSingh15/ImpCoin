@@ -177,6 +177,12 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   }
 }
 
+/**
+ * @brief
+ * 
+ * @param
+ * @param
+ */
 void exec_mult(multiply_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
@@ -195,14 +201,30 @@ void exec_mult(multiply_t instr, arm11_state_t *state) {
   state->register_file[instr.rd] = result;
 
   if (instr.set_cond) {
-    // TODO: Use Sid's setflag function to set the flag when the SET bit is 1
+    if (instr.set_cond) {
+    set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
+
+    if (result == 0) {
+      set_flag(state->register_file, SET, Z_FLAG);
+    } else {
+      set_flag(state->register_file, NOT_SET, Z_FLAG);
+    }
+
+  }
   }
 }
 
+/**
+ * @brief
+ * 
+ * @param
+ * @param
+ */
 void execute(instruction_t *instr, arm11_state_t *state) {
+  uint32_t raw;
   switch(instr->tag) {
     case DATAPROC:
-      // exec_dataproc
+      exec_dataproc(instr->data.dataproc, state);
       break;
     case MULTIPLY:
       exec_mult(instr->data.multiply, state);
@@ -216,10 +238,11 @@ void execute(instruction_t *instr, arm11_state_t *state) {
     case RAW:
     default:
       // Unexpected Result - Executer encountered a RAW or a HALT instruction
+      raw = instr->data.raw_data;
       fprintf(
         stderr,
-        "0x%32x is a RAW or a HALT instruction in execute. Halting emulator.",
-        instr->data
+        "0x%08x is a RAW or a HALT instruction in execute. Halting emulator.",
+        raw
       );
       exit(EXIT_FAILURE);
   }

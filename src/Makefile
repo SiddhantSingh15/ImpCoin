@@ -15,11 +15,15 @@ tests: testrunner
 
 assemble: assemble.o
 
-emulate: emulate.o emulate_utils.o decoder.o
+emulate: emulate.o emulate_utils.o decoder.o exec_instructions.o
 
 emulate_utils.o: emulate_utils.h
 
 decoder: decoder.h
+
+exec_instructions.o: exec_instructions.h exec_utils.o emulate_utils.o
+
+exec_utils.o: exec_utils.h
 
 testrunner: testrunner.o test_utils.o decoder.o emulate_utils.o
 

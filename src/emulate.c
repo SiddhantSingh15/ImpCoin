@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
 
 
   // Once everything is done, free state memory and pipeline
+  print_arm11_state(state);
   flush_pipeline(state->pipeline);
   free_state_memory(state);
 }

@@ -112,7 +112,7 @@ bool is_logic(int val) {
  * @return Returns true if val is of arithmetic type.
  */
 
-bool is_arith(int val) {
+bool is_arithmetic(int val) {
   return
     (val == SUB
     || val == RSB

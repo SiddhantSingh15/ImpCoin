@@ -13,7 +13,6 @@
  */
 
 void read_file(char *filename, arm11_state_t *state) {
-  printf("Attempting to read file: %s\n", filename);
   FILE *fptr;
   if ((fptr = fopen(filename, "rb")) == NULL) {
     printf("Error opening file.\n");
@@ -25,8 +24,6 @@ void read_file(char *filename, arm11_state_t *state) {
   if (ferror(fptr)) {
     perror("Error occurred when reading file\n");
     exit(EXIT_FAILURE);
-  } else {
-    printf("File read success\n");
   }
   fclose(fptr);
 }
@@ -91,7 +88,7 @@ void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through 17 registers */
   printf("Registers: \n");
-  for (int i = 0; i < NUM_GENERAL; i++) {
+  for (int i = 0; i <= NUM_GENERAL; i++) {
     printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i],
            state->register_file[i]);
   }
@@ -106,8 +103,8 @@ void print_arm11_state(arm11_state_t *state) {
   printf("Non-zero memory: \n");
   for (int i = 0; i < MEM_SIZE; i += 4) {
     uint32_t word = to_uint32(&state->main_memory[i]);
-    if (word == 0) {
-      printf("0x%08x: 0x%08x", i, word);
+    if (word != 0) {
+      printf("0x%08x: 0x%08x\n", i, word);
     }
   }
 }

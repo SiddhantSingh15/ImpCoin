@@ -22,6 +22,7 @@
 *.o
 emulate
 assemble
+testrunner
 
 #ignore junk files from compiling Haskell code
 *.hi
@@ -37,4 +38,3 @@ assemble
 *.vrb
 *.nav
 *.toc
-

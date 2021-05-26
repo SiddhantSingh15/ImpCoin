@@ -23,6 +23,7 @@
 emulate
 assemble
 testrunner
+exec_utils
 
 #ignore junk files from compiling Haskell code
 *.hi

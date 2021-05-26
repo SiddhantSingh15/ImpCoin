@@ -1,14 +1,9 @@
 #include "definitions.h"
 #include "emulate.h"
+#include "emulate_utils.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#define EXTRACT_BITS(raw, from, size)                                          \
-  (uint32_t)((raw >> (uint8_t)from) & ((1 << (uint8_t)size) - 1))
-
-#define EXTRACT_BIT(raw, pos)                                                  \
-  (uint32_t)((raw >> pos) & 1)
 
 // TODO: Macros or functions?
 
@@ -89,13 +84,14 @@ instruction_t *decode_branch(instruction_t *instr) {
   return instr;
 }
 
-/*
+/**
+ * @brief 
  * Takes an instruction containing raw uint32_t data, and decodes it to
  * a struct of instr_data.
  *
  * If the instruction is 0x0 (HALT signal), or if it cannot be decoded, it tags
  * the instruction_t with HALT.
- *
+ * @param *instr The input instruction.
  */
 instruction_t *decode(instruction_t *instr) {
   // the instruction to be decoded must be raw

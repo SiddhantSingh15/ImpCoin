@@ -4,6 +4,7 @@
 #define MEM_SIZE 65536
 #define NUM_REGS 17
 #define NUM_GENERAL 12
+#define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
 
 #define PC 15
@@ -35,27 +36,13 @@
 #define OFFSET_POS 0
 #define RD_POS 12
 #define RN_POS 16
-#define V_COND 28
-#define C_COND 29
-#define Z_COND 30
-#define N_COND 31
 
 /* DataProc  */
 #define OP2_POS 0
 #define OP2_SIZE 12
 #define OPCODE_POS 21
 #define OPCODE_SIZE 4
-
-#define AND 0
-#define EOR 1
-#define SUB 2
-#define RSB 3
-#define ADD 4
-#define TST 8
-#define TEQ 9
-#define CMP 10
-#define ORR 12
-#define MOV 13
+#define IMM_VALUE_SIZE 8
 
 /* Multiply  */
 #define RM_POS 0
@@ -81,6 +68,24 @@
 #define GT 0xC
 #define LE 0xD
 #define AL 0xE
+
+/* DP OpCodes  */
+#define AND 0x0
+#define EOR 0x1
+#define SUB 0x2
+#define RSB 0x3
+#define ADD 0x4
+#define TST 0x8
+#define TEQ 0x9
+#define CMP 0xA
+#define ORR 0xC
+#define MOV 0xD
+
+/* Shift Types */
+#define LSL 0x0
+#define LSR 0x1
+#define ASR 0x2
+#define ROR 0x3
 
 
 #endif // DEFINITIONS_H

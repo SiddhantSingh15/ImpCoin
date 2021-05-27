@@ -17,7 +17,8 @@ void fetch_next(arm11_state_t *state);
 void flush_pipeline(pipeline_t *pipeline);
 
 // Bit operations
-uint32_t to_uint32(uint8_t byte_array[WORD_SIZE_IN_BYTES]);
+uint32_t to_uint32_reg(uint8_t byte_array[WORD_SIZE_IN_BYTES]);
+uint32_t to_uint32_print(uint8_t byte_array[WORD_SIZE_IN_BYTES]);
 void to_uint8_array(uint32_t word, uint8_t byte_array[WORD_SIZE_IN_BYTES]);
 
 #define EXTRACT_BITS(raw, from, size)                                          \

@@ -87,7 +87,7 @@ void flush_pipeline(pipeline_t *pipeline) {
 void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through 17 registers */
-  printf("Registers: \n");
+  printf("Registers:\n");
   for (int i = 0; i <= NUM_GENERAL; i++) {
     printf("$%-2d : %10d (0x%08x)\n", i, state->register_file[i],
            state->register_file[i]);
@@ -100,18 +100,26 @@ void print_arm11_state(arm11_state_t *state) {
          state->register_file[CPSR]);
 
   /* Looping through non-0 locations */
-  printf("Non-zero memory: \n");
+  printf("Non-zero memory:\n");
   for (int i = 0; i < MEM_SIZE; i += 4) {
-    uint32_t word = to_uint32(&state->main_memory[i]);
+    uint32_t word = to_uint32_print(&state->main_memory[i]);
     if (word != 0) {
       printf("0x%08x: 0x%08x\n", i, word);
     }
   }
 }
 
-uint32_t to_uint32(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
+uint32_t to_uint32_reg(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t word = 0;
   for (int i = WORD_SIZE_IN_BYTES - 1; i >= 0; i--) {
+    word = (word << 8) | byte_array[i];
+  }
+  return word;
+}
+
+uint32_t to_uint32_print(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
+  uint32_t word = 0;
+  for (int i = 0; i < WORD_SIZE_IN_BYTES; i++) {
     word = (word << 8) | byte_array[i];
   }
   return word;

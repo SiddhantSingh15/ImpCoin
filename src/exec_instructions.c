@@ -6,12 +6,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-/**
- * @brief Executes the Data Processing Instruction.
- *
- * @param instr The input instruction.
- * @param state The current state of the ARM11 system.
- */
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
@@ -96,12 +90,6 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   }
 }
 
-/**
- * @brief
- *
- * @param
- * @param
- */
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
@@ -109,13 +97,6 @@ void exec_branch(branch_t instr, arm11_state_t *state) {
   state->register_file[PC] =
       state->register_file[PC] - 8 + (int32_t)(instr.offset << 2);
 }
-
-/**
- * @brief
- *
- * @param
- * @param
- */
 
 void exec_sdt(sdt_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
@@ -157,12 +138,6 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   }
 }
 
-/**
- * @brief
- *
- * @param
- * @param
- */
 void exec_mult(multiply_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
@@ -194,12 +169,6 @@ void exec_mult(multiply_t instr, arm11_state_t *state) {
   }
 }
 
-/**
- * @brief
- *
- * @param
- * @param
- */
 void execute(instruction_t *instr, arm11_state_t *state) {
   uint32_t raw;
   switch(instr->tag) {

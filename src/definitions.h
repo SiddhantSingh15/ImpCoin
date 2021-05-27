@@ -10,7 +10,7 @@
 #define PC 15
 #define CPSR 16
 
-/* OTHER FLAGS */
+/* FLAGS */
 #define SET 1
 #define NOT_SET 0
 #define V_FLAG 28

@@ -7,12 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/**
- *
- * @param filename Name of file for reading
- * @param memory Pointer to leading element of our state's memory array
- */
-
 void read_file(char *filename, arm11_state_t *state) {
   FILE *fptr;
   if ((fptr = fopen(filename, "rb")) == NULL) {
@@ -75,7 +69,6 @@ void fetch_next(arm11_state_t *state) {
   state->pipeline->fetched = fetched_instruction;
 }
 
-// Free all of pipeline, used for branch command
 void flush_pipeline(pipeline_t *pipeline) {
   free(pipeline->fetched);
   free(pipeline->decoded);

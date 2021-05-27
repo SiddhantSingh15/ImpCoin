@@ -25,7 +25,7 @@ exec_instructions.o: exec_utils.o exec_instructions.h
 
 exec_utils.o: exec_utils.h
 
-testrunner: testrunner.o test_utils.o decoder.o emulate_utils.o
+testrunner: testrunner.o test_utils.o decoder.o emulate_utils.o exec_utils.o
 
 test_utils: test_utils.h
 

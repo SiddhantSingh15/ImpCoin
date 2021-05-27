@@ -47,28 +47,12 @@ int32_t twos_comp(int32_t x) {
   return ~x + 1;
 }
 
-/**
- * @brief Sign-extends a signed number to 32 bits
- *
- * @param num Input
- *
- * @return 32 bit extended version of num
- */
-
 int32_t signed_24_to_32(uint32_t num) {
   if (num >> 23) {
     return (int32_t) (0xFF000000 | num);
   }
   return (int32_t) num;
 }
-
-/**
- * @brief Sets corresponding flag in the CPSR register.
- *
- * @param reg_file The current register state of the ARM11 system.
- * @param set Either 0 or 1
- * @param flag The flag the user wants to change.
- */
 
 void set_flag(uint32_t *reg_file, bool set, int flag) {
   if (set) {
@@ -109,22 +93,24 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
   uint8_t shift_amt = 0;
 
   if (is_immediate) {
-    to_shift = EXTRACT_BITS(offset, 0, 8);
-    shift_amt = 2 * EXTRACT_BITS(offset, 8, 4);
+    to_shift = EXTRACT_BITS(offset, OP2_POS, IMM_VALUE_SIZE);
+    shift_amt 
+      = SHIFT_MULTIPLIER * EXTRACT_BITS(offset, IMM_VALUE_SIZE, REG_SIZE);
     result = rotate_right(to_shift, shift_amt);
   } else {
 
-    uint32_t to_shift = register_file[EXTRACT_BITS(offset, 0, 4)];
-    uint8_t shift = EXTRACT_BITS(offset, 4, 8);
+    uint32_t to_shift = register_file[EXTRACT_BITS(offset, OP2_POS, REG_SIZE)];
+    uint8_t shift = EXTRACT_BITS(offset, REG_SIZE, IMM_VALUE_SIZE);
 
     if ((shift & 0x1) == 0) {
-      shift_amt = EXTRACT_BITS(shift, 3, 5);
+      shift_amt = EXTRACT_BITS(offset, SHIFT_VAL, SHIFT_VAL_SIZE);
     } else {
       // Shift amount is the bottom byte of the register specified
-      shift_amt = register_file[EXTRACT_BITS(shift, 4, 4)] & 0xf;
+      shift_amt 
+        = register_file[EXTRACT_BITS(offset, RS_POS, REG_SIZE)] & EIGHT_BIT_MASK;
     }
 
-    shift_type = EXTRACT_BITS(shift, 1, 2);
+    shift_type = EXTRACT_BITS(offset, SHIFT_TYPE_POS, SHIFT_TYPE_SIZE);
 
     switch (shift_type) {
     case LSL:

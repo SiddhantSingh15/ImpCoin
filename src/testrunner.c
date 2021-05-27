@@ -201,8 +201,8 @@ void test_to_uint8_array(int *passing, int *total) {
   to_uint8_array(fourth, byte_array + 12);
 
   uint8_t expected_byte_array[WORD_SIZE_IN_BYTES * 4] = {
-      0x1a, 0x46, 0x3c, 0xe9, 0xd6, 0x85, 0xea, 0x31,
-      0x69, 0x42, 0x0b, 0x00, 0x69, 0x69, 0x69, 0x69};
+      0xe9, 0x3c, 0x46, 0x1a, 0x31, 0xea, 0x85, 0xd6,
+      0x00, 0x0b, 0x42, 0x69, 0x69, 0x69, 0x69, 0x69};
   track_test(test_uint8_array(expected_byte_array, byte_array,
                               WORD_SIZE_IN_BYTES * 4,
                               "to_uint8_array works correctly"),
@@ -210,7 +210,7 @@ void test_to_uint8_array(int *passing, int *total) {
 }
 
 void test_to_uint32(int *passing, int *total) {
-  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0xd6, 0x85, 0xea, 0x31};
+  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0x31, 0xea, 0x85, 0xd6};
   track_test(test_uint32(0xd685ea31, to_uint32(byte_array),
                          "to_uint32 works correctly"),
              passing, total);

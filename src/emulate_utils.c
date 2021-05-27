@@ -1,4 +1,5 @@
 #include "emulate_utils.h"
+#include "definitions.h"
 #include "emulate.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -88,14 +89,14 @@ void print_arm11_state(arm11_state_t *state) {
   /* Looping through 17 registers */
   printf("Registers: \n");
   for (int i = 0; i <= NUM_GENERAL; i++) {
-    printf("$%-2d :          %d (0x%08x)\n", i, state->register_file[i],
+    printf("$%-2d : %10d (0x%08x)\n", i, state->register_file[i],
            state->register_file[i]);
   }
 
   /* Printing PC and CPSR */
-  printf("PC  :          %d (0x%08x)\n", state->register_file[PC],
+  printf("PC  : %10d (0x%08x)\n", state->register_file[PC],
          state->register_file[PC]);
-  printf("CPSR:          %d (0x%08x)\n", state->register_file[CPSR],
+  printf("CPSR: %10d (0x%08x)\n", state->register_file[CPSR],
          state->register_file[CPSR]);
 
   /* Looping through non-0 locations */
@@ -108,14 +109,9 @@ void print_arm11_state(arm11_state_t *state) {
   }
 }
 
-/*
- * EXPERIMENTAL PIECE OF CODE (maybe we could pass the ARM state
- * and check through that)
- *
- */
 uint32_t to_uint32(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t word = 0;
-  for (int i = 0; i < 4; i++) {
+  for (int i = WORD_SIZE_IN_BYTES - 1; i >= 0; i--) {
     word = (word << 8) | byte_array[i];
   }
   return word;

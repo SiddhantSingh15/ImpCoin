@@ -4,14 +4,15 @@
 #include "exec_utils.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
-  uint32_t result;
-  bool carry_out;
+  uint32_t result = 0;
+  int carry_out = 0;
 
   int32_t operand1 = state->register_file[instr.rn];
   // Changes the current Operand2 based on tehe value of the I flag.
@@ -24,6 +25,8 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 
   case AND:
     state->register_file[instr.rd] = operand1 & operand2;
+
+    result = state->register_file[instr.rd];
     break;
 
   case EOR:
@@ -41,8 +44,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case RSB:
-    carry_out =
-        !overflow(twos_comp(operand2), operand1) && !(operand1 > operand2);
+    carry_out = !overflow(operand2, twos_comp(operand1));
 
     state->register_file[instr.rd] = operand2 - operand1;
 
@@ -50,7 +52,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case ADD:
-    carry_out = overflow(operand2, operand1);
+    carry_out = overflow(operand1, operand2);
 
     state->register_file[instr.rd] = operand1 + operand2;
 
@@ -66,7 +68,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case CMP:
-    carry_out = !overflow(operand1, twos_comp(operand2));
+    carry_out = !(operand1 < operand2);
 
     result = operand1 - operand2;
     break;
@@ -117,7 +119,7 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
 
   uint32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
-    bool carry_out;
+    int carry_out = 0;
     interpreted_offset = barrel_shifter(!instr.is_shift_R, instr.offset,
                                         state->register_file, &carry_out);
     // set_flag(state->register_file, carry_out, C_FLAG);

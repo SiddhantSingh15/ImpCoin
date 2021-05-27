@@ -38,9 +38,9 @@ int32_t twos_comp(int32_t x);
 
 /**
  * @brief Sign-extends a signed number to 32 bits
- * 
+ *
  * @param num Input
- * 
+ *
  * @return 32 bit extended version of num
  */
 int32_t signed_24_to_32(uint32_t num);
@@ -52,7 +52,7 @@ int32_t signed_24_to_32(uint32_t num);
  * @param set Either 0 or 1
  * @param flag The flag the user wants to change.
  */
-void set_flag(uint32_t *reg_file, int set, int flag);
+void set_flag(uint32_t *reg_file, bool set, int flag);
 
 /**
  * @brief Checks if the instruction type is logical.
@@ -89,7 +89,7 @@ uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt);
  * @param offset Input register.
  * @param register_file The current registers of the ARM11 system.
  */
-uint32_t barrel_shifter(bool is_immediate, bool set_cond, uint16_t offset,
-                        uint32_t *register_file);
+uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
+                        uint32_t *register_file, bool *carry_out);
 
 #endif /* EXEC_UTILS_H */

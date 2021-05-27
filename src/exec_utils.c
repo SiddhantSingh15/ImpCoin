@@ -35,7 +35,7 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
 }
 
 bool overflow(int32_t x, int32_t y) {
-  return (x > (INT_MAX - y) || y > (INT_MAX - x));
+  return ((x > 0) && (x > (INT_MAX - y))) || ((x < 0) && (x < (INT_MIN - y)));
 }
 
 int32_t twos_comp(int32_t x) {
@@ -44,9 +44,9 @@ int32_t twos_comp(int32_t x) {
 
 /**
  * @brief Sign-extends a signed number to 32 bits
- * 
+ *
  * @param num Input
- * 
+ *
  * @return 32 bit extended version of num
  */
 
@@ -65,7 +65,7 @@ int32_t signed_24_to_32(uint32_t num) {
  * @param flag The flag the user wants to change.
  */
 
-void set_flag(uint32_t *reg_file, int set, int flag) {
+void set_flag(uint32_t *reg_file, bool set, int flag) {
   if (set) {
     reg_file[CPSR] |= 1 << flag;
   } else {
@@ -95,8 +95,8 @@ uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt) {
   return (to_rotate >> rotate_amt) | (to_rotate << (INSTR_SIZE - rotate_amt));
 }
 
-uint32_t barrel_shifter(bool is_immediate, bool set_cond, uint16_t offset,
-                          uint32_t *register_file) {
+uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
+                          uint32_t *register_file, bool *carry_out) {
 
   uint32_t to_shift;
   uint32_t result;
@@ -140,17 +140,11 @@ uint32_t barrel_shifter(bool is_immediate, bool set_cond, uint16_t offset,
     }
   }
 
-  if (set_cond) {
-    // find carry
-    bool carry;
-    if (shift_type == LSL) {
-      carry = EXTRACT_BIT(to_shift, (INSTR_SIZE - shift_amt + 1));
-    } else {
-      carry = EXTRACT_BIT(to_shift, (shift_amt - 1));
-    }
-
-    // save carry
-    set_flag(register_file, carry, C_FLAG);
+  // find carry
+  if (shift_type == LSL) {
+    *carry_out = EXTRACT_BIT(to_shift, (INSTR_SIZE - shift_amt + 1));
+  } else {
+    *carry_out = EXTRACT_BIT(to_shift, (shift_amt - 1));
   }
 
   return result;

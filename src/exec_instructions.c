@@ -11,12 +11,12 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     return;
 
   uint32_t result;
-  int c_flag;
+  bool carry_out;
 
   int32_t operand1 = state->register_file[instr.rn];
   // Changes the current Operand2 based on tehe value of the I flag.
-  int32_t operand2 = barrel_shifter(instr.is_immediate, instr.set_cond,
-                                    instr.op2, state->register_file);
+  int32_t operand2 = barrel_shifter(instr.is_immediate, instr.op2,
+                                    state->register_file, &carry_out);
 
   // Switch condition to perform the operations specified by the instruction
   // OpCode.
@@ -33,7 +33,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case SUB:
-    c_flag = !overflow(operand1, twos_comp(operand2));
+    carry_out = !overflow(operand1, twos_comp(operand2));
 
     state->register_file[instr.rd] = operand1 - operand2;
 
@@ -41,7 +41,8 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case RSB:
-    c_flag = !overflow(twos_comp(operand2), operand1) && !(operand1 > operand2);
+    carry_out =
+        !overflow(twos_comp(operand2), operand1) && !(operand1 > operand2);
 
     state->register_file[instr.rd] = operand2 - operand1;
 
@@ -49,7 +50,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case ADD:
-    c_flag = overflow(operand2, operand1);
+    carry_out = overflow(operand2, operand1);
 
     state->register_file[instr.rd] = operand1 + operand2;
 
@@ -65,7 +66,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     break;
 
   case CMP:
-    c_flag = !overflow(operand1, twos_comp(operand2));
+    carry_out = !overflow(operand1, twos_comp(operand2));
 
     result = operand1 - operand2;
     break;
@@ -89,7 +90,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   // Sets the COND flags if the C flag is 1.
   if (instr.set_cond) {
     set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
-    set_flag(state->register_file, c_flag, C_FLAG);
+    set_flag(state->register_file, carry_out, C_FLAG);
     set_flag(state->register_file, result == 0, Z_FLAG);
   }
 }
@@ -97,7 +98,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-  
+
   state->register_file[PC] =
       state->register_file[PC] + signed_24_to_32(instr.offset);
   flush_pipeline(state->pipeline);
@@ -116,8 +117,10 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
 
   uint32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
-    interpreted_offset
-      = barrel_shifter(!instr.is_shift_R, NOT_SET, instr.offset, state->register_file);
+    bool carry_out;
+    interpreted_offset = barrel_shifter(!instr.is_shift_R, instr.offset,
+                                        state->register_file, &carry_out);
+    // set_flag(state->register_file, carry_out, C_FLAG);
   }
 
   uint16_t mem_address = state->register_file[instr.rn];

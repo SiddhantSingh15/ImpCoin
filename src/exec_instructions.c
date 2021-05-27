@@ -12,127 +12,96 @@
  * @param instr The input instruction.
  * @param state The current state of the ARM11 system.
  */
-
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
-  uint32_t zero_checker;
+  uint32_t result;
+  int c_flag;
 
-  instr.op2 = barrel_shifter(instr.is_immediate, instr.set_cond, instr.op2,
-                             state->register_file);
+  uint32_t operand2 = barrel_shifter(instr.is_immediate, instr.set_cond,
+                                     instr.op2, state->register_file);
 
   switch (instr.opcode) {
 
-    case AND:
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] & instr.op2;
-      break;
+  case AND:
+    state->register_file[instr.rd] = state->register_file[instr.rn] & operand2;
+    break;
 
-    case EOR:
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] ^ instr.op2;
+  case EOR:
+    state->register_file[instr.rd] = state->register_file[instr.rn] ^ operand2;
 
-      zero_checker = state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    case SUB:
-      if (overflow(state->register_file[instr.rn], twos_comp(instr.op2))) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+  case SUB:
+    c_flag = !overflow(state->register_file[instr.rn], twos_comp(operand2));
 
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] - instr.op2;
+    state->register_file[instr.rd] = state->register_file[instr.rn] - operand2;
 
-      zero_checker = state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    case RSB:
-      if (overflow(twos_comp(instr.op2), state->register_file[instr.rn])) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else if (state->register_file[instr.rn] > instr.op2) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+  case RSB:
+    c_flag = !overflow(twos_comp(operand2), state->register_file[instr.rn]) &&
+             !(state->register_file[instr.rn] > operand2);
 
-      state->register_file[instr.rd]
-        = instr.op2 - state->register_file[instr.rn];
+    state->register_file[instr.rd] = operand2 - state->register_file[instr.rn];
 
-      zero_checker = state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    case ADD:
-      if (instr.set_cond) {
-        if (overflow(instr.op2, state->register_file[instr.rn])) {
-          set_flag(state->register_file, SET, C_FLAG);
-        } else {
-          set_flag(state->register_file, NOT_SET, C_FLAG);
-        }
-      }
+  case ADD:
+    c_flag = overflow(operand2, state->register_file[instr.rn]);
 
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] + instr.op2;
+    state->register_file[instr.rd] = state->register_file[instr.rn] + operand2;
 
-      zero_checker = state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    case TST:
-      zero_checker = state->register_file[instr.rn] & instr.op2;
-      break;
+  case TST:
+    result = state->register_file[instr.rn] & operand2;
+    break;
 
-    case TEQ:
-      zero_checker = state->register_file[instr.rn] ^ instr.op2;
-      break;
+  case TEQ:
+    result = state->register_file[instr.rn] ^ operand2;
+    break;
 
-    case CMP:
-      if (state->register_file[instr.rn] < instr.op2) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+  case CMP:
+    c_flag = !(state->register_file[instr.rn] < operand2);
 
-      zero_checker = state->register_file[instr.rn] - instr.op2;
-      break;
+    result = state->register_file[instr.rn] - operand2;
+    break;
 
-    case ORR:
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] | instr.op2;
+  case ORR:
+    state->register_file[instr.rd] = state->register_file[instr.rn] | operand2;
 
-      zero_checker =  state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    case MOV:
-      state->register_file[instr.rd] = instr.op2;
+  case MOV:
+    state->register_file[instr.rd] = operand2;
 
-      zero_checker = state->register_file[instr.rd];
-      break;
+    result = state->register_file[instr.rd];
+    break;
 
-    default:
-      printf("Illegal data processing instruction !");
+  default:
+    printf("Illegal data processing instruction !");
   }
 
   if (instr.set_cond) {
-    set_flag(state->register_file, EXTRACT_BIT(zero_checker, N_FLAG), N_FLAG);
-
-    if (zero_checker == 0) {
-      set_flag(state->register_file, SET, Z_FLAG);
-    } else {
-      set_flag(state->register_file, NOT_SET, Z_FLAG);
-    }
-
+    set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
+    set_flag(state->register_file, c_flag, C_FLAG);
+    set_flag(state->register_file, result == 0, Z_FLAG);
   }
-
 }
+
 /**
  * @brief
  *
  * @param
  * @param
  */
-
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;

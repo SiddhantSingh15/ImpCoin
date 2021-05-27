@@ -209,10 +209,17 @@ void test_to_uint8_array(int *passing, int *total) {
              passing, total);
 }
 
-void test_to_uint32(int *passing, int *total) {
+void test_to_uint32_reg(int *passing, int *total) {
   uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0x31, 0xea, 0x85, 0xd6};
-  track_test(test_uint32(0xd685ea31, to_uint32(byte_array),
-                         "to_uint32 works correctly"),
+  track_test(test_uint32(0xd685ea31, to_uint32_reg(byte_array),
+                         "to_uint32_reg works correctly"),
+             passing, total);
+}
+
+void test_to_uint32_print(int *passing, int *total) {
+  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0xd6, 0x85, 0xea, 0x31};
+  track_test(test_uint32(0xd685ea31, to_uint32_print(byte_array),
+                         "to_uint32_print works correctly"),
              passing, total);
 }
 
@@ -226,7 +233,8 @@ void test_unit_conversions(int *passing, int *total) {
   int internal_total = 0;
 
   test_to_uint8_array(&internal_passing, &internal_total);
-  test_to_uint32(&internal_passing, &internal_total);
+  test_to_uint32_reg(&internal_passing, &internal_total);
+  test_to_uint32_print(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

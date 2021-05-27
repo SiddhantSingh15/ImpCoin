@@ -3,19 +3,44 @@
 
 #include "exec_utils.h"
 
-// // Execute dataproc
+/**
+ * @brief Executes the Data Processing Instruction.
+ *
+ * @param instr The input instruction.
+ * @param state The current state of the ARM11 system.
+ */
 // void exec_dataproc(dataproc_t instr, arm11_state_t *state);
 
-// // Execute SDT
+/**
+ * @brief
+ *
+ * @param
+ * @param
+ */
 // void exec_sdt(sdt_t instr, arm11_state_t *state);
 
-// // Execute Mult
+/**
+ * @brief
+ *
+ * @param
+ * @param
+ */
 // void exec_mult(multiply_t instr, arm11_state_t *state);
 
-// // Execute Branch
+/**
+ * @brief
+ *
+ * @param
+ * @param
+ */
 // void exec_branch(branch_t instr, arm11_state_t *state);
 
-// Execute function
+/**
+ * @brief
+ *
+ * @param
+ * @param
+ */
 void execute(instruction_t *instr, arm11_state_t *state);
 
 #endif // EXEC_INSTRUCTIONS

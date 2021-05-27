@@ -130,7 +130,7 @@ bool is_arithmetic(int val) {
  */
 
 uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt) {
-  return (to_rotate << rotate_amt) | (to_rotate >> (INSTR_SIZE - rotate_amt));
+  return (to_rotate >> rotate_amt) | (to_rotate << (INSTR_SIZE - rotate_amt));
 }
 
 /**

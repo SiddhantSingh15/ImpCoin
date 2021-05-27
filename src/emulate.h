@@ -4,7 +4,7 @@
 #include "definitions.h"
 
 /**
- * @brief Data processing instruction type 
+ * @brief Data processing instruction type
  */
 typedef struct dataproc_t {
   uint16_t op2 : OP2_SIZE; /** Operand2 */

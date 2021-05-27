@@ -117,7 +117,7 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
     assert(PC != EXTRACT_BITS(instr.offset, RM_POS, REG_SIZE));
   }
 
-  uint32_t interpreted_offset = instr.offset;
+  int32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
     int carry_out = 0;
     interpreted_offset = barrel_shifter(!instr.is_shift_R, instr.offset,
@@ -128,8 +128,8 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   uint32_t mem_address = state->register_file[instr.rn];
 
   if (instr.is_preindexed == 1) {
-    mem_address +=
-        ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
+    mem_address += ((instr.up_bit == 1) ? interpreted_offset
+                                        : twos_comp(interpreted_offset));
   }
 
   if (mem_address <= MEM_SIZE) {

@@ -57,7 +57,7 @@ int32_t twos_comp(int32_t x) {
 
 int32_t signed_24_to_32(uint32_t num) {
   if (num >> 23) {
-    return - (~(0xFF000000 + num));
+    return (int32_t) (0xFF000000 | num);
   }
   return (int32_t) num;
 }

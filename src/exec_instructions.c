@@ -102,7 +102,7 @@ void exec_branch(branch_t instr, arm11_state_t *state) {
     return;
 
   state->register_file[PC] =
-      state->register_file[PC] + signed_24_to_32(instr.offset);
+      (int32_t)state->register_file[PC] + signed_24_to_32(instr.offset << 2);
   flush_pipeline(state->pipeline);
 }
 

@@ -22,7 +22,7 @@ instruction_t *decode_dataproc(instruction_t *instr) {
   assert(instr->tag == RAW);
 
   uint32_t raw_data = instr->data.raw_data;
-
+  
   instr->data.dataproc.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
   instr->data.dataproc.is_immediate = EXTRACT_BIT(raw_data, I_POS);
   instr->data.dataproc.opcode = EXTRACT_BITS(raw_data, OPCODE_POS, OPCODE_SIZE);
@@ -40,7 +40,7 @@ instruction_t *decode_multiply(instruction_t *instr) {
   assert(instr->tag == RAW);
 
   uint32_t raw_data = instr->data.raw_data;
-
+  
   instr->data.multiply.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
   instr->data.multiply.accumulate = EXTRACT_BIT(raw_data, A_POS);
   instr->data.multiply.set_cond = EXTRACT_BIT(raw_data, SET_COND_POS);

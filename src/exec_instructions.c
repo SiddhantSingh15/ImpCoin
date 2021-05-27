@@ -28,12 +28,14 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     case AND:
       state->register_file[instr.rd] 
         = state->register_file[instr.rn] & instr.op2;
+      break;
 
     case EOR:
       state->register_file[instr.rd] 
         = state->register_file[instr.rn] ^ instr.op2;
 
       zero_checker = state->register_file[instr.rd];
+      break;
 
     case SUB:
       if (overflow(state->register_file[instr.rn], twos_comp(instr.op2))) {
@@ -46,6 +48,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
         = state->register_file[instr.rn] - instr.op2;
 
       zero_checker = state->register_file[instr.rd];
+      break;
 
     case RSB:
       if (overflow(twos_comp(instr.op2), state->register_file[instr.rn])) {
@@ -60,24 +63,30 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
         = instr.op2 - state->register_file[instr.rn];
 
       zero_checker = state->register_file[instr.rd];
+      break;
     
     case ADD:
-      if (overflow(instr.op2, state->register_file[instr.rn])) {
-        set_flag(state->register_file, SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
+      if (instr.set_cond) {
+        if (overflow(instr.op2, state->register_file[instr.rn])) {
+          set_flag(state->register_file, SET, C_FLAG);
+        } else {
+          set_flag(state->register_file, NOT_SET, C_FLAG);
+        }
       }
 
       state->register_file[instr.rd]
         = state->register_file[instr.rn] + instr.op2;
 
       zero_checker = state->register_file[instr.rd];
+      break;
 
     case TST:
       zero_checker = state->register_file[instr.rn] & instr.op2;
+      break;
 
     case TEQ:
       zero_checker = state->register_file[instr.rn] ^ instr.op2;
+      break;
 
     case CMP:
       if (state->register_file[instr.rn] < instr.op2) {
@@ -87,17 +96,20 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
       }
 
       zero_checker = state->register_file[instr.rn] - instr.op2;
+      break;
 
     case ORR:
       state->register_file[instr.rd]
         = state->register_file[instr.rn] | instr.op2;
 
       zero_checker =  state->register_file[instr.rd];
+      break;
     
     case MOV:
       state->register_file[instr.rd] = instr.op2;
       
       zero_checker = state->register_file[instr.rd];
+      break;
     
     default:
       printf("Illegal data processing instruction !");

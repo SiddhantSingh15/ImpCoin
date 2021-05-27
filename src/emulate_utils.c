@@ -61,8 +61,8 @@ void fetch_next(arm11_state_t *state) {
   assert(curr < MEM_SIZE - 1);
 
   // Shift and insert the 4 pieces of data into curr 8 bytes at a time
-  incoming |= (state->main_memory)[curr];
-  for (int i = 1; i < REG_SIZE; i++) {
+  incoming |= (state->main_memory)[curr + 3];
+  for (int i = 2; i >= 0; i--) {
     incoming <<= ONE_B;
     incoming |= (state->main_memory)[curr + i];
   }
@@ -88,14 +88,14 @@ void print_arm11_state(arm11_state_t *state) {
   /* Looping through 17 registers */
   printf("Registers: \n");
   for (int i = 0; i <= NUM_GENERAL; i++) {
-    printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i],
+    printf("$%-2d :          %d (0x%08x)\n", i, state->register_file[i],
            state->register_file[i]);
   }
 
   /* Printing PC and CPSR */
   printf("PC  :          %d (0x%08x)\n", state->register_file[PC],
          state->register_file[PC]);
-  printf("CPSR  :          %d (0x%08x)\n", state->register_file[CPSR],
+  printf("CPSR:          %d (0x%08x)\n", state->register_file[CPSR],
          state->register_file[CPSR]);
 
   /* Looping through non-0 locations */

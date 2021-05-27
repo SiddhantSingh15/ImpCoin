@@ -8,7 +8,7 @@
 
 /**
  * @brief Executes the Data Processing Instruction.
- * 
+ *
  * @param instr The input instruction.
  * @param state The current state of the ARM11 system.
  */
@@ -16,22 +16,21 @@
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-  
+
   uint32_t zero_checker;
 
-  instr.op2 
-    = barrel_shifter(instr.is_immediate, instr.op2, state->register_file);
-  
+  instr.op2 = barrel_shifter(instr.is_immediate, instr.set_cond, instr.op2,
+                             state->register_file);
 
   switch (instr.opcode) {
 
     case AND:
-      state->register_file[instr.rd] 
+      state->register_file[instr.rd]
         = state->register_file[instr.rn] & instr.op2;
       break;
 
     case EOR:
-      state->register_file[instr.rd] 
+      state->register_file[instr.rd]
         = state->register_file[instr.rn] ^ instr.op2;
 
       zero_checker = state->register_file[instr.rd];
@@ -44,7 +43,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
         set_flag(state->register_file, SET, C_FLAG);
       }
 
-      state->register_file[instr.rd] 
+      state->register_file[instr.rd]
         = state->register_file[instr.rn] - instr.op2;
 
       zero_checker = state->register_file[instr.rd];
@@ -64,7 +63,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 
       zero_checker = state->register_file[instr.rd];
       break;
-    
+
     case ADD:
       if (instr.set_cond) {
         if (overflow(instr.op2, state->register_file[instr.rn])) {
@@ -104,13 +103,13 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 
       zero_checker =  state->register_file[instr.rd];
       break;
-    
+
     case MOV:
       state->register_file[instr.rd] = instr.op2;
-      
+
       zero_checker = state->register_file[instr.rd];
       break;
-    
+
     default:
       printf("Illegal data processing instruction !");
   }
@@ -129,7 +128,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 }
 /**
  * @brief
- * 
+ *
  * @param
  * @param
  */
@@ -144,7 +143,7 @@ void exec_branch(branch_t instr, arm11_state_t *state) {
 
 /**
  * @brief
- * 
+ *
  * @param
  * @param
  */
@@ -161,8 +160,8 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
 
   uint32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
-    interpreted_offset 
-      = barrel_shifter(!instr.is_shift_R, instr.offset, state->register_file);
+    interpreted_offset
+      = barrel_shifter(!instr.is_shift_R, NOT_SET, instr.offset, state->register_file);
   }
 
   uint16_t mem_address = state->register_file[instr.rn];
@@ -175,7 +174,7 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   if (instr.load == SET) {
     // Loads the memory to R[instr.rd], after converting it to word size
     state->register_file[instr.rd] =
-        to_uint32(&state->main_memory[mem_address]);
+        to_uint32_reg(&state->main_memory[mem_address]);
   } else {
     // Stores the value at instr.rd, after converting it to a byte array
     to_uint8_array(state->register_file[instr.rd],
@@ -191,7 +190,7 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
 
 /**
  * @brief
- * 
+ *
  * @param
  * @param
  */
@@ -228,7 +227,7 @@ void exec_mult(multiply_t instr, arm11_state_t *state) {
 
 /**
  * @brief
- * 
+ *
  * @param
  * @param
  */

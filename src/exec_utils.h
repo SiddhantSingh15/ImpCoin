@@ -12,7 +12,7 @@ void set_flag(uint32_t *reg_file, int set, int flag);
 bool is_logic(int val);
 bool is_arithmetic(int val);
 uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt);
-uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
-                          uint32_t *register_file);
+uint32_t barrel_shifter(bool is_immediate, bool set_cond, uint16_t offset,
+                        uint32_t *register_file);
 
 #endif /* EXEC_UTILS_H */

@@ -229,12 +229,19 @@ void test_to_uint32_print(int *passing, int *total) {
 
 
 void test_overflow(int *passing, int *total) {
-  track_test(test_bool(!overflow(2, 2), "2 + 2 doesn't overflow"),
-             passing, total);
+  track_test(test_bool(!overflow(2, 2), "2 + 2 doesn't overflow"), passing,
+             total);
+  track_test(test_bool(!overflow(-2, -2), "-2 + -2 doesn't overflow"), passing,
+             total);
   track_test(test_bool(overflow(INT_MAX, 1000), "INT_MAX + 1000 overflows"),
              passing, total);
-  track_test(test_bool(overflow(INT_MIN, -6969), "INT_MIN - 6969 overflows"),
+  track_test(test_bool(!overflow(69, -69), "69 + -69 doesn't overflow"),
              passing, total);
+  track_test(test_bool(!overflow(-420, 420), "-420 + 420 doesn't overflow"),
+             passing, total);
+      track_test(
+          test_bool(overflow(INT_MIN, -6969), "INT_MIN - 6969 overflows"),
+          passing, total);
 }
 
 

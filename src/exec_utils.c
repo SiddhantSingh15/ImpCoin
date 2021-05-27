@@ -34,10 +34,15 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
   }
 }
 
-bool overflow(int32_t x, int32_t y) {
-  return ((x > 0) && (x > (INT_MAX - y))) || ((x < 0) && (x < (INT_MIN - y)));
+bool overflow(int32_t a, int32_t b) {
+  if ((a > 0) ^ (b > 0)) {
+    // if the signs are different
+    return ((a > 0) && (a > (INT_MAX + b))) || ((a < 0) && (a < (INT_MIN + b)));
+  } else {
+    // if the signs are the same
+    return ((a > 0) && (a > (INT_MAX - b))) || ((a < 0) && (a < (INT_MIN - b)));
+  }
 }
-
 int32_t twos_comp(int32_t x) {
   return ~x + 1;
 }
@@ -96,12 +101,12 @@ uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt) {
 }
 
 uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
-                          uint32_t *register_file, bool *carry_out) {
+                          uint32_t *register_file, int *carry_out) {
 
-  uint32_t to_shift;
-  uint32_t result;
-  uint8_t shift_type;
-  uint8_t shift_amt;
+  uint32_t to_shift = 0;
+  uint32_t result = 0;
+  uint8_t shift_type = 0;
+  uint8_t shift_amt = 0;
 
   if (is_immediate) {
     to_shift = EXTRACT_BITS(offset, 0, 8);
@@ -141,10 +146,12 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
   }
 
   // find carry
-  if (shift_type == LSL) {
-    *carry_out = EXTRACT_BIT(to_shift, (INSTR_SIZE - shift_amt + 1));
-  } else {
-    *carry_out = EXTRACT_BIT(to_shift, (shift_amt - 1));
+  if (shift_amt > 0) {
+    if (shift_type == LSL) {
+      *carry_out = EXTRACT_BIT(to_shift, (INSTR_SIZE - shift_amt + 1));
+    } else {
+      *carry_out = EXTRACT_BIT(to_shift, (shift_amt - 1));
+    }
   }
 
   return result;

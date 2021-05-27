@@ -18,12 +18,12 @@
 bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]);
 
 /**
- * @brief Checks if the input values cause an overflow.
+ * @brief Checks if the addition of two values causes an overflow or underflow.
  *
  * @param x First input.
  * @param y Second input.
  *
- * @return true if there is an overflow.
+ * @return true if there is an overflow or underflow.
  */
 bool overflow(int32_t x, int32_t y);
 
@@ -90,6 +90,6 @@ uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt);
  * @param register_file The current registers of the ARM11 system.
  */
 uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
-                        uint32_t *register_file, bool *carry_out);
+                        uint32_t *register_file, int *carry_out);
 
 #endif /* EXEC_UTILS_H */

@@ -29,12 +29,11 @@ int main(int argc, char **argv) {
       free(state->pipeline->executed);
     }
 
+    state->pipeline->decoded = state->pipeline->fetched;
     // Decode an instruction
     if (state->pipeline->decoded != NULL) {
-      decode(state->pipeline->decoded);
+      state->pipeline->executed = decode(state->pipeline->decoded);
     }
-    state->pipeline->executed = state->pipeline->decoded;
-    state->pipeline->decoded = state->pipeline->fetched;
 
     // Fetch an instruction
     fetch_next(state);

@@ -78,7 +78,6 @@ void fetch_next(arm11_state_t *state) {
 void flush_pipeline(pipeline_t *pipeline) {
   free(pipeline->fetched);
   free(pipeline->decoded);
-  free(pipeline->executed);
   pipeline->fetched = NULL;
   pipeline->decoded = NULL;
   pipeline->executed = NULL;

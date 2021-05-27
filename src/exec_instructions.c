@@ -125,21 +125,26 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
     // set_flag(state->register_file, carry_out, C_FLAG);
   }
 
-  uint16_t mem_address = state->register_file[instr.rn];
+  uint32_t mem_address = state->register_file[instr.rn];
 
   if (instr.is_preindexed == 1) {
     mem_address +=
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
   }
 
-  if (instr.load == SET) {
-    // Loads the memory to R[instr.rd], after converting it to word size
-    state->register_file[instr.rd] =
-        to_uint32_reg(&state->main_memory[mem_address]);
+  if (mem_address <= MEM_SIZE) {
+    if (instr.load == SET) {
+      // Loads the memory to R[instr.rd], after converting it to word size
+      state->register_file[instr.rd] =
+          to_uint32_reg(&state->main_memory[mem_address]);
+    } else {
+      // Stores the value at instr.rd, after converting it to a byte array
+      to_uint8_array(state->register_file[instr.rd],
+                     &state->main_memory[mem_address]);
+    }
   } else {
-    // Stores the value at instr.rd, after converting it to a byte array
-    to_uint8_array(state->register_file[instr.rd],
-                   &state->main_memory[mem_address]);
+    printf("Error: Out of bounds memory access at address 0x%08x\n",
+           mem_address);
   }
 
   if (instr.is_preindexed == 0) {

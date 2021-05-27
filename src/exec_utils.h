@@ -25,7 +25,7 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]);
  *
  * @return true if there is an overflow.
  */
-bool overflow(uint32_t x, uint32_t y);
+bool overflow(int32_t x, int32_t y);
 
 /**
  * @brief Turns input into 2s complement.
@@ -34,7 +34,7 @@ bool overflow(uint32_t x, uint32_t y);
  *
  * @return 2s complement output.
  */
-uint32_t twos_comp(uint8_t x);
+int32_t twos_comp(int32_t x);
 
 /**
  * @brief Sets corresponding flag in the CPSR register.

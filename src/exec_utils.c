@@ -34,19 +34,19 @@ bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
   }
 }
 
-bool overflow(uint32_t x, uint32_t y) {
+bool overflow(int32_t x, int32_t y) {
   return (x > (INT_MAX - y) || y > (INT_MAX - x));
 }
 
-uint32_t twos_comp(uint8_t x) {
+int32_t twos_comp(int32_t x) {
   return ~x + 1;
 }
 
 void set_flag(uint32_t *reg_file, int set, int flag) {
   if (set) {
-    reg_file[CPSR] |= set << flag;
+    reg_file[CPSR] |= 1 << flag;
   } else {
-    reg_file[CPSR] &= ~(set << flag);
+    reg_file[CPSR] &= ~(1 << flag);
   }
 }
 

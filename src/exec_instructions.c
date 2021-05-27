@@ -13,65 +13,65 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   uint32_t result;
   int c_flag;
 
+  int32_t operand1 = state->register_file[instr.rn];
   // Changes the current Operand2 based on tehe value of the I flag.
-  uint32_t operand2 = barrel_shifter(instr.is_immediate, instr.set_cond,
-                                     instr.op2, state->register_file);
+  int32_t operand2 = barrel_shifter(instr.is_immediate, instr.set_cond,
+                                    instr.op2, state->register_file);
 
   // Switch condition to perform the operations specified by the instruction
   // OpCode.
   switch (instr.opcode) {
 
   case AND:
-    state->register_file[instr.rd] = state->register_file[instr.rn] & operand2;
+    state->register_file[instr.rd] = operand1 & operand2;
     break;
 
   case EOR:
-    state->register_file[instr.rd] = state->register_file[instr.rn] ^ operand2;
+    state->register_file[instr.rd] = operand1 ^ operand2;
 
     result = state->register_file[instr.rd];
     break;
 
   case SUB:
-    c_flag = !overflow(state->register_file[instr.rn], twos_comp(operand2));
+    c_flag = !overflow(operand1, twos_comp(operand2));
 
-    state->register_file[instr.rd] = state->register_file[instr.rn] - operand2;
+    state->register_file[instr.rd] = operand1 - operand2;
 
     result = state->register_file[instr.rd];
     break;
 
   case RSB:
-    c_flag = !overflow(twos_comp(operand2), state->register_file[instr.rn]) &&
-             !(state->register_file[instr.rn] > operand2);
+    c_flag = !overflow(twos_comp(operand2), operand1) && !(operand1 > operand2);
 
-    state->register_file[instr.rd] = operand2 - state->register_file[instr.rn];
+    state->register_file[instr.rd] = operand2 - operand1;
 
     result = state->register_file[instr.rd];
     break;
 
   case ADD:
-    c_flag = overflow(operand2, state->register_file[instr.rn]);
+    c_flag = overflow(operand2, operand1);
 
-    state->register_file[instr.rd] = state->register_file[instr.rn] + operand2;
+    state->register_file[instr.rd] = operand1 + operand2;
 
     result = state->register_file[instr.rd];
     break;
 
   case TST:
-    result = state->register_file[instr.rn] & operand2;
+    result = operand1 & operand2;
     break;
 
   case TEQ:
-    result = state->register_file[instr.rn] ^ operand2;
+    result = operand1 ^ operand2;
     break;
 
   case CMP:
-    c_flag = !(state->register_file[instr.rn] < operand2);
+    c_flag = !overflow(operand1, twos_comp(operand2));
 
-    result = state->register_file[instr.rn] - operand2;
+    result = operand1 - operand2;
     break;
 
   case ORR:
-    state->register_file[instr.rd] = state->register_file[instr.rn] | operand2;
+    state->register_file[instr.rd] = operand1 | operand2;
 
     result = state->register_file[instr.rd];
     break;
@@ -106,11 +106,12 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
-  if (instr.rn == PC)
-    state->register_file[instr.rn] += 8;
-
   assert(PC != instr.rd);
   assert(PC != instr.offset);
+  if (instr.is_shift_R) {
+    // PC cannot be equal to the shift register (R_m).
+    assert(PC != EXTRACT_BITS(instr.offset, RM_POS, REG_SIZE));
+  }
 
   uint32_t interpreted_offset = instr.offset;
   if (instr.is_shift_R == 1) {
@@ -136,7 +137,6 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
   }
 
   if (instr.is_preindexed == 0) {
-    // TODO: check the R_m != PC condition, add this after doing dataproc
     state->register_file[instr.rn] +=
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
   }

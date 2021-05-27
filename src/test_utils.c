@@ -8,14 +8,14 @@
 
 bool test_bool(bool cond, char *testname) {
   printf("TEST - %s : %s%s%s\n", testname, cond ? GREEN : RED,
-         cond ? PASSED : FAILED, RESET);
+         cond ? PASSED : FAILED, NOCOLOUR);
   return cond;
 }
 
 bool test_uint8(uint8_t expected, uint8_t got, char *testname) {
   bool passed = expected == got;
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
-         passed ? PASSED : FAILED, RESET);
+         passed ? PASSED : FAILED, NOCOLOUR);
 
   if (!passed) {
     printf("\texpected : %d (0x%02x)\n", expected, expected);
@@ -28,7 +28,7 @@ bool test_uint8(uint8_t expected, uint8_t got, char *testname) {
 bool test_uint16(uint16_t expected, uint16_t got, char *testname) {
   bool passed = expected == got;
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
-         passed ? PASSED : FAILED, RESET);
+         passed ? PASSED : FAILED, NOCOLOUR);
 
   if (!passed) {
     printf("\texpected : %d (0x%04x)\n", expected, expected);
@@ -41,7 +41,7 @@ bool test_uint16(uint16_t expected, uint16_t got, char *testname) {
 bool test_uint32(uint32_t expected, uint32_t got, char *testname) {
   bool passed = expected == got;
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
-         passed ? PASSED : FAILED, RESET);
+         passed ? PASSED : FAILED, NOCOLOUR);
 
   if (!passed) {
     printf("\texpected : %d (0x%08x)\n", expected, expected);
@@ -54,7 +54,7 @@ bool test_uint32(uint32_t expected, uint32_t got, char *testname) {
 bool test_string(char *expected, char *got, char *testname) {
   bool passed = strcmp(expected, got) == 0;
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
-         passed ? PASSED : FAILED, RESET);
+         passed ? PASSED : FAILED, NOCOLOUR);
 
   if (!passed) {
     printf("\texpected : %s\n", expected);
@@ -72,7 +72,7 @@ bool test_uint8_array(uint8_t *expected, uint8_t *got, size_t length,
   }
 
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
-         passed ? PASSED : FAILED, RESET);
+         passed ? PASSED : FAILED, NOCOLOUR);
 
   if (!passed) {
     printf("\texpected : ");

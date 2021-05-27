@@ -168,7 +168,7 @@ void test_decoder(int *passing, int *total) {
          "\n");
   printf("-----%sDECODER "
          "TESTS%s---------------------------------------------------\n",
-         BOLDBLUE, RESET);
+         BOLDBLUE, NOCOLOUR);
   int internal_passing = 0;
   int internal_total = 0;
 
@@ -184,7 +184,7 @@ void test_decoder(int *passing, int *total) {
          internal_passing == internal_total        ? GREEN
          : (internal_passing > internal_total / 2) ? YELLOW
                                                    : RED,
-         internal_passing, internal_total, RESET);
+         internal_passing, internal_total, NOCOLOUR);
 
   *passing = *passing + internal_passing;
   *total = *total + internal_total;
@@ -250,7 +250,7 @@ void test_bit_operations(int *passing, int *total) {
          "\n");
   printf("-----%sBIT OPERATIONS "
          "TESTS%s-------------------------------------------\n",
-         BOLDBLUE, RESET);
+         BOLDBLUE, NOCOLOUR);
   int internal_passing = 0;
   int internal_total = 0;
 
@@ -265,7 +265,7 @@ void test_bit_operations(int *passing, int *total) {
          internal_passing == internal_total        ? GREEN
          : (internal_passing > internal_total / 2) ? YELLOW
                                                    : RED,
-         internal_passing, internal_total, RESET);
+         internal_passing, internal_total, NOCOLOUR);
 
   *passing = *passing + internal_passing;
   *total = *total + internal_total;
@@ -279,15 +279,15 @@ int main(void) {
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",
-      BOLDWHITE, RESET);
+      BOLDWHITE, NOCOLOUR);
   printf("%sTOTAL PASSING: (%d/%d) tests%s\n",
          passing == total        ? BOLDGREEN
          : (passing > total / 2) ? BOLDYELLOW
                                  : BOLDRED,
-         passing, total, RESET);
+         passing, total, NOCOLOUR);
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",
-      BOLDWHITE, RESET);
+      BOLDWHITE, NOCOLOUR);
   return EXIT_SUCCESS;
 }

@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define RESET "\033[0m"
+#define NOCOLOUR "\033[0m"
 #define RED "\033[31m"               /* Red */
 #define GREEN "\033[32m"             /* Green */
 #define YELLOW "\033[33m"            /* Yellow */

@@ -10,13 +10,12 @@
 #define PC 15
 #define CPSR 16
 
-#define TWO_BIT_MASK 0x3
-#define FOUR_BIT_MASK 0xf
-#define EIGHT_BIT_MASK 0xff
+/* Macro for creating 32-bit set-masks of size n */
+#define MASK(n) (uint32_t) ((1 << n) - 1)
 
 /* FLAGS */
 #define SET 1
-#define NOT_SET 0
+#define RESET 0
 #define V_FLAG 28
 #define C_FLAG 29
 #define Z_FLAG 30

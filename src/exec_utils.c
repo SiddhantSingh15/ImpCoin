@@ -94,7 +94,7 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
 
   if (is_immediate) {
     to_shift = EXTRACT_BITS(offset, OP2_POS, IMM_VALUE_SIZE);
-    shift_amt 
+    shift_amt
       = SHIFT_MULTIPLIER * EXTRACT_BITS(offset, IMM_VALUE_SIZE, REG_SIZE);
     result = rotate_right(to_shift, shift_amt);
   } else {
@@ -106,8 +106,8 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
       shift_amt = EXTRACT_BITS(offset, SHIFT_VAL, SHIFT_VAL_SIZE);
     } else {
       // Shift amount is the bottom byte of the register specified
-      shift_amt 
-        = register_file[EXTRACT_BITS(offset, RS_POS, REG_SIZE)] & EIGHT_BIT_MASK;
+      shift_amt
+        = register_file[EXTRACT_BITS(offset, RS_POS, REG_SIZE)] & MASK(8);
     }
 
     shift_type = EXTRACT_BITS(offset, SHIFT_TYPE_POS, SHIFT_TYPE_SIZE);

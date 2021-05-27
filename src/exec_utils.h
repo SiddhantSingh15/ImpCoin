@@ -37,6 +37,15 @@ bool overflow(int32_t x, int32_t y);
 int32_t twos_comp(int32_t x);
 
 /**
+ * @brief Sign-extends a signed number to 32 bits
+ * 
+ * @param num Input
+ * 
+ * @return 32 bit extended version of num
+ */
+int32_t signed_24_to_32(uint32_t num);
+
+/**
  * @brief Sets corresponding flag in the CPSR register.
  *
  * @param reg_file The current register state of the ARM11 system.

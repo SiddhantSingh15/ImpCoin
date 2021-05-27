@@ -97,9 +97,10 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-
+  
   state->register_file[PC] =
-      state->register_file[PC] - 8 + (int32_t)(instr.offset << 2);
+      state->register_file[PC] + signed_24_to_32(instr.offset);
+  flush_pipeline(state->pipeline);
 }
 
 void exec_sdt(sdt_t instr, arm11_state_t *state) {

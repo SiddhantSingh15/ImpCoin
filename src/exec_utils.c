@@ -42,6 +42,29 @@ int32_t twos_comp(int32_t x) {
   return ~x + 1;
 }
 
+/**
+ * @brief Sign-extends a signed number to 32 bits
+ * 
+ * @param num Input
+ * 
+ * @return 32 bit extended version of num
+ */
+
+int32_t signed_24_to_32(uint32_t num) {
+  if (num >> 23) {
+    return - (~(0xFF000000 + num));
+  }
+  return (int32_t) num;
+}
+
+/**
+ * @brief Sets corresponding flag in the CPSR register.
+ *
+ * @param reg_file The current register state of the ARM11 system.
+ * @param set Either 0 or 1
+ * @param flag The flag the user wants to change.
+ */
+
 void set_flag(uint32_t *reg_file, int set, int flag) {
   if (set) {
     reg_file[CPSR] |= 1 << flag;

@@ -13,9 +13,12 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   uint32_t result;
   int c_flag;
 
+  // Changes the current Operand2 based on tehe value of the I flag.
   uint32_t operand2 = barrel_shifter(instr.is_immediate, instr.set_cond,
                                      instr.op2, state->register_file);
 
+  // Switch condition to perform the operations specified by the instruction
+  // OpCode.
   switch (instr.opcode) {
 
   case AND:
@@ -83,6 +86,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     printf("Illegal data processing instruction !");
   }
 
+  // Sets the COND flags if the C flag is 1.
   if (instr.set_cond) {
     set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
     set_flag(state->register_file, c_flag, C_FLAG);

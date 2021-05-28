@@ -12,34 +12,35 @@
 void exec_dataproc(dataproc_t instr, arm11_state_t *state);
 
 /**
- * @brief
+ * @brief Executes the Single Data Transfer Instruction.
  *
- * @param
- * @param
+ * @param instr The input instruction.
+ * @param state The current state of the ARM11 system.
  */
 void exec_sdt(sdt_t instr, arm11_state_t *state);
 
 /**
- * @brief
+ * @brief Executes the Multiply Instruction.
  *
- * @param
- * @param
+ * @param instr The input instruction.
+ * @param state The current state of the ARM11 system.
  */
 void exec_mult(multiply_t instr, arm11_state_t *state);
 
 /**
- * @brief
+ * @brief Executes the Branch Instruction.
  *
- * @param
- * @param
+ * @param instr The input instruction.
+ * @param state The current state of the ARM11 system.
  */
 void exec_branch(branch_t instr, arm11_state_t *state);
 
 /**
- * @brief
+ * @brief Takes a pointer to an instruction and updates the internal memory 
+ * and registers to reflect the executed operation.
  *
- * @param
- * @param
+ * @param instr The pointer to the instruction.
+ * @param state The pointer to the state of the ARM11 system.
  */
 void execute(instruction_t *instr, arm11_state_t *state);
 

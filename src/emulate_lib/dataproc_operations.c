@@ -31,6 +31,3 @@ int32_t orr(int32_t op1, int32_t op2, int *carry_out) { return op1 | op2; }
 
 int32_t mov(int32_t op1, int32_t op2, int *carry_out) { return op2; }
 
-bool discards_result(int val){
-  return val == TST || val == TEQ || val == CMP;
-}

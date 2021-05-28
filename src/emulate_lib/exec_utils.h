@@ -72,7 +72,16 @@ bool is_logic(int val);
  */
 bool is_arithmetic(int val);
 
+/**
+ * @brief Checks if the operation type discards result i.e. does not save result
+ * to register.
+ *
+ * @param val The opcode of instruction.
+ *
+ * @return Returns true if the operation discards result.
+ */
 bool discards_result(int val);
+
 /**
  * @brief Rotates the register to the right specified by input params.
  *

@@ -2,10 +2,18 @@
 #include "../global_helpers/types.h"
 #include "emulate_utils.h"
 #include "exec_utils.h"
+#include "dataproc_operations.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+const data_operation *get_operations() {
+  const static data_operation operations[] = {
+      and_tst, eor_teq, sub,     rsb, add,  NULL, NULL,
+      NULL,    and_tst, eor_teq, cmp, NULL, orr,  mov};
+  return operations;
+}
 
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file)) {
@@ -20,8 +28,11 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   int32_t operand2 = barrel_shifter(instr.is_immediate, instr.op2,
                                     state->register_file, &carry_out);
 
+  result = get_operations()[instr.opcode](operand1, operand2, &carry_out);
+
   // Switch condition to perform the operations specified by the instruction
   // OpCode.
+  /*
   switch (instr.opcode) {
 
   case AND:
@@ -78,6 +89,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   default:
     printf("Illegal data processing instruction !");
   }
+  */
 
   // Sets the COND flags if the C flag is 1.
   if (instr.set_cond) {
@@ -86,6 +98,7 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     set_flag(state->register_file, result == 0, Z_FLAG);
   }
 }
+
 
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file)) {

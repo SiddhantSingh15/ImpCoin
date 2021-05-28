@@ -23,7 +23,7 @@ emulate_lib/decoder: emulate_lib/decoder.h
 
 emulate_lib/exec_instructions.o: emulate_lib/exec_utils.o emulate_lib/exec_instructions.h
 
-# emulate_lib/exec_utils.o: emulate_lib/exec_utils.h
+emulate_lib/exec_utils.o: emulate_lib/exec_utils.h
 
 testrunner: testing/test_utils.o emulate_lib/decoder.o emulate_lib/emulate_utils.o emulate_lib/exec_utils.o
 

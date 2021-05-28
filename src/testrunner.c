@@ -1,8 +1,8 @@
-#include "../emulate_lib/decoder.h"
-#include "../global_helpers/types.h"
-#include "../emulate_lib/emulate_utils.h"
-#include "../emulate_lib/exec_utils.h"
-#include "test_utils.h"
+#include "emulate_lib/decoder.h"
+#include "global_helpers/types.h"
+#include "emulate_lib/emulate_utils.h"
+#include "emulate_lib/exec_utils.h"
+#include "testing/test_utils.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>

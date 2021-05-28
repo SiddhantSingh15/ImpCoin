@@ -9,7 +9,7 @@
  * @param instr The input instruction.
  * @param state The current state of the ARM11 system.
  */
-// void exec_dataproc(dataproc_t instr, arm11_state_t *state);
+void exec_dataproc(dataproc_t instr, arm11_state_t *state);
 
 /**
  * @brief
@@ -17,7 +17,7 @@
  * @param
  * @param
  */
-// void exec_sdt(sdt_t instr, arm11_state_t *state);
+void exec_sdt(sdt_t instr, arm11_state_t *state);
 
 /**
  * @brief
@@ -25,7 +25,7 @@
  * @param
  * @param
  */
-// void exec_mult(multiply_t instr, arm11_state_t *state);
+void exec_mult(multiply_t instr, arm11_state_t *state);
 
 /**
  * @brief
@@ -33,7 +33,7 @@
  * @param
  * @param
  */
-// void exec_branch(branch_t instr, arm11_state_t *state);
+void exec_branch(branch_t instr, arm11_state_t *state);
 
 /**
  * @brief

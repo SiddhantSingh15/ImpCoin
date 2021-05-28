@@ -10,9 +10,12 @@
 #define PC 15
 #define CPSR 16
 
+/* Macro for creating 32-bit set-masks of size n */
+#define MASK(n) (uint32_t) ((1 << n) - 1)
+
 /* FLAGS */
 #define SET 1
-#define NOT_SET 0
+#define RESET 0
 #define V_FLAG 28
 #define C_FLAG 29
 #define Z_FLAG 30
@@ -30,7 +33,6 @@
 
 /* Common register start positions */
 #define COND_POS 28
-#define SET_COND_POS 20
 #define S_POS 20
 #define I_POS 25
 #define OFFSET_POS 0
@@ -81,7 +83,12 @@
 #define ORR 0xC
 #define MOV 0xD
 
-/* Shift Types */
+/* Shift Operations */
+#define SHIFT_MULTIPLIER 2
+#define SHIFT_TYPE_POS 5
+#define SHIFT_TYPE_SIZE 2
+#define SHIFT_VAL 7
+#define SHIFT_VAL_SIZE 5
 #define LSL 0x0
 #define LSR 0x1
 #define ASR 0x2

@@ -26,7 +26,7 @@ instruction_t *decode_dataproc(instruction_t *instr) {
   instr->data.dataproc.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
   instr->data.dataproc.is_immediate = EXTRACT_BIT(raw_data, I_POS);
   instr->data.dataproc.opcode = EXTRACT_BITS(raw_data, OPCODE_POS, OPCODE_SIZE);
-  instr->data.dataproc.set_cond = EXTRACT_BIT(raw_data, SET_COND_POS);
+  instr->data.dataproc.set_cond = EXTRACT_BIT(raw_data, S_POS);
   instr->data.dataproc.rn = EXTRACT_BITS(raw_data, RN_POS, REG_SIZE);
   instr->data.dataproc.rd = EXTRACT_BITS(raw_data, RD_POS, REG_SIZE);
   instr->data.dataproc.op2 = EXTRACT_BITS(raw_data, OP2_POS, OP2_SIZE);
@@ -43,7 +43,7 @@ instruction_t *decode_multiply(instruction_t *instr) {
 
   instr->data.multiply.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
   instr->data.multiply.accumulate = EXTRACT_BIT(raw_data, A_POS);
-  instr->data.multiply.set_cond = EXTRACT_BIT(raw_data, SET_COND_POS);
+  instr->data.multiply.set_cond = EXTRACT_BIT(raw_data, S_POS);
   instr->data.multiply.rd = EXTRACT_BITS(raw_data, MULTIPLY_RD_POS, REG_SIZE);
   instr->data.multiply.rn = EXTRACT_BITS(raw_data, MULTIPLY_RN_POS, REG_SIZE);
   instr->data.multiply.rs = EXTRACT_BITS(raw_data, RS_POS, REG_SIZE);

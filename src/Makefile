@@ -33,4 +33,5 @@ clean:
 	rm -f $(wildcard *.o)
 	rm -f assemble
 	rm -f emulate
+	rm -f emulate_lib/emulate_utils
 	rm -f testrunner

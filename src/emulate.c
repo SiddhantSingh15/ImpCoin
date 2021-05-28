@@ -4,6 +4,7 @@
 #include "decoder.h"
 #include "emulate.h"
 #include "emulate_utils.h"
+#include "exec_instructions.h"
 
 int main(int argc, char **argv) {
 	if (argc != 2) {
@@ -24,16 +25,15 @@ int main(int argc, char **argv) {
   while (state->pipeline->executed == NULL || state->pipeline->executed->tag != HALT) {
     // Execute an instruction
     if (state->pipeline->executed != NULL) {
-      // execute()
+      execute(state->pipeline->executed, state);
       free(state->pipeline->executed);
     }
 
+    state->pipeline->decoded = state->pipeline->fetched;
     // Decode an instruction
     if (state->pipeline->decoded != NULL) {
-      decode(state->pipeline->decoded);
+      state->pipeline->executed = decode(state->pipeline->decoded);
     }
-    state->pipeline->executed = state->pipeline->decoded;
-    state->pipeline->decoded = state->pipeline->fetched;
 
     // Fetch an instruction
     fetch_next(state);
@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
 
 
   // Once everything is done, free state memory and pipeline
+  print_arm11_state(state);
   flush_pipeline(state->pipeline);
   free_state_memory(state);
 }

@@ -1,4 +1,5 @@
 #include "emulate_utils.h"
+#include "definitions.h"
 #include "emulate.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -6,14 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/**
- *
- * @param filename Name of file for reading
- * @param memory Pointer to leading element of our state's memory array
- */
-
 void read_file(char *filename, arm11_state_t *state) {
-  printf("Attempting to read file: %s\n", filename);
   FILE *fptr;
   if ((fptr = fopen(filename, "rb")) == NULL) {
     printf("Error opening file.\n");
@@ -25,8 +19,6 @@ void read_file(char *filename, arm11_state_t *state) {
   if (ferror(fptr)) {
     perror("Error occurred when reading file\n");
     exit(EXIT_FAILURE);
-  } else {
-    printf("File read success\n");
   }
   fclose(fptr);
 }
@@ -57,31 +49,21 @@ void free_state_memory(arm11_state_t *state) {
 
 void fetch_next(arm11_state_t *state) {
   instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
-  // Set the incoming 32 byte data to be all 0s
-  uint32_t incoming = 0;
   int curr = (state->register_file)[PC];
-
   assert(curr < MEM_SIZE - 1);
-
-  // Shift and insert the 4 pieces of data into curr 8 bytes at a time
-  incoming |= (state->main_memory)[curr];
-  for (int i = 1; i < REG_SIZE; i++) {
-    incoming <<= ONE_B;
-    incoming |= (state->main_memory)[curr + i];
-  }
   // Set up the union data
-  union instr_data incoming_instruction_data = {incoming};
+  union instr_data incoming_instruction_data = {
+    to_uint32_reg(&state->main_memory[curr])
+  };
   *fetched_instruction =
       (instruction_t){.data = incoming_instruction_data, .tag = RAW};
   // Insert into pipeline for fetched
   state->pipeline->fetched = fetched_instruction;
 }
 
-// Free all of pipeline, used for branch command
 void flush_pipeline(pipeline_t *pipeline) {
   free(pipeline->fetched);
   free(pipeline->decoded);
-  free(pipeline->executed);
   pipeline->fetched = NULL;
   pipeline->decoded = NULL;
   pipeline->executed = NULL;
@@ -90,36 +72,39 @@ void flush_pipeline(pipeline_t *pipeline) {
 void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through 17 registers */
-  printf("Registers: \n");
-  for (int i = 0; i < NUM_GENERAL; i++) {
-    printf("$%d  :          %d (0x%08x)\n", i, state->register_file[i],
+  printf("Registers:\n");
+  for (int i = 0; i <= NUM_GENERAL; i++) {
+    printf("$%-2d : %10d (0x%08x)\n", i, state->register_file[i],
            state->register_file[i]);
   }
 
   /* Printing PC and CPSR */
-  printf("PC  :          %d (0x%08x)\n", state->register_file[PC],
+  printf("PC  : %10d (0x%08x)\n", state->register_file[PC],
          state->register_file[PC]);
-  printf("CPSR  :          %d (0x%08x)\n", state->register_file[CPSR],
+  printf("CPSR: %10d (0x%08x)\n", state->register_file[CPSR],
          state->register_file[CPSR]);
 
   /* Looping through non-0 locations */
-  printf("Non-zero memory: \n");
+  printf("Non-zero memory:\n");
   for (int i = 0; i < MEM_SIZE; i += 4) {
-    uint32_t word = to_uint32(&state->main_memory[i]);
-    if (word == 0) {
-      printf("0x%08x: 0x%08x", i, word);
+    uint32_t word = to_uint32_print(&state->main_memory[i]);
+    if (word != 0) {
+      printf("0x%08x: 0x%08x\n", i, word);
     }
   }
 }
 
-/*
- * EXPERIMENTAL PIECE OF CODE (maybe we could pass the ARM state
- * and check through that)
- *
- */
-uint32_t to_uint32(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
+uint32_t to_uint32_reg(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t word = 0;
-  for (int i = 0; i < 4; i++) {
+  for (int i = WORD_SIZE_IN_BYTES - 1; i >= 0; i--) {
+    word = (word << 8) | byte_array[i];
+  }
+  return word;
+}
+
+uint32_t to_uint32_print(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
+  uint32_t word = 0;
+  for (int i = 0; i < WORD_SIZE_IN_BYTES; i++) {
     word = (word << 8) | byte_array[i];
   }
   return word;

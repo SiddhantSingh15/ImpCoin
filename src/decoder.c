@@ -62,6 +62,7 @@ instruction_t *decode_sdt(instruction_t *instr) {
   instr->data.sdt.cond = EXTRACT_BITS(raw_data, COND_POS, COND_SIZE);
   instr->data.sdt.is_shift_R = EXTRACT_BIT(raw_data, I_POS);
   instr->data.sdt.is_preindexed = EXTRACT_BIT(raw_data, P_POS);
+  instr->data.sdt.up_bit = EXTRACT_BIT(raw_data, U_POS);
   instr->data.sdt.load = EXTRACT_BIT(raw_data, L_POS);
   instr->data.sdt.rn = EXTRACT_BITS(raw_data, RN_POS, REG_SIZE);
   instr->data.sdt.rd = EXTRACT_BITS(raw_data, RD_POS, REG_SIZE);
@@ -84,15 +85,6 @@ instruction_t *decode_branch(instruction_t *instr) {
   return instr;
 }
 
-/**
- * @brief 
- * Takes an instruction containing raw uint32_t data, and decodes it to
- * a struct of instr_data.
- *
- * If the instruction is 0x0 (HALT signal), or if it cannot be decoded, it tags
- * the instruction_t with HALT.
- * @param *instr The input instruction.
- */
 instruction_t *decode(instruction_t *instr) {
   // the instruction to be decoded must be raw
   assert(instr->tag == RAW);

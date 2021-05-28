@@ -1,7 +1,9 @@
 #include "decoder.h"
 #include "emulate.h"
 #include "emulate_utils.h"
+#include "exec_utils.h"
 #include "test_utils.h"
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -201,32 +203,61 @@ void test_to_uint8_array(int *passing, int *total) {
   to_uint8_array(fourth, byte_array + 12);
 
   uint8_t expected_byte_array[WORD_SIZE_IN_BYTES * 4] = {
-      0x1a, 0x46, 0x3c, 0xe9, 0xd6, 0x85, 0xea, 0x31,
-      0x69, 0x42, 0x0b, 0x00, 0x69, 0x69, 0x69, 0x69};
+      0xe9, 0x3c, 0x46, 0x1a, 0x31, 0xea, 0x85, 0xd6,
+      0x00, 0x0b, 0x42, 0x69, 0x69, 0x69, 0x69, 0x69};
   track_test(test_uint8_array(expected_byte_array, byte_array,
                               WORD_SIZE_IN_BYTES * 4,
                               "to_uint8_array works correctly"),
              passing, total);
 }
 
-void test_to_uint32(int *passing, int *total) {
-  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0xd6, 0x85, 0xea, 0x31};
-  track_test(test_uint32(0xd685ea31, to_uint32(byte_array),
-                         "to_uint32 works correctly"),
+
+void test_to_uint32_reg(int *passing, int *total) {
+  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0x31, 0xea, 0x85, 0xd6};
+  track_test(test_uint32(0xd685ea31, to_uint32_reg(byte_array),
+                         "to_uint32_reg works correctly"),
              passing, total);
 }
 
-void test_unit_conversions(int *passing, int *total) {
+
+void test_to_uint32_print(int *passing, int *total) {
+  uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0xd6, 0x85, 0xea, 0x31};
+  track_test(test_uint32(0xd685ea31, to_uint32_print(byte_array),
+                         "to_uint32_print works correctly"),
+             passing, total);
+}
+
+
+void test_overflow(int *passing, int *total) {
+  track_test(test_bool(!overflow(2, 2), "2 + 2 doesn't overflow"), passing,
+             total);
+  track_test(test_bool(!overflow(-2, -2), "-2 + -2 doesn't overflow"), passing,
+             total);
+  track_test(test_bool(overflow(INT_MAX, 1000), "INT_MAX + 1000 overflows"),
+             passing, total);
+  track_test(test_bool(!overflow(69, -69), "69 + -69 doesn't overflow"),
+             passing, total);
+  track_test(test_bool(!overflow(-420, 420), "-420 + 420 doesn't overflow"),
+             passing, total);
+      track_test(
+          test_bool(overflow(INT_MIN, -6969), "INT_MIN - 6969 overflows"),
+          passing, total);
+}
+
+
+void test_bit_operations(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
          "\n");
-  printf("-----%sUNIT CONVERSION "
+  printf("-----%sBIT OPERATIONS "
          "TESTS%s-------------------------------------------\n",
          BOLDBLUE, RESET);
   int internal_passing = 0;
   int internal_total = 0;
 
   test_to_uint8_array(&internal_passing, &internal_total);
-  test_to_uint32(&internal_passing, &internal_total);
+  test_to_uint32_reg(&internal_passing, &internal_total);
+  test_to_uint32_print(&internal_passing, &internal_total);
+  test_overflow(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");
@@ -244,7 +275,7 @@ int main(void) {
   int passing = 0;
   int total = 0;
   test_decoder(&passing, &total);
-  test_unit_conversions(&passing, &total);
+  test_bit_operations(&passing, &total);
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",

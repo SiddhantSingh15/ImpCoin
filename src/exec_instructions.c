@@ -4,174 +4,150 @@
 #include "exec_utils.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
-
-/**
- * @brief Executes the Data Processing Instruction.
- * 
- * @param instr The input instruction.
- * @param state The current state of the ARM11 system.
- */
 
 void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
-  
-  uint32_t zero_checker;
 
-  instr.op2 
-    = barrel_shifter(instr.is_immediate, instr.op2, state->register_file);
-  
+  uint32_t result = 0;
+  int carry_out = 0;
 
+  int32_t operand1 = state->register_file[instr.rn];
+  // Changes the current Operand2 based on tehe value of the I flag.
+  int32_t operand2 = barrel_shifter(instr.is_immediate, instr.op2,
+                                    state->register_file, &carry_out);
+
+  // Switch condition to perform the operations specified by the instruction
+  // OpCode.
   switch (instr.opcode) {
 
-    case AND:
-      state->register_file[instr.rd] 
-        = state->register_file[instr.rn] & instr.op2;
+  case AND:
+    state->register_file[instr.rd] = operand1 & operand2;
 
-    case EOR:
-      state->register_file[instr.rd] 
-        = state->register_file[instr.rn] ^ instr.op2;
+    result = state->register_file[instr.rd];
+    break;
 
-      zero_checker = state->register_file[instr.rd];
+  case EOR:
+    state->register_file[instr.rd] = operand1 ^ operand2;
 
-    case SUB:
-      if (overflow(state->register_file[instr.rn], twos_comp(instr.op2))) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+    result = state->register_file[instr.rd];
+    break;
 
-      state->register_file[instr.rd] 
-        = state->register_file[instr.rn] - instr.op2;
+  case SUB:
+    carry_out = !overflow(operand1, twos_comp(operand2));
 
-      zero_checker = state->register_file[instr.rd];
+    state->register_file[instr.rd] = operand1 - operand2;
 
-    case RSB:
-      if (overflow(twos_comp(instr.op2), state->register_file[instr.rn])) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else if (state->register_file[instr.rn] > instr.op2) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+    result = state->register_file[instr.rd];
+    break;
 
-      state->register_file[instr.rd]
-        = instr.op2 - state->register_file[instr.rn];
+  case RSB:
+    carry_out = !overflow(operand2, twos_comp(operand1));
 
-      zero_checker = state->register_file[instr.rd];
-    
-    case ADD:
-      if (overflow(instr.op2, state->register_file[instr.rn])) {
-        set_flag(state->register_file, SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      }
+    state->register_file[instr.rd] = operand2 - operand1;
 
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] + instr.op2;
+    result = state->register_file[instr.rd];
+    break;
 
-      zero_checker = state->register_file[instr.rd];
+  case ADD:
+    carry_out = overflow(operand1, operand2);
 
-    case TST:
-      zero_checker = state->register_file[instr.rn] & instr.op2;
+    state->register_file[instr.rd] = operand1 + operand2;
 
-    case TEQ:
-      zero_checker = state->register_file[instr.rn] ^ instr.op2;
+    result = state->register_file[instr.rd];
+    break;
 
-    case CMP:
-      if (state->register_file[instr.rn] < instr.op2) {
-        set_flag(state->register_file, NOT_SET, C_FLAG);
-      } else {
-        set_flag(state->register_file, SET, C_FLAG);
-      }
+  case TST:
+    result = operand1 & operand2;
+    break;
 
-      zero_checker = state->register_file[instr.rn] - instr.op2;
+  case TEQ:
+    result = operand1 ^ operand2;
+    break;
 
-    case ORR:
-      state->register_file[instr.rd]
-        = state->register_file[instr.rn] | instr.op2;
+  case CMP:
+    carry_out = !(operand1 < operand2);
 
-      zero_checker =  state->register_file[instr.rd];
-    
-    case MOV:
-      state->register_file[instr.rd] = instr.op2;
-      
-      zero_checker = state->register_file[instr.rd];
-    
-    default:
-      printf("Illegal data processing instruction !");
+    result = operand1 - operand2;
+    break;
+
+  case ORR:
+    state->register_file[instr.rd] = operand1 | operand2;
+
+    result = state->register_file[instr.rd];
+    break;
+
+  case MOV:
+    state->register_file[instr.rd] = operand2;
+
+    result = state->register_file[instr.rd];
+    break;
+
+  default:
+    printf("Illegal data processing instruction !");
   }
 
+  // Sets the COND flags if the C flag is 1.
   if (instr.set_cond) {
-    set_flag(state->register_file, EXTRACT_BIT(zero_checker, N_FLAG), N_FLAG);
-
-    if (zero_checker == 0) {
-      set_flag(state->register_file, SET, Z_FLAG);
-    } else {
-      set_flag(state->register_file, NOT_SET, Z_FLAG);
-    }
-
+    set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
+    set_flag(state->register_file, carry_out, C_FLAG);
+    set_flag(state->register_file, result == 0, Z_FLAG);
   }
-
 }
-/**
- * @brief
- * 
- * @param
- * @param
- */
 
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
   state->register_file[PC] =
-      state->register_file[PC] - 8 + (int32_t)(instr.offset << 2);
+      (int32_t)state->register_file[PC] + signed_24_to_32(instr.offset << 2);
+  flush_pipeline(state->pipeline);
 }
-
-/**
- * @brief
- * 
- * @param
- * @param
- */
 
 void exec_sdt(sdt_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file))
     return;
 
-  if (instr.rn == PC)
-    state->register_file[instr.rn] += 8;
-
   assert(PC != instr.rd);
   assert(PC != instr.offset);
-
-  uint32_t interpreted_offset = instr.offset;
-  if (instr.is_shift_R == 1) {
-    interpreted_offset 
-      = barrel_shifter(!instr.is_shift_R, instr.offset, state->register_file);
+  if (instr.is_shift_R) {
+    // PC cannot be equal to the shift register (R_m).
+    assert(PC != EXTRACT_BITS(instr.offset, RM_POS, REG_SIZE));
   }
 
-  uint16_t mem_address = state->register_file[instr.rn];
+  int32_t interpreted_offset = instr.offset;
+  if (instr.is_shift_R == 1) {
+    int carry_out = 0;
+    interpreted_offset = barrel_shifter(!instr.is_shift_R, instr.offset,
+                                        state->register_file, &carry_out);
+    // set_flag(state->register_file, carry_out, C_FLAG);
+  }
+
+  uint32_t mem_address = state->register_file[instr.rn];
 
   if (instr.is_preindexed == 1) {
-    mem_address +=
-        ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
+    mem_address += ((instr.up_bit == 1) ? interpreted_offset
+                                        : twos_comp(interpreted_offset));
   }
 
-  if (instr.load == SET) {
-    // Loads the memory to R[instr.rd], after converting it to word size
-    state->register_file[instr.rd] =
-        to_uint32(&state->main_memory[mem_address]);
+  if (mem_address <= MEM_SIZE) {
+    if (instr.load == SET) {
+      // Loads the memory to R[instr.rd], after converting it to word size
+      state->register_file[instr.rd] =
+          to_uint32_reg(&state->main_memory[mem_address]);
+    } else {
+      // Stores the value at instr.rd, after converting it to a byte array
+      to_uint8_array(state->register_file[instr.rd],
+                     &state->main_memory[mem_address]);
+    }
   } else {
-    // Stores the value at instr.rd, after converting it to a byte array
-    to_uint8_array(state->register_file[instr.rd],
-                   &state->main_memory[mem_address]);
+    printf("Error: Out of bounds memory access at address 0x%08x\n",
+           mem_address);
   }
 
   if (instr.is_preindexed == 0) {
-    // TODO: check the R_m != PC condition, add this after doing dataproc
     state->register_file[instr.rn] +=
         ((instr.up_bit == 1) ? interpreted_offset : -1 * interpreted_offset);
   }
@@ -195,14 +171,24 @@ void exec_mult(multiply_t instr, arm11_state_t *state) {
   state->register_file[instr.rd] = result;
 
   if (instr.set_cond) {
-    // TODO: Use Sid's setflag function to set the flag when the SET bit is 1
+    if (instr.set_cond) {
+    set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
+
+    if (result == 0) {
+      set_flag(state->register_file, SET, Z_FLAG);
+    } else {
+      set_flag(state->register_file, NOT_SET, Z_FLAG);
+    }
+
+  }
   }
 }
 
 void execute(instruction_t *instr, arm11_state_t *state) {
+  uint32_t raw;
   switch(instr->tag) {
     case DATAPROC:
-      // exec_dataproc
+      exec_dataproc(instr->data.dataproc, state);
       break;
     case MULTIPLY:
       exec_mult(instr->data.multiply, state);
@@ -216,10 +202,11 @@ void execute(instruction_t *instr, arm11_state_t *state) {
     case RAW:
     default:
       // Unexpected Result - Executer encountered a RAW or a HALT instruction
+      raw = instr->data.raw_data;
       fprintf(
         stderr,
-        "0x%32x is a RAW or a HALT instruction in execute. Halting emulator.",
-        instr->data
+        "0x%08x is a RAW or a HALT instruction in execute. Halting emulator.",
+        raw
       );
       exit(EXIT_FAILURE);
   }

@@ -49,20 +49,12 @@ void free_state_memory(arm11_state_t *state) {
 
 void fetch_next(arm11_state_t *state) {
   instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
-  // Set the incoming 32 byte data to be all 0s
-  uint32_t incoming = 0;
   int curr = (state->register_file)[PC];
-
   assert(curr < MEM_SIZE - 1);
-
-  // Shift and insert the 4 pieces of data into curr 8 bytes at a time
-  incoming |= (state->main_memory)[curr + 3];
-  for (int i = 2; i >= 0; i--) {
-    incoming <<= ONE_B;
-    incoming |= (state->main_memory)[curr + i];
-  }
   // Set up the union data
-  union instr_data incoming_instruction_data = {incoming};
+  union instr_data incoming_instruction_data = {
+    to_uint32_reg(&state->main_memory[curr])
+  };
   *fetched_instruction =
       (instruction_t){.data = incoming_instruction_data, .tag = RAW};
   // Insert into pipeline for fetched

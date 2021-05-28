@@ -15,19 +15,19 @@ tests: testrunner
 
 assemble: assemble.o
 
-emulate: emulate.o emulate_utils.o decoder.o exec_instructions.o exec_utils.o
+emulate: emulate_lib/emulate_utils.o emulate_lib/decoder.o emulate_lib/exec_instructions.o emulate_lib/exec_utils.o
 
-emulate_utils.o: emulate_utils.h
+emulate_lib/emulate_utils.o: emulate_lib/emulate_utils.h
 
-decoder: decoder.h
+emulate_lib/decoder: emulate_lib/decoder.h
 
-exec_instructions.o: exec_utils.o exec_instructions.h
+emulate_lib/exec_instructions.o: emulate_lib/exec_utils.o emulate_lib/exec_instructions.h
 
-exec_utils.o: exec_utils.h
+# emulate_lib/exec_utils.o: emulate_lib/exec_utils.h
 
-testrunner: testrunner.o test_utils.o decoder.o emulate_utils.o exec_utils.o
+testrunner: testing/test_utils.o emulate_lib/decoder.o emulate_lib/emulate_utils.o emulate_lib/exec_utils.o
 
-test_utils: test_utils.h
+testing/test_utils: testing/test_utils.h
 
 clean:
 	rm -f $(wildcard *.o)

@@ -1,7 +1,7 @@
 #ifndef DECODER_H
 #define DECODER_H
 
-#include "emulate.h"
+#include "../global_helpers/types.h"
 
 /**
  * @brief 

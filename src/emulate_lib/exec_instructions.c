@@ -1,5 +1,5 @@
-#include "definitions.h"
-#include "emulate.h"
+#include "../global_helpers/definitions.h"
+#include "../global_helpers/types.h"
 #include "emulate_utils.h"
 #include "exec_utils.h"
 #include <assert.h>

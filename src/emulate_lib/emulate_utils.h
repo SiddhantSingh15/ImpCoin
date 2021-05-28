@@ -1,10 +1,10 @@
 #ifndef SRC_IOUTILS_H
 #define SRC_IOUTILS_H
 
-#include "emulate.h"
+#include "../global_helpers/types.h"
 #include <stdint.h>
 #include <stdio.h>
-
+// ---------------- IO Functions ----------------
 /**
  * @brief Reads the file passed to the program.
  * 
@@ -26,7 +26,7 @@ void print_size(void);
 void print_arm11_state(arm11_state_t *state);
 
 
-
+// -------- State Manipulation Functions --------
 /**
  * @brief Initialises the ARM11 state before startup.
  * @return The initialised ARM11 state.
@@ -51,7 +51,7 @@ void fetch_next(arm11_state_t *state);
  */
 void flush_pipeline(pipeline_t *pipeline);
 
-
+// --------- Type Conversion Functions ----------
 /**
  * @brief Turns a uint8_t byte array to a suitable uint32_t type.
  * 

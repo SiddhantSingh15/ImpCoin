@@ -72,6 +72,7 @@ bool is_logic(int val);
  */
 bool is_arithmetic(int val);
 
+bool discards_result(int val);
 /**
  * @brief Rotates the register to the right specified by input params.
  *

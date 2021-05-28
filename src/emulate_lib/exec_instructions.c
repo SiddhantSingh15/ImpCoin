@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* The order in which operations are declared matters
+ * as they correspond to the opcodes*/
 const data_operation *get_operations() {
   const static data_operation operations[] = {
       and_tst, eor_teq, sub,     rsb, add,  NULL, NULL,
@@ -20,76 +22,24 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     return;
   }
 
-  uint32_t result = 0;
   int carry_out = 0;
-
   int32_t operand1 = state->register_file[instr.rn];
-  // Changes the current Operand2 based on tehe value of the I flag.
+  // Changes the current Operand2 based on the value of the I flag.
   int32_t operand2 = barrel_shifter(instr.is_immediate, instr.op2,
                                     state->register_file, &carry_out);
 
-  result = get_operations()[instr.opcode](operand1, operand2, &carry_out);
+  data_operation operation = get_operations()[instr.opcode];
 
-  // Switch condition to perform the operations specified by the instruction
-  // OpCode.
-  /*
-  switch (instr.opcode) {
-
-  case AND:
-    state->register_file[instr.rd] = operand1 & operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  case EOR:
-    state->register_file[instr.rd] = operand1 ^ operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  case SUB:
-    carry_out = !overflow(operand1, twos_comp(operand2));
-    state->register_file[instr.rd] = operand1 - operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  case RSB:
-    carry_out = !overflow(operand2, twos_comp(operand1));
-    state->register_file[instr.rd] = operand2 - operand1;
-    result = state->register_file[instr.rd];
-    break;
-
-  case ADD:
-    carry_out = overflow(operand1, operand2);
-    state->register_file[instr.rd] = operand1 + operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  case TST:
-    result = operand1 & operand2;
-    break;
-
-  case TEQ:
-    result = operand1 ^ operand2;
-    break;
-
-  case CMP:
-    carry_out = !(operand1 < operand2);
-    result = operand1 - operand2;
-    break;
-
-  case ORR:
-    state->register_file[instr.rd] = operand1 | operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  case MOV:
-    state->register_file[instr.rd] = operand2;
-    result = state->register_file[instr.rd];
-    break;
-
-  default:
-    printf("Illegal data processing instruction !");
+  if (operation == NULL || instr.opcode > MOV || instr.opcode < ADD) {
+    printf("Illegal data processing instruction!");
+    return;
   }
-  */
+
+  uint32_t result = operation(operand1, operand2, &carry_out);
+
+  if (!discards_result(instr.opcode)) {
+    state->register_file[instr.rd] = result;
+  }
 
   // Sets the COND flags if the C flag is 1.
   if (instr.set_cond) {
@@ -98,7 +48,6 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
     set_flag(state->register_file, result == 0, Z_FLAG);
   }
 }
-
 
 void exec_branch(branch_t instr, arm11_state_t *state) {
   if (!satisfies_cpsr(instr.cond, state->register_file)) {

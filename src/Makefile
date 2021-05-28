@@ -15,13 +15,15 @@ tests: testrunner
 
 assemble: assemble.o
 
-emulate: emulate_lib/emulate_utils.o emulate_lib/decoder.o emulate_lib/exec_instructions.o emulate_lib/exec_utils.o
+emulate: emulate_lib/emulate_utils.o emulate_lib/decoder.o emulate_lib/exec_instructions.o emulate_lib/exec_utils.o emulate_lib/dataproc_operations.o
 
 emulate_lib/emulate_utils.o: emulate_lib/emulate_utils.h
 
 emulate_lib/decoder: emulate_lib/decoder.h
 
-emulate_lib/exec_instructions.o: emulate_lib/exec_utils.o emulate_lib/exec_instructions.h
+emulate_lib/exec_instructions.o: emulate_lib/exec_utils.o emulate_lib/exec_instructions.h emulate_lib/dataproc_operations.o
+
+emulate_lib/dataproc_operations.o: emulate_lib/dataproc_operations.h
 
 emulate_lib/exec_utils.o: emulate_lib/exec_utils.h
 

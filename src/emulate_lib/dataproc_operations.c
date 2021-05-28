@@ -31,13 +31,6 @@ int32_t orr(int32_t op1, int32_t op2, int *carry_out) { return op1 | op2; }
 
 int32_t mov(int32_t op1, int32_t op2, int *carry_out) { return op2; }
 
-typedef int32_t (*data_operation)(int32_t, int32_t, int *);
-
-/* The order in which operations are declared matters
- * as they correspond to the opcodes*/
-/* const data_operation *get_operations() {
-  const static data_operation operations[] = {
-      and_tst, eor_teq, sub,     rsb, add,  NULL, NULL,
-      NULL,    and_tst, eor_teq, cmp, NULL, orr,  mov};
-  return operations;
-} */
+bool discards_result(int val){
+  return val == TST || val == TEQ || val == CMP;
+}

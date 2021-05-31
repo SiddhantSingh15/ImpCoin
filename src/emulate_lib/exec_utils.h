@@ -83,16 +83,6 @@ bool is_arithmetic(int val);
 bool discards_result(int val);
 
 /**
- * @brief Rotates the register to the right specified by input params.
- *
- * @param to_rotate The input register to rotate.
- * @param rotate_amt The amount the register should be rotated by.
- *
- * @return The rotated register.
- */
-uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt);
-
-/**
  * @brief Applies shifts to the input register based on the shift type.
  *
  * @param is_immediate I flag

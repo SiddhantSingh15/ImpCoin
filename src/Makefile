@@ -37,7 +37,7 @@ clean:
 	rm -f $(wildcard *.o)
 	rm -f assemble_lib/*.o
 	rm -f emulate_lib/*.o
-	rm -f test_utils/*.o
+	rm -f testing/*.o
 	rm -f assemble
 	rm -f emulate
 	rm -f testrunner

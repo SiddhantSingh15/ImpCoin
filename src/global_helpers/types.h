@@ -98,12 +98,19 @@ typedef struct arm11_state_t {
 } arm11_state_t;
 
 /**
+ * @brief A hashtable that will contain the label-address pairs
+ */
+typedef struct symbol_table {
+  uint8_t capacity;
+  uint8_t count;
+} symbol_table;
+
+/**
  * @brief The key-value pair structure for the symbol table 
  */
-typedef struct symbol_table_kvp{
+typedef struct symbol_table_kvp {
   char *key;
   uint32_t value;
-  symbol_table_kvp *next;
 } symbol_table_kvp;
 
 #endif

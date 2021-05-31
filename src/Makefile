@@ -13,7 +13,9 @@ all: assemble emulate testrunner
 
 tests: testrunner
 
-assemble: assemble.o
+assemble: assemble_lib/assemble_utils.o
+
+assemble_lib/assemble_utils.o: assemble_lib/assemble_utils.h
 
 emulate: emulate_lib/emulate_utils.o emulate_lib/decoder.o emulate_lib/exec_instructions.o emulate_lib/exec_utils.o emulate_lib/dataproc_operations.o
 

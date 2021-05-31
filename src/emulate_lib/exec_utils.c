@@ -2,7 +2,6 @@
 #include "../global_helpers/types.h"
 #include "exec_utils.h"
 #include "dataproc_operations.h"
-#include "decoder.h"
 #include "emulate_utils.h"
 #include <assert.h>
 #include <limits.h>

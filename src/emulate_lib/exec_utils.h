@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "../global_helpers/definitions.h"
 
 /**
  * @brief Checks if the COND bits passed in satisfy the pre-defined constraints

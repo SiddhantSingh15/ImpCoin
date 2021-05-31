@@ -272,35 +272,39 @@ void test_bit_operations(int *passing, int *total) {
   *total = *total + internal_total;
 }
 
-// void test_symbol_table(int *passing, int*total) {
-//   symbol_table_kvp *header = init_symbol_table();
-//   insert_to_symbol_table(header, "ayaya", 5);
-//   printf("---------------------------------------------------------------------"
-//          "\n");
-//   printf("-----%sSYMBOL TABLE "
-//          "TESTS%s-------------------------------------------\n",
-//          BOLDBLUE, NOCOLOUR);
-//   int internal_passing = 0;
-//   int internal_total = 0;
+void test_symbol_table(int *passing, int*total) {
+  symbol_table_kvp *st = init_symbol_table();
+  insert_to_symbol_table(st, "ayaya", 5);
+  insert_to_symbol_table(st, "peanut", 10);
+  insert_to_symbol_table(st, "chickne", 11);
+  insert_to_symbol_table(st, "tortle", 102);
+  insert_to_symbol_table(st, "blabla", 30);
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("-----%sSYMBOL TABLE "
+         "TESTS%s-------------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+  int internal_passing = 0;
+  int internal_total = 0;
 
-//   printf("---------------------------------------------------------------------"
-//          "\n");
-//   printf("%sPASSING: (%d/%d) tests%s\n",
-//          internal_passing == internal_total        ? GREEN
-//          : (internal_passing > internal_total / 2) ? YELLOW
-//                                                    : RED,
-//          internal_passing, internal_total, NOCOLOUR);
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
 
-//   *passing = *passing + internal_passing;
-//   *total = *total + internal_total;
-// }
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+}
 
 int main(void) {
   int passing = 0;
   int total = 0;
   test_decoder(&passing, &total);
   test_bit_operations(&passing, &total);
-  // test_symbol_table(&passing, &total);
+  test_symbol_table(&passing, &total);
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",

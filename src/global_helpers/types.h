@@ -103,7 +103,7 @@ typedef struct arm11_state_t {
 typedef struct symbol_table {
   uint8_t capacity;
   uint8_t count;
-  symbol_table_kvp **kvps;
+  struct symbol_table_kvp **kvps;
 } symbol_table;
 
 /**

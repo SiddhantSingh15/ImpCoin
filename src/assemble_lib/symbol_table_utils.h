@@ -9,7 +9,7 @@
  * 
  * @return The pointer to the header of the symbol table
  */
-symbol_table_kvp *init_symbol_table();
+symbol_table *init_symbol_table();
 
 /**
  * @brief Insert a label and its associated memory address into the symbol table
@@ -18,6 +18,6 @@ symbol_table_kvp *init_symbol_table();
  * @param label The string of the label
  * @param address The address associated with the label
  */
-void insert_to_symbol_table (symbol_table_kvp *header, char* label, int address);
+void symbol_table_insert (symbol_table_kvp *header, char* label, int address);
 
 #endif // SYMBOL_TABLE_UTILS_H

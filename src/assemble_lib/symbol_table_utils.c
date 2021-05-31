@@ -35,3 +35,11 @@ uint64_t hash (char* label) {
 bool contains_key (symbol_table_kvp *header, char* key) {
   return false;
 }
+
+void insert_to_symbol_table (symbol_table *st, char* label, int address) {
+  // Create the key-value pair first
+  symbol_table_kvp *kvp = calloc(1, sizeof(symbol_table_kvp));
+  char* new_key = malloc(strlen(label) + 1);
+  strcpy(new_key, label);
+  kvp->key = new_key;
+}

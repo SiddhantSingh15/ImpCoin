@@ -28,14 +28,13 @@ void exec_dataproc(dataproc_t instr, arm11_state_t *state) {
   int32_t operand2 = barrel_shifter(instr.is_immediate, instr.op2,
                                     state->register_file, &carry_out);
 
-  data_operation operation = get_operations()[instr.opcode];
-
-  if (operation == NULL || instr.opcode > MOV || instr.opcode < ADD) {
+  uint32_t result = 0;
+  if (is_arithmetic(instr.opcode) || is_logic(instr.opcode)) {
+    result = get_operations()[instr.opcode](operand1, operand2, &carry_out);
+  } else {
     printf("Illegal data processing instruction!");
     return;
   }
-
-  uint32_t result = operation(operand1, operand2, &carry_out);
 
   if (!discards_result(instr.opcode)) {
     state->register_file[instr.rd] = result;

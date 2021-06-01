@@ -1,8 +1,13 @@
 #include "../global_helpers/definitions.h"
+#include "dataproc_operations.h"
 #include "exec_utils.h"
 #include "emulate_utils.h"
 #include <stdint.h>
 #include <stdlib.h>
+
+/*------------------------------------------------------------
+ * Arithmetic and Logical Data Processing Functions.
+ * */
 
 int32_t and_tst(int32_t op1, int32_t op2, int *carry_out) { return op1 & op2; }
 

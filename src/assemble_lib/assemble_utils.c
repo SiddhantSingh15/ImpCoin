@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
-#include "definitions.h"
+
+#include "../global_helpers/definitions.h"
 
 void write_file(uint32_t *instr_array, int array_size, char *save_name) {
   FILE *file = fopen(save_name, "wb");

@@ -1,6 +1,7 @@
 #ifndef ASSEMBLE_UTILS_H
 #define ASSEMBLE_UTILS_H
 
+#include <stdint.h>
 #include <stdlib.h>
 
 

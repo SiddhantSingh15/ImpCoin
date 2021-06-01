@@ -272,24 +272,58 @@ void test_bit_operations(int *passing, int *total) {
   *total = *total + internal_total;
 }
 
-void test_symbol_table(int *passing, int*total) {
+void test_symbol_table_insert(int *passing, int *total) {
+
   symbol_table *st = init_symbol_table();
-  insert_to_symbol_table(st, "ayaya", 5);
-  insert_to_symbol_table(st, "peanut", 10);
-  insert_to_symbol_table(st, "chickne", 11);
-  insert_to_symbol_table(st, "tortle", 102);
-  insert_to_symbol_table(st, "blabla", 30);
-  printf("%d", retrieve_address(st, "ayaya"));
-  printf("%d", retrieve_address(st, "peanut"));
-  printf("%d", retrieve_address(st, "tortle"));
-  printf("%d", retrieve_address(st, "blabla"));
+
+  insert_to_symbol_table(st, "first", 5);
+  insert_to_symbol_table(st, "second", 10);
+  insert_to_symbol_table(st, "third", 11);
+  insert_to_symbol_table(st, "fourth", 102);
+  insert_to_symbol_table(st, "fifth", 30);
+  uint32_t *first = retrieve_address(st, "first");
+  uint32_t *second = retrieve_address(st, "second");
+  uint32_t *third = retrieve_address(st, "third");
+  uint32_t *fourth = retrieve_address(st, "fourth");
+  uint32_t *fifth = retrieve_address(st, "fifth");
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "First Insertion Works Correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *second == 10,
+      "Second Insertion Works Correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == 11,
+      "Third Insertion Works Correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fourth == 102,
+      "Fourth Insertion Works Correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fifth == 30,
+      "Fifth Insertion Works Correctly"
+    ), passing, total);
+}
+
+void test_symbol_table(int *passing, int*total) {
   printf("---------------------------------------------------------------------"
          "\n");
   printf("-----%sSYMBOL TABLE "
-         "TESTS%s-------------------------------------------\n",
+         "TESTS%s----------------------------------------------\n",
          BOLDBLUE, NOCOLOUR);
   int internal_passing = 0;
   int internal_total = 0;
+
+  test_symbol_table_insert(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

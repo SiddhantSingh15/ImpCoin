@@ -29,6 +29,6 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address);
  * 
  * @result The address of the provided label
  */
-uint32_t retrieve_address (symbol_table *st, char* label);
+uint32_t *retrieve_address (symbol_table *st, char* label);
 
 #endif // SYMBOL_TABLE_UTILS_H

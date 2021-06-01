@@ -9,7 +9,6 @@
 symbol_table *init_symbol_table() {
   symbol_table *st = calloc(1, sizeof(symbol_table));
   st->capacity = TABLE_CAPACITY;
-  st->kvps = calloc(TABLE_CAPACITY, sizeof(symbol_table_kvp*));
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     st->kvps[i] = NULL;
   }
@@ -38,7 +37,7 @@ uint32_t rehash(uint32_t prev_hash) {
 
 uint32_t *retrieve_address (symbol_table *st, char* label) {
   uint32_t hashcode = hash(label);
-  while (st->kvps[hashcode] != NULL && !strcmp(st->kvps[hashcode]->key, label)) {
+  while (st->kvps[hashcode] != NULL && strcmp(st->kvps[hashcode]->key, label)) {
     hashcode = rehash(hashcode);
   }
   if (st->kvps[hashcode] == NULL) {
@@ -47,18 +46,12 @@ uint32_t *retrieve_address (symbol_table *st, char* label) {
   return &st->kvps[hashcode]->value;
 }
 
-void free_kvp (symbol_table_kvp *kvp) {
-  free(kvp->key);
-  free(kvp);
-}
-
 void free_symbol_table (symbol_table *st) {
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     if (st->kvps[i] != NULL){
-      free_kvp(st->kvps[i]);
+      free(st->kvps[i]->key);
     }
   }
-  free(st->kvps);
   free(st);
 }
 
@@ -73,6 +66,7 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address) {
   char* new_key = malloc(strlen(label) + 1);
   strcpy(new_key, label);
   kvp->key = new_key;
+  kvp->value = address;
 
   // Apply hash function
   uint32_t hashcode = hash(label);
@@ -84,7 +78,7 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address) {
   } else {
     // Hashcode occupied
     // Two labels of the same name will never be added in
-    if (strcmp(label,st->kvps[hashcode]->key)) {
+    if (!strcmp(label,st->kvps[hashcode]->key)) {
       fprintf(stderr, "Two labels of the same name are being inserted.\n");
       exit(EXIT_FAILURE);   
     }

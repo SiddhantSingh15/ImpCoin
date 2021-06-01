@@ -334,6 +334,48 @@ void test_st_insert_varying_input(int *passing, int *total) {
     ), passing, total);
 }
 
+void test_st_collision(int *passing, int *total) {
+
+  symbol_table *st = init_symbol_table();
+
+  insert_to_symbol_table(st, "abcd", 5);
+  insert_to_symbol_table(st, "badc", 10);
+  insert_to_symbol_table(st, "dabc", 11);
+  insert_to_symbol_table(st, "abdc", 102);
+  insert_to_symbol_table(st, "dcba", 30);
+  uint32_t *first = retrieve_address(st, "abcd");
+  uint32_t *second = retrieve_address(st, "badc");
+  uint32_t *third = retrieve_address(st, "dabc");
+  uint32_t *fourth = retrieve_address(st, "abdc");
+  uint32_t *fifth = retrieve_address(st, "dcba");
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "\"abcd\" insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *second == 10,
+      "\"badc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == 11,
+      "\"dabc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fourth == 102,
+      "\"abdc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fifth == 30,
+      "\"dcba\" insertion rehashes and works correctly"
+    ), passing, total);
+}
+
 void test_symbol_table(int *passing, int*total) {
   printf("---------------------------------------------------------------------"
          "\n");
@@ -345,6 +387,7 @@ void test_symbol_table(int *passing, int*total) {
 
   test_st_insert(&internal_passing, &internal_total);
   test_st_insert_varying_input(&internal_passing, &internal_total);
+  test_st_collision(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

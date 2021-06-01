@@ -32,7 +32,7 @@ symbol_table *init_symbol_table() {
 }
 
 uint32_t rehash(uint32_t prev_hash) {
-  return (prev_hash * prev_hash + 1) % TABLE_CAPACITY;
+  return (prev_hash + 1) % TABLE_CAPACITY;
 }
 
 uint32_t *retrieve_address (symbol_table *st, char* label) {

@@ -86,6 +86,7 @@ void free_symbol_table (symbol_table *st) {
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     if (st->kvps[i] != NULL){
       free(st->kvps[i]->key);
+      free(st->kvps[i]);
     }
   }
   free(st);

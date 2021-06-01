@@ -318,6 +318,7 @@ void test_st_insert(int *passing, int *total) {
       missing == NULL,
       "Invalid insertion correctly produces NULL pointer"
     ), passing, total);
+  free_symbol_table(st);
 }
 
 void test_st_insert_varying_input(int *passing, int *total) {
@@ -332,6 +333,7 @@ void test_st_insert_varying_input(int *passing, int *total) {
       *first == 5,
       "extended[511] = \"first\" and raw \"first\" are the same"
     ), passing, total);
+  free_symbol_table(st);
 }
 
 void test_st_collision(int *passing, int *total) {
@@ -374,6 +376,7 @@ void test_st_collision(int *passing, int *total) {
       *fifth == 30,
       "\"dcba\" insertion rehashes and works correctly"
     ), passing, total);
+  free_symbol_table(st);
 }
 
 void test_symbol_table(int *passing, int*total) {

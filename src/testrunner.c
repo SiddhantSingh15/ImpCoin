@@ -272,7 +272,7 @@ void test_bit_operations(int *passing, int *total) {
   *total = *total + internal_total;
 }
 
-void test_symbol_table_insert(int *passing, int *total) {
+void test_st_insert(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
 
@@ -286,31 +286,51 @@ void test_symbol_table_insert(int *passing, int *total) {
   uint32_t *third = retrieve_address(st, "third");
   uint32_t *fourth = retrieve_address(st, "fourth");
   uint32_t *fifth = retrieve_address(st, "fifth");
+  uint32_t *missing = retrieve_address(st, "missing");
 
   track_test(
     test_bool(
       *first == 5,
-      "First Insertion Works Correctly"
+      "First insertion works correctly"
     ), passing, total);
   track_test(
     test_bool(
       *second == 10,
-      "Second Insertion Works Correctly"
+      "Second insertion works correctly"
     ), passing, total);
   track_test(
     test_bool(
       *third == 11,
-      "Third Insertion Works Correctly"
+      "Third insertion works correctly"
     ), passing, total);
   track_test(
     test_bool(
       *fourth == 102,
-      "Fourth Insertion Works Correctly"
+      "Fourth insertion works correctly"
     ), passing, total);
   track_test(
     test_bool(
       *fifth == 30,
-      "Fifth Insertion Works Correctly"
+      "Fifth insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      missing == NULL,
+      "Invalid insertion correctly produces NULL pointer"
+    ), passing, total);
+}
+
+void test_st_insert_varying_input(int *passing, int *total) {
+
+  symbol_table *st = init_symbol_table();
+  char extended[511] = "first";
+  insert_to_symbol_table(st, "first", 5);
+  uint32_t *first = retrieve_address(st, extended);
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "extended[511] = \"first\" and raw \"first\" are the same"
     ), passing, total);
 }
 
@@ -323,7 +343,8 @@ void test_symbol_table(int *passing, int*total) {
   int internal_passing = 0;
   int internal_total = 0;
 
-  test_symbol_table_insert(&internal_passing, &internal_total);
+  test_st_insert(&internal_passing, &internal_total);
+  test_st_insert_varying_input(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

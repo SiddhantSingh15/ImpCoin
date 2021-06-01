@@ -46,15 +46,6 @@ uint32_t *retrieve_address (symbol_table *st, char* label) {
   return &st->kvps[hashcode]->value;
 }
 
-void free_symbol_table (symbol_table *st) {
-  for (int i = 0; i < TABLE_CAPACITY; i++) {
-    if (st->kvps[i] != NULL){
-      free(st->kvps[i]->key);
-    }
-  }
-  free(st);
-}
-
 void insert_to_symbol_table (symbol_table *st, char* label, int address) {
   if (st->count == st->capacity) {
     fprintf(stderr, "Symbol Table is at full capacity.\n");
@@ -89,4 +80,13 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address) {
     } while (st->kvps[hashcode] != NULL);
   }
   st->kvps[hashcode] = kvp;
+}
+
+void free_symbol_table (symbol_table *st) {
+  for (int i = 0; i < TABLE_CAPACITY; i++) {
+    if (st->kvps[i] != NULL){
+      free(st->kvps[i]->key);
+    }
+  }
+  free(st);
 }

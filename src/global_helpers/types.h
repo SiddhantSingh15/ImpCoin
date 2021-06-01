@@ -101,8 +101,8 @@ typedef struct arm11_state_t {
  * @brief A hashtable that will contain the label-address pairs
  */
 typedef struct symbol_table {
-  uint8_t capacity;
-  uint8_t count;
+  uint32_t capacity;
+  uint32_t count;
   struct symbol_table_kvp **kvps;
 } symbol_table;
 

@@ -9,7 +9,7 @@
 symbol_table *init_symbol_table() {
   symbol_table *st = calloc(1, sizeof(symbol_table));
   st->capacity = TABLE_CAPACITY;
-  st->kvps = malloc(TABLE_CAPACITY * sizeof(symbol_table_kvp*));
+  st->kvps = calloc(TABLE_CAPACITY, sizeof(symbol_table_kvp*));
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     st->kvps[i] = NULL;
   }
@@ -36,7 +36,7 @@ uint32_t rehash(uint32_t prev_hash) {
   return (prev_hash * prev_hash + 1) % TABLE_CAPACITY;
 }
 
-uint32_t retrieve_address (symbol_table *st, char* label) {
+uint32_t *retrieve_address (symbol_table *st, char* label) {
   uint32_t hashcode = hash(label);
   while (st->kvps[hashcode] != NULL && !strcmp(st->kvps[hashcode]->key, label)) {
     hashcode = rehash(hashcode);
@@ -44,7 +44,7 @@ uint32_t retrieve_address (symbol_table *st, char* label) {
   if (st->kvps[hashcode] == NULL) {
     return NULL;
   }
-  return st->kvps[hashcode]->value;
+  return &st->kvps[hashcode]->value;
 }
 
 void free_kvp (symbol_table_kvp *kvp) {

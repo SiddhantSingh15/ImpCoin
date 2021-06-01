@@ -273,12 +273,16 @@ void test_bit_operations(int *passing, int *total) {
 }
 
 void test_symbol_table(int *passing, int*total) {
-  symbol_table_kvp *st = init_symbol_table();
+  symbol_table *st = init_symbol_table();
   insert_to_symbol_table(st, "ayaya", 5);
   insert_to_symbol_table(st, "peanut", 10);
   insert_to_symbol_table(st, "chickne", 11);
   insert_to_symbol_table(st, "tortle", 102);
   insert_to_symbol_table(st, "blabla", 30);
+  printf("%d", retrieve_address(st, "ayaya"));
+  printf("%d", retrieve_address(st, "peanut"));
+  printf("%d", retrieve_address(st, "tortle"));
+  printf("%d", retrieve_address(st, "blabla"));
   printf("---------------------------------------------------------------------"
          "\n");
   printf("-----%sSYMBOL TABLE "

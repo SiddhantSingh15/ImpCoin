@@ -1,7 +1,7 @@
 #ifndef EXEC_INSTRUCTIONS_H
 #define EXEC_INSTRUCTIONS_H
 
-#include "exec_utils.h"
+#include "../global_helpers/types.h"
 
 /**
  * @brief Executes the Data Processing Instruction.

@@ -94,5 +94,7 @@
 #define ASR 0x2
 #define ROR 0x3
 
+/* Symbol Table */
+#define TABLE_CAPACITY 16
 
 #endif // DEFINITIONS_H

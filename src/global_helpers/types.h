@@ -97,4 +97,21 @@ typedef struct arm11_state_t {
   pipeline_t *pipeline; /** Current pipeline of the system */
 } arm11_state_t;
 
+/**
+ * @brief A hashtable that will contain the label-address pairs
+ */
+typedef struct symbol_table {
+  uint32_t capacity;
+  uint32_t count;
+  struct symbol_table_kvp *kvps[TABLE_CAPACITY];
+} symbol_table;
+
+/**
+ * @brief The key-value pair structure for the symbol table 
+ */
+typedef struct symbol_table_kvp {
+  char *key;
+  uint32_t value;
+} symbol_table_kvp;
+
 #endif

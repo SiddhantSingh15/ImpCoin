@@ -3,6 +3,7 @@
 #include "emulate_lib/emulate_utils.h"
 #include "emulate_lib/exec_utils.h"
 #include "testing/test_utils.h"
+#include "assemble_lib/symbol_table_utils.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -271,11 +272,144 @@ void test_bit_operations(int *passing, int *total) {
   *total = *total + internal_total;
 }
 
+void test_st_insert(int *passing, int *total) {
+
+  symbol_table *st = init_symbol_table();
+
+  insert_to_symbol_table(st, "first", 5);
+  insert_to_symbol_table(st, "second", 10);
+  insert_to_symbol_table(st, "third", 11);
+  insert_to_symbol_table(st, "fourth", 102);
+  insert_to_symbol_table(st, "fifth", 30);
+  uint32_t *first = retrieve_address(st, "first");
+  uint32_t *second = retrieve_address(st, "second");
+  uint32_t *third = retrieve_address(st, "third");
+  uint32_t *fourth = retrieve_address(st, "fourth");
+  uint32_t *fifth = retrieve_address(st, "fifth");
+  uint32_t *missing = retrieve_address(st, "missing");
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "First insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *second == 10,
+      "Second insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == 11,
+      "Third insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fourth == 102,
+      "Fourth insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fifth == 30,
+      "Fifth insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      missing == NULL,
+      "Invalid insertion correctly produces NULL pointer"
+    ), passing, total);
+  free_symbol_table(st);
+}
+
+void test_st_insert_varying_input(int *passing, int *total) {
+
+  symbol_table *st = init_symbol_table();
+  char extended[511] = "first";
+  insert_to_symbol_table(st, "first", 5);
+  uint32_t *first = retrieve_address(st, extended);
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "extended[511] = \"first\" and raw \"first\" are the same"
+    ), passing, total);
+  free_symbol_table(st);
+}
+
+void test_st_collision(int *passing, int *total) {
+
+  symbol_table *st = init_symbol_table();
+
+  insert_to_symbol_table(st, "abcd", 5);
+  insert_to_symbol_table(st, "badc", 10);
+  insert_to_symbol_table(st, "dabc", 11);
+  insert_to_symbol_table(st, "abdc", 102);
+  insert_to_symbol_table(st, "dcba", 30);
+  uint32_t *first = retrieve_address(st, "abcd");
+  uint32_t *second = retrieve_address(st, "badc");
+  uint32_t *third = retrieve_address(st, "dabc");
+  uint32_t *fourth = retrieve_address(st, "abdc");
+  uint32_t *fifth = retrieve_address(st, "dcba");
+
+  track_test(
+    test_bool(
+      *first == 5,
+      "\"abcd\" insertion works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *second == 10,
+      "\"badc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == 11,
+      "\"dabc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fourth == 102,
+      "\"abdc\" insertion rehashes and works correctly"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *fifth == 30,
+      "\"dcba\" insertion rehashes and works correctly"
+    ), passing, total);
+  free_symbol_table(st);
+}
+
+void test_symbol_table(int *passing, int*total) {
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("-----%sSYMBOL TABLE "
+         "TESTS%s----------------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+  int internal_passing = 0;
+  int internal_total = 0;
+
+  test_st_insert(&internal_passing, &internal_total);
+  test_st_insert_varying_input(&internal_passing, &internal_total);
+  test_st_collision(&internal_passing, &internal_total);
+
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
+
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+}
+
 int main(void) {
   int passing = 0;
   int total = 0;
   test_decoder(&passing, &total);
   test_bit_operations(&passing, &total);
+  test_symbol_table(&passing, &total);
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",

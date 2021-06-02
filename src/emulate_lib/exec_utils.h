@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "../global_helpers/definitions.h"
 
 /**
  * @brief Checks if the COND bits passed in satisfy the pre-defined constraints
@@ -81,16 +82,6 @@ bool is_arithmetic(int val);
  * @return Returns true if the operation discards result.
  */
 bool discards_result(int val);
-
-/**
- * @brief Rotates the register to the right specified by input params.
- *
- * @param to_rotate The input register to rotate.
- * @param rotate_amt The amount the register should be rotated by.
- *
- * @return The rotated register.
- */
-uint32_t rotate_right(uint32_t to_rotate, uint8_t rotate_amt);
 
 /**
  * @brief Applies shifts to the input register based on the shift type.

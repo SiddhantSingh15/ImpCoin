@@ -7,7 +7,7 @@ endif
 
 SRC_DIRS ?= .
 
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_DIRS := $(shell find . ! -path . -type d)
 INC_FLAGS := $(addprefix -I, $(INC_DIRS:./%=%))
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 
@@ -24,15 +24,14 @@ ASSEMBLE_OBJS := $(call GET_OBJS, $(ASSEMBLE_SRC_DIRS))
 TEST_SRC_DIRS := emulate_lib assemble_lib testing testrunner.c
 TEST_OBJS := $(call GET_OBJS, $(TEST_SRC_DIRS))
 
-TO_CLEAN := $(shell find $(SRC_DIRS) -name "*.o" -or -name "*.d")
-
 .SUFFIXES: .c .o
 .PHONY: all clean
 
 all: assemble emulate testrunner
-	  rm -f $(TO_CLEAN)
+	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
 
 tests: testrunner
+	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
 
 emulate: $(EMULATE_OBJS)
 
@@ -41,9 +40,10 @@ assemble: $(ASSEMBLE_OBJS)
 testrunner: $(TEST_OBJS)
 
 clean:
-	rm -f $(TO_CLEAN)
-	rm -f assemble
-	rm -f emulate
-	rm -f testrunner
+	$(RM) $(shell find $(SRC_DIRS) -name "*.o")
+	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
+	$(RM) assemble
+	$(RM) emulate
+	$(RM) testrunner
 
 -include $(DEPS)

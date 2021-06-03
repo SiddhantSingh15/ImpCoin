@@ -5,41 +5,45 @@ ifeq ($(shell uname), Darwin)
   CC = gcc-9
 endif
 
-.SUFFIXES: .c .o
+SRC_DIRS ?= .
 
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_FLAGS := $(addprefix -I, $(INC_DIRS:./%=%))
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
+
+# SRCS := $(shell find $(SRC_DIRS) -name "*.c")
+GET_OBJS = $(addsuffix .o, $(basename $(shell find $(1) -name "*.c")))
+DEPS := $($(call GET_OBJS,$(SRC_DIRS)):.o=.d)
+
+EMULATE_SRC_DIRS := emulate_lib emulate.c
+EMULATE_OBJS := $(call GET_OBJS, $(EMULATE_SRC_DIRS))
+
+ASSEMBLE_SRC_DIRS := assemble_lib assemble.c
+ASSEMBLE_OBJS := $(call GET_OBJS, $(ASSEMBLE_SRC_DIRS))
+
+TEST_SRC_DIRS := emulate_lib assemble_lib testing testrunner.c
+TEST_OBJS := $(call GET_OBJS, $(TEST_SRC_DIRS))
+
+TO_CLEAN := $(shell find $(SRC_DIRS) -name "*.o" -or -name "*.d")
+
+.SUFFIXES: .c .o
 .PHONY: all clean
 
 all: assemble emulate testrunner
+	  rm -f $(TO_CLEAN)
 
 tests: testrunner
 
-assemble: assemble_lib/assemble_utils.o assemble_lib/symbol_table_utils.o
+emulate: $(EMULATE_OBJS)
 
-assemble_lib/assemble_utils: assemble_lib/assemble_utils.h
+assemble: $(ASSEMBLE_OBJS)
 
-assemble_lib/symbol_table_utils.o: assemble_lib/symbol_table_utils.h
-
-emulate: emulate_lib/exec_instructions.o emulate_lib/emulate_utils.o emulate_lib/decoder.o emulate_lib/exec_utils.o emulate_lib/dataproc_operations.o
-
-emulate_lib/emulate_utils: emulate_lib/emulate_utils.h
-
-emulate_lib/decoder: emulate_lib/decoder.h
-
-emulate_lib/exec_instructions: emulate_lib/exec_instructions.h
-
-emulate_lib/dataproc_operations: emulate_lib/dataproc_operations.h
-
-emulate_lib/exec_utils: emulate_lib/exec_utils.h
-
-testrunner: testing/test_utils.o emulate_lib/decoder.o emulate_lib/emulate_utils.o emulate_lib/exec_utils.o emulate_lib/dataproc_operations.o assemble_lib/symbol_table_utils.o
-
-testing/test_utils: testing/test_utils.h
+testrunner: $(TEST_OBJS)
 
 clean:
-	rm -f $(wildcard *.o)
-	rm -f assemble_lib/*.o
-	rm -f emulate_lib/*.o
-	rm -f testing/*.o
+	rm -f $(TO_CLEAN)
 	rm -f assemble
 	rm -f emulate
 	rm -f testrunner
+
+-include $(DEPS)

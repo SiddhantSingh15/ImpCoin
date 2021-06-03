@@ -1,0 +1,62 @@
+#include <assert.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+struct node {
+  void *value;
+  uint32_t address;
+  struct node *next;
+} node;
+
+struct linked_list {
+  struct node *root;
+  int size;
+} linked_list;
+
+void append(struct linked_list *list, void *val, uint32_t addr) {
+  assert(val);
+
+  struct node *new_node = malloc(sizeof(node));
+  new_node->value = val;
+  new_node->address = addr;
+  new_node->next = NULL;
+
+  if (list->root == NULL) {
+    list->size = 1;
+    list->root = new_node;
+    return;
+  }
+
+  struct node *curr = list->root;
+
+  while (curr->next != NULL) {
+    curr = curr->next;
+  }
+  curr->next = new_node;
+  list->size += 1;
+}
+
+struct node traverse(struct linked_list *list, int pos) {
+  assert(list);
+  assert(pos);
+  assert(0 <= pos < list->size);
+
+  struct node *curr;
+  curr = list->root;
+
+  while (pos >= 0) {
+    pos--;
+    curr = curr->next;
+  }
+
+  return *curr;
+}
+
+void change_node(struct linked_list *list, int pos, void *val) {
+  assert(list);
+  assert(0 <= pos < list->size);
+
+  struct node *node_to_change;
+  *node_to_change = traverse(list, pos);
+  node_to_change->value = val;
+}

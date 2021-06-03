@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +13,7 @@ token_list *tokenizer(char *instr_line) {
   token_list *tokens = calloc(1, sizeof(token_list));
 
   uint8_t count = 0;
-  // char *token;
+  char *token;
   char *rest = strdup(instr_line);
 
   char *instr_name = strtok_r(rest, " ", &rest);
@@ -20,19 +21,46 @@ token_list *tokenizer(char *instr_line) {
   tokens->list[count].data.instr_name = instr_name;
   count++;
 
-  /*
-  while ((token = strtok2(rest, ",[]#=", &rest))) {
-    if (token[0] == ',' || token[0] == ' ') {
+  while ((token = strbrk_r(rest, ",[]#=+-", &rest))) {
+
+    enum token_type type;
+    union token_data data;
+
+    if (strcspn(token, ",") == 0) {
       continue;
     }
-    // split separators
-    // figure out token type
-    // read associated data
-    // create and assign token
-  }
-  */
 
-  return NULL;
+    if (strlen(token) == 1) {
+      type = SEPARATOR;
+      data.separator = *token;
+
+    } else if (*token == 'r' && isdigit(token[1])) {
+      type = REG;
+      data.reg = (uint8_t) parse_int(token + 1);
+
+    } else if (isdigit(*token)) {
+      type = EXPRESSION;
+      data.exp = parse_int(token);
+
+    }
+
+    // TODO: if token is shiftname, initialize shiftname
+    // shiftname is always strlen() == 3
+
+    // TODO: if token is cond, initialize cond
+    // cond is always strlen() == 2
+
+    // TODO: how to distinguish between label and invalid token?
+    // label is apparently not always alphabetic
+
+    free(token);
+    tokens->list[count].type = type;
+    tokens->list[count].data = data;
+    count++;
+  }
+
+  free(rest);
+  return tokens;
 }
 
 /*
@@ -53,6 +81,10 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
     s = *save_pointer;
   }
 
+  if (*s == '\0') {
+    return NULL;
+  }
+
   char *token = malloc(sizeof(s));
   int tok_size = strcspn(s, delims);
   tok_size = tok_size == 0 ? 1 : tok_size;
@@ -65,4 +97,12 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
   *save_pointer += tok_size;
 
   return token;
+}
+
+uint32_t parse_int(char *str) {
+  // TODO: implement this
+  // this should be able to parse hexadecimal numbers with `0x` prefix
+  //
+  // use strtol and cast to uint32_t
+  return 0;
 }

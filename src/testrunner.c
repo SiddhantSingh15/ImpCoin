@@ -434,6 +434,9 @@ void test_strbrk_r(int *passing, int *total) {
   track_test(test_string("]", sixth_token, "Sixth token works"), passing,
              total);
   free(sixth_token);
+  char *extra_token = strbrk_r(instruction, delims, &instruction);
+  track_test(test_string(NULL, extra_token, "Extra token works"), passing,
+             total);
 }
 
 void test_tokenizer(int *passing, int *total) {

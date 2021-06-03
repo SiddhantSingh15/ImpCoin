@@ -275,48 +275,86 @@ void test_bit_operations(int *passing, int *total) {
 void test_st_insert(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
+  uint8_t *first = malloc(sizeof(uint8_t));
+  *first = 5;
+  uint8_t *second = malloc(sizeof(uint8_t));
+  *second = 10;
+  uint8_t *third = malloc(sizeof(uint8_t));
+  *third = 11;
+  uint32_t *fourth = malloc(sizeof(uint32_t));
+  *fourth = 102;
+  uint32_t *fifth = malloc(sizeof(uint32_t));
+  *fifth = 30;
 
-  insert_to_symbol_table(st, "first", 5);
-  insert_to_symbol_table(st, "second", 10);
-  insert_to_symbol_table(st, "third", 11);
-  insert_to_symbol_table(st, "fourth", 102);
-  insert_to_symbol_table(st, "fifth", 30);
-  uint32_t *first = retrieve_address(st, "first");
-  uint32_t *second = retrieve_address(st, "second");
-  uint32_t *third = retrieve_address(st, "third");
-  uint32_t *fourth = retrieve_address(st, "fourth");
-  uint32_t *fifth = retrieve_address(st, "fifth");
-  uint32_t *missing = retrieve_address(st, "missing");
+  insert_to_symbol_table(st, "first", first);
+  insert_to_symbol_table(st, "second", second);
+  insert_to_symbol_table(st, "third", third);
+  insert_to_symbol_table(st, "fourth", fourth);
+  insert_to_symbol_table(st, "fifth", fifth);
+  uint32_t *result_1 = st_retrieve(st, "first");
+  uint32_t *result_2 = st_retrieve(st, "second");
+  uint32_t *result_3 = st_retrieve(st, "third");
+  uint32_t *result_4 = st_retrieve(st, "fourth");
+  uint32_t *result_5 = st_retrieve(st, "fifth");
+  uint32_t *missing = st_retrieve(st, "missing");
 
+  // Tests for value in memory
   track_test(
     test_bool(
-      *first == 5,
-      "First insertion works correctly"
+      *first == *result_1,
+      "First value is equal"
     ), passing, total);
   track_test(
     test_bool(
-      *second == 10,
-      "Second insertion works correctly"
+      *second == *result_2,
+      "Second value is equal"
     ), passing, total);
   track_test(
     test_bool(
-      *third == 11,
-      "Third insertion works correctly"
+      *third == *result_3,
+      "Third value is equal"
     ), passing, total);
   track_test(
     test_bool(
-      *fourth == 102,
-      "Fourth insertion works correctly"
+      *fourth == *result_4,
+      "Fourth value is equal"
     ), passing, total);
   track_test(
     test_bool(
-      *fifth == 30,
-      "Fifth insertion works correctly"
+      *fifth == *result_5,
+      "Fifth value is equal"
     ), passing, total);
   track_test(
     test_bool(
       missing == NULL,
       "Invalid insertion correctly produces NULL pointer"
+    ), passing, total);
+
+  // Tests for memory
+  track_test(
+    test_bool(
+      first == result_1,
+      "First memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      second == result_2,
+      "Second memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      third == result_3,
+      "Third memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth == result_4,
+      "Fourth memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fifth == result_5,
+      "Fifth memory is equal"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -325,13 +363,21 @@ void test_st_insert_varying_input(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
   char extended[511] = "first";
-  insert_to_symbol_table(st, "first", 5);
-  uint32_t *first = retrieve_address(st, extended);
+  uint8_t *first = malloc(sizeof(uint8_t));
+  first = 5;
+  insert_to_symbol_table(st, "first", first);
+  uint32_t *result_1 = st_retrieve(st, extended);
 
   track_test(
     test_bool(
-      *first == 5,
+      *first == *result_1,
       "extended[511] = \"first\" and raw \"first\" are the same"
+    ), passing, total);
+
+  track_test(
+    test_bool(
+      first == result_1,
+      "memory of extended and raw \"first\" are the same"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -340,41 +386,31 @@ void test_st_collision(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
 
+  uint8_t *first = malloc(sizeof(uint8_t));
+  uint8_t *second = malloc(sizeof(uint8_t));
+  uint8_t *third = malloc(sizeof(uint8_t));
+
   insert_to_symbol_table(st, "abcd", 5);
   insert_to_symbol_table(st, "badc", 10);
   insert_to_symbol_table(st, "dabc", 11);
-  insert_to_symbol_table(st, "abdc", 102);
-  insert_to_symbol_table(st, "dcba", 30);
-  uint32_t *first = retrieve_address(st, "abcd");
-  uint32_t *second = retrieve_address(st, "badc");
-  uint32_t *third = retrieve_address(st, "dabc");
-  uint32_t *fourth = retrieve_address(st, "abdc");
-  uint32_t *fifth = retrieve_address(st, "dcba");
+  uint32_t *result_1 = st_retrieve(st, "abcd");
+  uint32_t *result_2 = st_retrieve(st, "badc");
+  uint32_t *result_3 = st_retrieve(st, "dabc");
 
   track_test(
     test_bool(
-      *first == 5,
+      *first == *result_1,
       "\"abcd\" insertion works correctly"
     ), passing, total);
   track_test(
     test_bool(
-      *second == 10,
+      *second == *result_2,
       "\"badc\" insertion rehashes and works correctly"
     ), passing, total);
   track_test(
     test_bool(
-      *third == 11,
+      *third == *result_3,
       "\"dabc\" insertion rehashes and works correctly"
-    ), passing, total);
-  track_test(
-    test_bool(
-      *fourth == 102,
-      "\"abdc\" insertion rehashes and works correctly"
-    ), passing, total);
-  track_test(
-    test_bool(
-      *fifth == 30,
-      "\"dcba\" insertion rehashes and works correctly"
     ), passing, total);
   free_symbol_table(st);
 }

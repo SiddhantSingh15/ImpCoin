@@ -114,4 +114,9 @@ typedef struct symbol_table_kvp {
   void *value;
 } symbol_table_kvp;
 
+typedef struct instr_func_map {
+  uint8_t opcode;
+  void *function;
+} instr_func_map;
+
 #endif

@@ -46,7 +46,7 @@ void *st_retrieve (symbol_table *st, char* key) {
   return &st->kvps[hashcode]->value;
 }
 
-void insert_to_symbol_table (symbol_table *st, char* key, void* value) {
+void st_insert (symbol_table *st, char* key, void* value) {
   if (st->count == st->capacity) {
     fprintf(stderr, "Symbol Table is at full capacity.\n");
     exit(EXIT_FAILURE);

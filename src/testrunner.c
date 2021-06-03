@@ -291,12 +291,12 @@ void test_st_insert(int *passing, int *total) {
   st_insert(st, "third", third);
   st_insert(st, "fourth", fourth);
   st_insert(st, "fifth", fifth);
-  uint32_t *result_1 = st_retrieve(st, "first");
-  uint32_t *result_2 = st_retrieve(st, "second");
-  uint32_t *result_3 = st_retrieve(st, "third");
-  uint32_t *result_4 = st_retrieve(st, "fourth");
-  uint32_t *result_5 = st_retrieve(st, "fifth");
-  uint32_t *missing = st_retrieve(st, "missing");
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "first");
+  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "second");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "third");
+  uint32_t *result_4 = (uint32_t*) st_retrieve(st, "fourth");
+  uint32_t *result_5 = (uint32_t*) st_retrieve(st, "fifth");
+  uint32_t *missing = (uint32_t*) st_retrieve(st, "missing");
 
   // Tests for value in memory
   track_test(
@@ -364,9 +364,9 @@ void test_st_insert_varying_input(int *passing, int *total) {
   symbol_table *st = init_symbol_table();
   char extended[511] = "first";
   uint8_t *first = malloc(sizeof(uint8_t));
-  first = 5;
+  *first = 5;
   st_insert(st, "first", first);
-  uint32_t *result_1 = st_retrieve(st, extended);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, extended);
 
   track_test(
     test_bool(
@@ -390,12 +390,12 @@ void test_st_collision(int *passing, int *total) {
   uint8_t *second = malloc(sizeof(uint8_t));
   uint8_t *third = malloc(sizeof(uint8_t));
 
-  st_insert(st, "abcd", 5);
-  st_insert(st, "badc", 10);
-  st_insert(st, "dabc", 11);
-  uint32_t *result_1 = st_retrieve(st, "abcd");
-  uint32_t *result_2 = st_retrieve(st, "badc");
-  uint32_t *result_3 = st_retrieve(st, "dabc");
+  st_insert(st, "abcd", first);
+  st_insert(st, "badc", second);
+  st_insert(st, "dabc", third);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "abcd");
+  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "badc");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "dabc");
 
   // Test for value
   track_test(

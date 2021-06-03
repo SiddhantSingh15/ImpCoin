@@ -43,7 +43,7 @@ void *st_retrieve (symbol_table *st, char* key) {
   if (st->kvps[hashcode] == NULL) {
     return NULL;
   }
-  return &st->kvps[hashcode]->value;
+  return st->kvps[hashcode]->value;
 }
 
 void st_insert (symbol_table *st, char* key, void* value) {

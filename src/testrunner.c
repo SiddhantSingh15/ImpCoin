@@ -397,20 +397,38 @@ void test_st_collision(int *passing, int *total) {
   uint32_t *result_2 = st_retrieve(st, "badc");
   uint32_t *result_3 = st_retrieve(st, "dabc");
 
+  // Test for value
   track_test(
     test_bool(
       *first == *result_1,
-      "\"abcd\" insertion works correctly"
+      "\"abcd\" value is equal"
     ), passing, total);
   track_test(
     test_bool(
       *second == *result_2,
-      "\"badc\" insertion rehashes and works correctly"
+      "\"badc\" value is equal"
     ), passing, total);
   track_test(
     test_bool(
       *third == *result_3,
-      "\"dabc\" insertion rehashes and works correctly"
+      "\"dabc\" value is equal"
+    ), passing, total);
+
+  // Test for memory
+  track_test(
+    test_bool(
+      first == result_1,
+      "\"abcd\" memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *second == *result_2,
+      "\"badc\" memory is equal"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == *result_3,
+      "\"dabc\" memory is equal"
     ), passing, total);
   free_symbol_table(st);
 }

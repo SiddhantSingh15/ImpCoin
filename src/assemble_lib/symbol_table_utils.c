@@ -21,11 +21,11 @@ symbol_table *init_symbol_table() {
  *        by 2, adds them together, then gets the remainder
  *        based on the size of the symbol table
  */ 
- uint32_t hash (char* label) {
+ uint32_t hash (char* key) {
   uint32_t acc = 0;
   size_t index = 0;
-  while (label[index] != '\0') {
-    acc += label[index] >> 2;
+  while (key[index] != '\0') {
+    acc += key[index] >> 2;
     index++;
   }
   return acc % TABLE_CAPACITY;
@@ -35,9 +35,9 @@ uint32_t rehash(uint32_t prev_hash) {
   return (prev_hash + 1) % TABLE_CAPACITY;
 }
 
-uint32_t *retrieve_address (symbol_table *st, char* label) {
-  uint32_t hashcode = hash(label);
-  while (st->kvps[hashcode] != NULL && strcmp(st->kvps[hashcode]->key, label)) {
+void *st_retrieve (symbol_table *st, char* key) {
+  uint32_t hashcode = hash(key);
+  while (st->kvps[hashcode] != NULL && strcmp(st->kvps[hashcode]->key, key)) {
     hashcode = rehash(hashcode);
   }
   if (st->kvps[hashcode] == NULL) {
@@ -46,7 +46,7 @@ uint32_t *retrieve_address (symbol_table *st, char* label) {
   return &st->kvps[hashcode]->value;
 }
 
-void insert_to_symbol_table (symbol_table *st, char* label, int address) {
+void insert_to_symbol_table (symbol_table *st, char* key, void* value) {
   if (st->count == st->capacity) {
     fprintf(stderr, "Symbol Table is at full capacity.\n");
     exit(EXIT_FAILURE);
@@ -54,13 +54,13 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address) {
 
   // Create the key-value pair
   symbol_table_kvp *kvp = calloc(1, sizeof(symbol_table_kvp));
-  char* new_key = malloc(strlen(label) + 1);
-  strcpy(new_key, label);
+  char* new_key = malloc(strlen(key) + 1);
+  strcpy(new_key, key);
   kvp->key = new_key;
-  kvp->value = address;
+  kvp->value = value;
 
   // Apply hash function
-  uint32_t hashcode = hash(label);
+  uint32_t hashcode = hash(key);
 
   // Insert into hash table
   if (st->kvps[hashcode] == NULL) {
@@ -68,9 +68,9 @@ void insert_to_symbol_table (symbol_table *st, char* label, int address) {
     st->count++;
   } else {
     // Hashcode occupied
-    // Two labels of the same name will never be added in
-    if (!strcmp(label,st->kvps[hashcode]->key)) {
-      fprintf(stderr, "Two labels of the same name are being inserted.\n");
+    // Two keys of the same name will never be added in
+    if (!strcmp(key,st->kvps[hashcode]->key)) {
+      fprintf(stderr, "Two keys of the same name are being inserted.\n");
       exit(EXIT_FAILURE);   
     }
     // Encounter collision
@@ -86,6 +86,7 @@ void free_symbol_table (symbol_table *st) {
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     if (st->kvps[i] != NULL){
       free(st->kvps[i]->key);
+      free(st->kvps[i]->value);
       free(st->kvps[i]);
     }
   }

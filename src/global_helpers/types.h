@@ -111,7 +111,7 @@ typedef struct symbol_table {
  */
 typedef struct symbol_table_kvp {
   char *key;
-  uint32_t value;
+  void *value;
 } symbol_table_kvp;
 
 #endif

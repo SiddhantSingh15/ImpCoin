@@ -286,11 +286,11 @@ void test_st_insert(int *passing, int *total) {
   uint32_t *fifth = malloc(sizeof(uint32_t));
   *fifth = 30;
 
-  insert_to_symbol_table(st, "first", first);
-  insert_to_symbol_table(st, "second", second);
-  insert_to_symbol_table(st, "third", third);
-  insert_to_symbol_table(st, "fourth", fourth);
-  insert_to_symbol_table(st, "fifth", fifth);
+  st_insert(st, "first", first);
+  st_insert(st, "second", second);
+  st_insert(st, "third", third);
+  st_insert(st, "fourth", fourth);
+  st_insert(st, "fifth", fifth);
   uint32_t *result_1 = st_retrieve(st, "first");
   uint32_t *result_2 = st_retrieve(st, "second");
   uint32_t *result_3 = st_retrieve(st, "third");
@@ -365,7 +365,7 @@ void test_st_insert_varying_input(int *passing, int *total) {
   char extended[511] = "first";
   uint8_t *first = malloc(sizeof(uint8_t));
   first = 5;
-  insert_to_symbol_table(st, "first", first);
+  st_insert(st, "first", first);
   uint32_t *result_1 = st_retrieve(st, extended);
 
   track_test(
@@ -390,9 +390,9 @@ void test_st_collision(int *passing, int *total) {
   uint8_t *second = malloc(sizeof(uint8_t));
   uint8_t *third = malloc(sizeof(uint8_t));
 
-  insert_to_symbol_table(st, "abcd", 5);
-  insert_to_symbol_table(st, "badc", 10);
-  insert_to_symbol_table(st, "dabc", 11);
+  st_insert(st, "abcd", 5);
+  st_insert(st, "badc", 10);
+  st_insert(st, "dabc", 11);
   uint32_t *result_1 = st_retrieve(st, "abcd");
   uint32_t *result_2 = st_retrieve(st, "badc");
   uint32_t *result_3 = st_retrieve(st, "dabc");

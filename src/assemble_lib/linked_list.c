@@ -6,7 +6,7 @@
 void append(struct linked_list *list, void *val, uint32_t addr) {
   assert(val);
 
-  struct node *new_node = malloc(sizeof(node));
+  node *new_node = malloc(sizeof(node));
   new_node->value = val;
   new_node->address = addr;
   new_node->next = NULL;
@@ -26,10 +26,10 @@ void append(struct linked_list *list, void *val, uint32_t addr) {
   list->size += 1;
 }
 
-struct node traverse(struct linked_list *list, int pos) {
+node *traverse(struct linked_list *list, int pos) {
   assert(list);
   assert(pos);
-  assert(0 <= pos < list->size);
+  assert((0 <= pos) < list->size);
 
   struct node *curr;
   curr = list->root;
@@ -39,14 +39,13 @@ struct node traverse(struct linked_list *list, int pos) {
     curr = curr->next;
   }
 
-  return *curr;
+  return curr;
 }
 
-void change_node(struct linked_list *list, int pos, void *val) {
+void change_node(linked_list *list, int pos, void *val) {
   assert(list);
-  assert(0 <= pos < list->size);
+  assert((0 <= pos) < list->size);
 
-  struct node *node_to_change;
-  *node_to_change = traverse(list, pos);
+  node *node_to_change = traverse(list, pos);
   node_to_change->value = val;
 }

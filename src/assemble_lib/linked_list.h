@@ -8,7 +8,7 @@
  * a line in the given file as an instr_t type or as tokens, and also stores the
  * address of that line.
  */
-struct node {
+typedef struct node {
   void *value;
   uint32_t address;
   struct node *next;
@@ -18,7 +18,7 @@ struct node {
  * @brief The linked list of nodes that will contain lines of the file as
  * instr_t or as tokens.
  */
-struct linked_list {
+typedef struct linked_list {
   struct node *root;
   int size;
 } linked_list;
@@ -31,7 +31,7 @@ struct linked_list {
  * @param val The value of the node to be appended.
  * @param addr The address of the value.
  */
-void append(struct linked_list *list, void *val, uint32_t addr);
+void append(linked_list *list, void *val, uint32_t addr);
 
 /**
  * @brief Traverses the given linked list and returns the node at a specified
@@ -40,9 +40,9 @@ void append(struct linked_list *list, void *val, uint32_t addr);
  * @param list The linked list to be traversed.
  * @param pos The position of the node that must be returned.
  *
- * @return The node at specified position 'pos'.
+ * @return A pointer to node at specified position 'pos'.
  */
-struct node traverse(struct linked_list *list, int pos);
+node *traverse(linked_list *list, int pos);
 
 /**
  * @brief Changes the value of the node in tge given linked list at a specified
@@ -52,6 +52,6 @@ struct node traverse(struct linked_list *list, int pos);
  * @param pos The position of the node to be changed.
  * @param val The new value to be assigned to the node.
  */
-void change_node(struct linked_list *list, int pos, void *val);
+void change_node(linked_list *list, int pos, void *val);
 
 #endif

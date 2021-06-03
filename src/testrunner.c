@@ -302,27 +302,27 @@ void test_st_insert(int *passing, int *total) {
   track_test(
     test_bool(
       *first == *result_1,
-      "First value is equal"
+      "(\"first\", 5) maps properly (5 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *second == *result_2,
-      "Second value is equal"
+      "(\"second\", 10) maps properly (10 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *third == *result_3,
-      "Third value is equal"
+      "(\"third\", 11) maps properly (11 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *fourth == *result_4,
-      "Fourth value is equal"
+      "(\"fourth\", 102) maps properly (102 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *fifth == *result_5,
-      "Fifth value is equal"
+      "(\"fifth\", 30) maps properly (30 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
@@ -334,27 +334,27 @@ void test_st_insert(int *passing, int *total) {
   track_test(
     test_bool(
       first == result_1,
-      "First memory is equal"
+      "Retrieved memory for \"first\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       second == result_2,
-      "Second memory is equal"
+      "Retrieved memory for \"second\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       third == result_3,
-      "Third memory is equal"
+      "Retrieved memory for \"third\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       fourth == result_4,
-      "Fourth memory is equal"
+      "Retrieved memory for \"fourth\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       fifth == result_5,
-      "Fifth memory is equal"
+      "Retrieved memory for \"fifth\" is equal to provided memory"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -377,7 +377,7 @@ void test_st_insert_varying_input(int *passing, int *total) {
   track_test(
     test_bool(
       first == result_1,
-      "memory of extended and raw \"first\" are the same"
+      "memory of extended[511] and raw \"first\" are the same"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -390,6 +390,10 @@ void test_st_collision(int *passing, int *total) {
   uint8_t *second = malloc(sizeof(uint8_t));
   uint8_t *third = malloc(sizeof(uint8_t));
 
+  *first = 29;
+  *second = 30;
+  *third = 31;
+
   st_insert(st, "abcd", first);
   st_insert(st, "badc", second);
   st_insert(st, "dabc", third);
@@ -401,34 +405,119 @@ void test_st_collision(int *passing, int *total) {
   track_test(
     test_bool(
       *first == *result_1,
-      "\"abcd\" value is equal"
+      "(\"abcd\", 29) maps properly (29 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *second == *result_2,
-      "\"badc\" value is equal"
+      "(\"badc\", 30) maps properly (30 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
       *third == *result_3,
-      "\"dabc\" value is equal"
+      "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
     ), passing, total);
 
   // Test for memory
   track_test(
     test_bool(
       first == result_1,
-      "\"abcd\" memory is equal"
+      "Retrieved memory for \"abcd\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       *second == *result_2,
-      "\"badc\" memory is equal"
+      "Retrieved memory for \"badc\" is equal to provided memory"
     ), passing, total);
   track_test(
     test_bool(
       *third == *result_3,
-      "\"dabc\" memory is equal"
+      "Retrieved memory for \"dabc\" is equal to provided memory"
+    ), passing, total);
+  free_symbol_table(st);
+}
+
+// Placeholder function for testing the storing of functions
+void placeholder_function(void * a) {
+  return;
+}
+
+void test_st_different_value_pointers(int *passing, int *total) {
+  symbol_table *st = init_symbol_table();
+
+  uint8_t *first = malloc(sizeof(uint8_t));
+  instr_func_map *second = malloc(sizeof(instr_func_map));
+  uint8_t *third = malloc(sizeof(uint8_t));
+  instr_func_map *fourth = malloc(sizeof(instr_func_map));
+
+  *first = 29;
+  second->opcode = 10;
+  second->function = NULL;
+  *third = 31;
+  fourth->opcode = 0xA;
+  fourth->function = &placeholder_function;
+
+  st_insert(st, "alpha_num", first);
+  st_insert(st, "alpha_func", second);
+  st_insert(st, "beta_num", third);
+  st_insert(st, "beta_func", fourth);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "alpha_num");
+  instr_func_map *result_2 = (instr_func_map*) st_retrieve(st, "alpha_func");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "beta_num");
+  instr_func_map *result_4 = (instr_func_map*) st_retrieve(st, "beta_func");
+
+  // Test for value
+  track_test(
+    test_bool(
+      *first == *result_1,
+      "(\"alpha_num\", 29) maps properly (29 is a uint8_t here)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      second->opcode == result_2->opcode,
+      "(\"alpha_func\", {instr_func_map}) maps properly (opcode = 10)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      second->function == result_2->function,
+      "(\"alpha_func\", {instr_func_map}) maps properly (function points to NULL)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      *third == *result_3,
+      "(\"beta_num\", 31) maps properly (31 is a uint8_t here)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth->opcode == result_4->opcode,
+      "(\"beta_func\", {function struct}) maps properly (opcode = 0xA)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth->function == result_4->function,
+      "(\"beta_func\", {function struct}) maps properly (function points to &test_st_insert)"
+    ), passing, total);
+
+  // Test for memory
+  track_test(
+    test_bool(
+      first == result_1,
+      "Retrieved memory for \"alpha_num\" is equal to provided memory"
+    ), passing, total);
+  track_test(
+    test_bool(
+      second == result_2,
+      "Retrieved memory for \"alpha_func\" is equal to provided memory"
+    ), passing, total);
+  track_test(
+    test_bool(
+      third == result_3,
+      "Retrieved memory for \"beta_num\" is equal to provided memory"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth == result_4,
+      "Retrieved memory for \"beta_func\" is equal to provided memory"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -445,6 +534,7 @@ void test_symbol_table(int *passing, int*total) {
   test_st_insert(&internal_passing, &internal_total);
   test_st_insert_varying_input(&internal_passing, &internal_total);
   test_st_collision(&internal_passing, &internal_total);
+  test_st_different_value_pointers(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

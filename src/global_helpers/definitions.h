@@ -95,7 +95,7 @@
 #define ROR 0x3
 
 /* Symbol Table */
-#define TABLE_CAPACITY 16
+#define TABLE_CAPACITY 64
 
 /* Tokenizer definitions */
 #define DELIMITERS " ,[]#=+-"

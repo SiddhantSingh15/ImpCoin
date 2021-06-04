@@ -115,7 +115,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
 
 uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) {
   assert (st == NULL);
-  dataproc_t dataproc_instr = {0};
+  // dataproc_t dataproc_instr = {0};
   return 0;
 }
 
@@ -127,22 +127,22 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
 
   mult_instr.cond = AL;
 
-  assert_token(tokens->list[1].type == REG), 1, line);
+  assert_token(tokens->list[1].type == REG, 1, line);
   mult_instr.rd = tokens->list[1].data.reg;
 
-  assert_token(tokens->list[2].type == REG), 2, line);
+  assert_token(tokens->list[2].type == REG, 2, line);
   mult_instr.rm = tokens->list[2].data.reg;
 
-  assert_token(tokens->list[3].type == REG), 3, line);
+  assert_token(tokens->list[3].type == REG, 3, line);
   mult_instr.rs = tokens->list[3].data.reg;
 
   if (tokens->size == 5) {
-    assert_token(tokens->list[4].type == REG), 4, line);
+    assert_token(tokens->list[4].type == REG, 4, line);
     mult_instr.rn = tokens->list[4].data.reg;
   }
 
   mult_instr.accumulate = code.mul_a;
-  
+
   mult_instr.set_cond = !SET;
 
   return construct_mult_binary(&mult_instr);

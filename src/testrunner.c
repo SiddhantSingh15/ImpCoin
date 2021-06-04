@@ -381,8 +381,8 @@ void test_st_collision(int *passing, int *total) {
 }
 
 // Placeholder function for testing the storing of functions
-void placeholder_function(void *a, union instr_code b, symbol_table *c) {
-  return;
+uint32_t placeholder_function(void *a, union instr_code b, symbol_table *c) {
+  return 0;
 }
 
 void test_st_different_value_pointers(int *passing, int *total) {
@@ -396,7 +396,7 @@ void test_st_different_value_pointers(int *passing, int *total) {
   uint8_t third = 31;
   instr_func_map fourth = {
     .code.dataproc_opcode = 0xA,
-    .function = &placeholder_function
+    .function = placeholder_function
   };
 
   st_insert(st, "alpha_num", &first, 1);

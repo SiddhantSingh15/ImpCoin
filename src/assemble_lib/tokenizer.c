@@ -16,9 +16,10 @@ token_list *tokenizer(char *instr_line) {
 
   uint8_t count = 0;
   char *token;
-  char *rest = strdup(instr_line);
+  char *rest = malloc(strlen(instr_line) + 1);
+  strcpy(rest, instr_line);
 
-  char *instr_name = strtok_r(rest, " ", &rest);
+  char *instr_name = strbrk_r(rest, " ", &rest);
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;

@@ -468,7 +468,9 @@ void test_symbol_table(int *passing, int *total) {
 
 void test_strbrk_r(int *passing, int *total) {
   char str[] = "[r1, r2]";
-  char *instruction = strdup(str);
+  // char *instruction = strdup(str);
+  char *instruction = malloc(strlen(str) + 1);
+  strcpy(instruction, str);
   const char delims[] = "[], ";
   char *first_token = strbrk_r(instruction, delims, &instruction);
   track_test(test_string("[", first_token, "First token works"), passing,

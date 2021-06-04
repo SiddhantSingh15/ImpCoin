@@ -42,7 +42,7 @@ testrunner: $(TEST_OBJS)
 clean:
 	$(RM) $(shell find $(SRC_DIRS) -name "*.o")
 	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
-	$(RM) $(shell find $(SRC_DIRS) -name "*.dSYM")
+	rm -rf $(shell find $(SRC_DIRS) -name "*.dSYM")
 	$(RM) assemble
 	$(RM) emulate
 	$(RM) testrunner

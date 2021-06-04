@@ -376,6 +376,8 @@ void test_st_collision(int *passing, int *total) {
       third == *result_3,
       "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
     ), passing, total);
+
+  free_symbol_table(st);
 }
 
 // Placeholder function for testing the storing of functions
@@ -468,35 +470,39 @@ void test_symbol_table(int *passing, int *total) {
 
 void test_strbrk_r(int *passing, int *total) {
   char str[] = "[r1, r2]";
-  char *instruction = strdup(str);
+  // char *instruction = strdup(str);
+  char *instruction = malloc(strlen(str) + 1);
+  strcpy(instruction, str);
+  char *rest = instruction;
   const char delims[] = "[], ";
-  char *first_token = strbrk_r(instruction, delims, &instruction);
+  char *first_token = strbrk_r(rest, delims, &rest);
   track_test(test_string("[", first_token, "First token works"), passing,
              total);
   free(first_token);
-  char *second_token = strbrk_r(instruction, delims, &instruction);
+  char *second_token = strbrk_r(rest, delims, &rest);
   track_test(test_string("r1", second_token, "Second token works"), passing,
              total);
-  free(first_token);
-  char *third_token = strbrk_r(instruction, delims, &instruction);
+  free(second_token);
+  char *third_token = strbrk_r(rest, delims, &rest);
   track_test(test_string(",", third_token, "Third token works"), passing,
              total);
   free(third_token);
-  char *fourth_token = strbrk_r(instruction, delims, &instruction);
+  char *fourth_token = strbrk_r(rest, delims, &rest);
   track_test(test_string(" ", fourth_token, "Fourth token works"), passing,
              total);
   free(fourth_token);
-  char *fifth_token = strbrk_r(instruction, delims, &instruction);
+  char *fifth_token = strbrk_r(rest, delims, &rest);
   track_test(test_string("r2", fifth_token, "Fifth token works"), passing,
              total);
   free(fifth_token);
-  char *sixth_token = strbrk_r(instruction, delims, &instruction);
+  char *sixth_token = strbrk_r(rest, delims, &rest);
   track_test(test_string("]", sixth_token, "Sixth token works"), passing,
              total);
   free(sixth_token);
-  char *extra_token = strbrk_r(instruction, delims, &instruction);
+  char *extra_token = strbrk_r(rest, delims, &rest);
   track_test(test_string(NULL, extra_token, "Extra token works"), passing,
              total);
+  free(instruction);
 }
 
 void test_tokenizer(int *passing, int *total) {

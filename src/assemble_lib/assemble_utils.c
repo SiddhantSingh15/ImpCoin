@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include "symbol_table_utils.h"
 #include "parser.h"
@@ -26,8 +27,7 @@ void read_asm(char *filename, linked_list *instructions,
               symbol_table *symbols) {
 
   FILE *fptr;
-  char *buffer = NULL;
-  size_t bufsize = 511;
+  char buffer[511];
   uint32_t mem_address;
 
   if ((fptr = fopen(filename, "r")) == NULL) {
@@ -35,31 +35,28 @@ void read_asm(char *filename, linked_list *instructions,
     exit(EXIT_FAILURE);
   }
 
-  while (getline(&buffer, &bufsize, fptr)) {
-
-    if (ferror(fptr)) {
-      perror("Error occurred when reading file\n");
-      exit(EXIT_FAILURE);
-    }
+  while (fgets(buffer, 511, fptr)) {
 
     // remove trailing newline
     buffer[strcspn(buffer, "\n")] = '\0';
 
     if (buffer[strlen(buffer) - 1] == ':') {
-      // it is a label, add to symbol table
-      // TODO: add to symbol table
+      // it is a label, add it to the symbol table
+      st_insert(symbols, buffer, &mem_address, sizeof(uint32_t));
       continue;
     }
 
-    // tokenize, and add to the linked list
+    // tokenize, and add it to the instruction list
     token_list *tokens = tokenizer(buffer);
     append_to_linked_list(instructions, tokens, mem_address);
 
     mem_address += 4;
   }
 
-  free(buffer);
-  buffer = NULL;
+  if (ferror(fptr)) {
+    perror("Error occurred when reading file\n");
+    exit(EXIT_FAILURE);
+  }
 
   fclose(fptr);
 }
@@ -230,4 +227,18 @@ void populate_st_instructions(symbol_table *st) {
     .function = &parse_branch
   };
   st_insert(st, "ble", &ble, vsize);
+}
+
+int8_t is_shift(char *token) {
+  if (!strcmp(token, "lsl")) {
+    return LSL;
+  } else if (!strcmp(token, "lsr")) {
+    return LSR;
+  } else if (!strcmp(token, "asr")) {
+    return ASR;
+  } else if (!strcmp(token, "ror")) {
+    return ROR;
+  } else {
+    return -1;
+  }
 }

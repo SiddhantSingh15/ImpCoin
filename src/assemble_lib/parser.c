@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,7 @@
 #include "definitions.h"
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
+#include "tokens.h"
 
 // All parsing functions should look like this
 // void parse_function (void* ll_node, union instr_code code, symbol_table* st);
@@ -57,6 +59,58 @@ uint32_t construct_branch_binary (branch_t *instr) {
   branch_base |= instr->offset << OFFSET_POS;
   branch_base |= instr->cond << COND_POS;
   return branch_base;
+}
+
+void throw_parse_error(uint8_t pos, uint32_t line) {
+  printf("Parse error: invalid token at position %d on line %d", pos, line);
+  exit(1);
+}
+
+void assert_token(bool token_cond, uint8_t pos, uint32_t line) {
+  if (!token_cond) {
+    throw_parse_error(pos, line);
+  }
+}
+
+uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
+
+  uint8_t i = *index;
+
+  if (tokens->list[i].type == SEPARATOR) {
+    assert_token(tokens->list[i].data.separator == '#', i, line);
+    assert_token(tokens->list[i + 1].type == EXPRESSION, i + 1, line);
+    *index = i + 2;
+    return (uint16_t) tokens->list[i + 1].data.exp;
+  }
+
+  assert_token(tokens->list[i].type == REG, i, line);
+  uint8_t rm = tokens->list[i].data.reg;
+
+  if (tokens->size == i || tokens->list[i + 1].type != SHIFTNAME) {
+    *index = i + 1;
+    return (uint16_t) rm;
+  }
+
+  assert_token(tokens->list[i + 1].type == SHIFTNAME, i + 1, line);
+  uint8_t shift = tokens->list[i + 1].data.shift_name << 1;
+  assert(shift < 4);
+
+  if (tokens->list[i + 2].type == SEPARATOR) {
+    assert_token(tokens->list[i + 2].data.separator == '#', i + 2, line);
+    assert_token(tokens->list[i + 3].type == EXPRESSION, i + 3, line);
+    shift |= tokens->list[i + 3].data.exp << 3;
+    *index = i + 4;
+  } else {
+    assert_token(tokens->list[i + 2].type == REG, i + 2, line);
+    shift |= tokens->list[i + 2].data.reg << 4;
+    shift++;
+    *index = i + 3;
+  }
+
+  uint16_t base = 0;
+  base |= rm;
+  base |= shift << 4;
+  return base;
 }
 
 uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) {
@@ -136,8 +190,62 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
 
 uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   assert (st == NULL);
+
   sdt_t sdt_instr = {0};
-  return 0;
+  node *node = ll_node;
+  token_list *tokens = node->value;
+  uint32_t line = node->address;
+
+  sdt_instr.cond = AL;
+  sdt_instr.load = code.sdt_l;
+
+  assert_token(tokens->list[1].type == REG, 1, line);
+  sdt_instr.rd = tokens->list[1].data.reg;
+
+  assert_token(tokens->list[2].type == SEPARATOR, 2, line);
+  if (tokens->list[2].data.separator == '=') {
+    assert_token(strcmp(tokens->list[0].data.instr_name, "ldr") == 0, 2, line);
+    assert_token(tokens->list[3].type == EXPRESSION, 3, line);
+    // TODO: constant expressions
+  }
+
+  assert_token(tokens->list[3].data.separator == '[', 3, line);
+  assert_token(tokens->list[4].type == REG, 4, line);
+  sdt_instr.rn = tokens->list[4].data.reg;
+
+  // Check post / pre-indexed
+  if (tokens->list[5].type == SEPARATOR &&
+      tokens->list[5].data.separator == ']') {
+    sdt_instr.is_preindexed = (tokens->size == 6);
+  }
+
+  // No offset
+  if (tokens->size == 6) {
+    sdt_instr.is_shift_R = !SET;
+    sdt_instr.offset = 0;
+    sdt_instr.up_bit = !SET;
+    return construct_sdt_binary(&sdt_instr);
+  }
+
+  uint8_t currptr;
+
+  if (tokens->list[5].type == SEPARATOR) {
+    sdt_instr.up_bit = (tokens->list[5].data.separator == '-') ? !SET : SET;
+    sdt_instr.is_shift_R = (tokens->list[5].data.separator == '#') ? !SET : SET;
+    currptr = (tokens->list[5].data.separator == '#') ? 5 : 6;
+    sdt_instr.offset = parse_operand2(tokens, &currptr, line);
+  } else {
+    sdt_instr.is_shift_R = SET;
+    sdt_instr.up_bit = SET;
+    sdt_instr.offset = parse_operand2(tokens, &currptr, line);
+  }
+
+  if (sdt_instr.is_preindexed) {
+    assert_token(tokens->list[currptr].type == SEPARATOR, currptr, line);
+    assert_token(tokens->list[currptr].data.separator == ']', currptr, line);
+  }
+
+  return construct_sdt_binary(&sdt_instr);
 }
 
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {

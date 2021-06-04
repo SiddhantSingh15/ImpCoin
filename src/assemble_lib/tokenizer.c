@@ -20,17 +20,17 @@ token_list *tokenizer(char *instr_line) {
   strcpy(rest_start, instr_line);
   char *rest = rest_start;
 
-  char *instr_name = strbrk_r(rest, " ", &rest);
+  char *instr_name = strbrk_r(rest, BLANK_SPACE, &rest);
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;
 
-  while ((token = strbrk_r(rest, " ,[]#=+-", &rest))) {
+  while ((token = strbrk_r(rest, DELIMITERS, &rest))) {
 
     enum token_type type;
     union token_data data;
 
-    if (strcspn(token, ", ") == 0) {
+    if (strcspn(token, COMMA_SPACE) == 0) {
       continue;
     }
 
@@ -38,7 +38,7 @@ token_list *tokenizer(char *instr_line) {
       type = EXPRESSION;
       data.exp = parse_int(token);
 
-    } else if (*token == 'r' && isdigit(token[1])) {
+    } else if (*token == REGISTER_SYMB && isdigit(token[1])) {
       type = REG;
       data.reg = (uint8_t) parse_int(token + 1);
 
@@ -88,7 +88,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
     s = *save_pointer;
   }
 
-  if (*s == '\0') {
+  if (*s == LINE_TERMINATOR) {
     return NULL;
   }
 
@@ -97,7 +97,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
   tok_size = tok_size == 0 ? 1 : tok_size;
 
   assert(tok_size <= strlen(s));
-  *token = '\0';
+  *token = LINE_TERMINATOR;
   strncat(token, s, tok_size);
   token = realloc(token, sizeof(char) * (strlen(token) + 1));
 
@@ -107,7 +107,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
 }
 
 uint32_t parse_int(char *str) {
-  int base = 10;
+  int base = DENARY;
 
   if (strlen(str) == 1) {
     return strtol(str, NULL, base);
@@ -115,13 +115,13 @@ uint32_t parse_int(char *str) {
 
   switch (str[1]) {
     case 'x':
-      base = 16;
+      base = HEX;
     case 'b':
-      base = 2;
+      base = BINARY;
     case 'o':
-      base = 8;
+      base = OCTAL;
     default:
-      base = 10;
+      base = DENARY;
   }
 
   return strtol(str, NULL, base);

@@ -30,6 +30,29 @@ void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
   curr->next = new_node;
 }
 
+void append_via_root(node *root, void *val, uint32_t addr){
+  assert(val);
+
+  node *to_append = malloc(sizeof(node));
+  to_append->value = val;
+  to_append->address = addr;
+  to_append->next = NULL;
+
+  if(root == NULL){
+    root = to_append;
+    return;
+  }
+
+  node *curr = root;
+
+  while(curr->next != NULL){
+    curr = curr->next;
+  }
+  curr->next = to_append;
+}
+
+  
+
 node *traverse_linked_list(linked_list *list, int pos) {
   assert(list);
   assert(pos);

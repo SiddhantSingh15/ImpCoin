@@ -23,9 +23,19 @@ typedef struct linked_list {
 } linked_list;
 
 /**
- * @brief Initialises a new linked list with a null root node and size of 0.
+ * @brief Initialises a new linked list with a null root node and size of 0..
  */
 linked_list *init_linked_list(void);
+
+/**
+ * @brief Adds a new node with given value and address to the list. The list is
+ * accessed via the given root node.
+ *
+ * @param root The root node of the list.
+ * @param val The value to node to be appended.
+ * @param addr The address of node to be appended.
+ */
+void append_via_root(node *root, void *val, uint32_t addr);
 
 /**
  * @brief Adds a new node to the linked list. Generally used when the file is
@@ -36,15 +46,6 @@ linked_list *init_linked_list(void);
  * @param addr The address of the value.
  */
 void append_to_linked_list(linked_list *list, void *val, uint32_t addr);
-
-/**
- * @brief Adds a new node with given value and address to the list. The list is accessed via the given root node.
- *
- * @param root The root node of the list.
- * @param val The value to node to be appended.
- * @param addr The address of node to be appended.
- */ 
-void append_via_root(node *root, void *val, uint32_t addr);
 
 /**
  * @brief Traverses the given linked list and returns the node at a specified

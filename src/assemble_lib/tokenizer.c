@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include "tokens.h"
 #include "tokenizer.h"
 #include "assemble_utils.h"
@@ -47,23 +48,14 @@ token_list *tokenizer(char *instr_line) {
       type = SHIFTNAME;
       data.shift_name = is_shift(*token);
 
-    } else if () {
+    } else if (is_alpha(*token)) {
       type = LABEL;
-      data.label = ;
+      data.label = *token;
 
-    } else if () {
+    } else {
       type = TOKERR;
-      data.error = ;
+      data.error = *token;
     }
-
-    // TODO: if token is shiftname, initialize shiftname
-    // shiftname is always strlen() == 3
-
-    // TODO: if token is cond, initialize cond
-    // cond is always strlen() == 2
-
-    // TODO: how to distinguish between label and invalid token?
-    // label is apparently not always alphabetic
 
     free(token);
     tokens->list[count].type = type;
@@ -76,16 +68,16 @@ token_list *tokenizer(char *instr_line) {
 }
 
 /*
-  // s      = "[r1, r2]"
-  // delims = "[], "
-  // save_pointer = &s
-  //
-  // token 1: [        0       rest: r1, r2]
-  // token 2: r1       2       rest: , r2]
-  // token 3: ,        0       rest:  r2]
-  // token 4:          0       rest: r2]
-  // token 5: r2       2       rest: ]
-  // token 6: ]        0       rest:
+  s      = "[r1, r2]"
+  delims = "[], "
+  save_pointer = &s
+
+  token 1: [        0       rest: r1, r2]
+  token 2: r1       2       rest: , r2]
+  token 3: ,        0       rest:  r2]
+  token 4:          0       rest: r2]
+  token 5: r2       2       rest: ]
+  token 6: ]        0       rest:
 */
 char *strbrk_r(char *s, const char *delims, char **save_pointer) {
 

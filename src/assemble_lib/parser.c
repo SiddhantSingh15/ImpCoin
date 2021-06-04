@@ -61,7 +61,47 @@ uint32_t construct_branch_binary (branch_t *instr) {
 uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) {
   assert (st == NULL);
   dataproc_t dataproc_instr = {0};
-  return 0;
+  node *node = ll_node;
+  uint32_t line = node->address;
+  token_list *tokens = node->value;
+  if (code.dataproc_opcode <= 0xA && code.dataproc_opcode >= 0x8) {
+    // Check for TST, TEQ, CMP
+    // 0 - INSTR, 1 - RD, 2  - <#expression>
+    dataproc_instr.set_cond = SET;
+    assert_token(tokens->list[1].type == REG, 1, line);
+    dataproc_instr.rn = tokens->list[1].data;
+    if (tokens->list[2].type == SEPARATOR) {
+      assert_token(tokens->list[2].data == '#');
+      dataproc_instr.is_immediate = SET;
+    }
+    dataproc_instr.op2 = parse_operand2(tokens, 2, line);
+  } else if (code.dataproc_opcode == 0xD) {
+    // Check for MOV
+    // 0 - INSTR, 1 - RD, 2  - <#expression>
+    assert_token(tokens->list[1].type == REG, 1, line);
+    dataproc_instr.rd = tokens->list[1].data;
+    if (tokens->list[2].type == SEPARATOR) {
+      assert_token(tokens->list[2].data == '#');
+      dataproc_instr.is_immediate = SET;
+    }
+    dataproc_instr.op2 = parse_operand2(tokens, 2, line);
+  } else {
+    // Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
+    // 0 - INSTR, 1 - RD, 2 - RN, 3 - <#expression>
+    assert_token(tokens->list[1].type == REG, 1, line);
+    dataproc_instr.rd = tokens->list[1].data;
+    assert_token(tokens->list[2].type == REG, 2, line);
+    dataproc_instr.rn = tokens->list[2].data;
+    if (tokens->list[3].type == SEPARATOR) {
+      assert_token(tokens->list[2].data == '#');
+      dataproc_instr.is_immediate = SET;
+    }
+    dataproc_instr.op2 = parse_operand2(tokens, 3, line);
+  }
+  dataproc_instr.opcode = code.dataproc_opcode;
+  dataproc_instr.cond = AL;
+
+  return construct_dataproc_binary(dataproc_instr);
 }
 
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {

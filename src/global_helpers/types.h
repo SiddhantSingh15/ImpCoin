@@ -114,9 +114,23 @@ typedef struct symbol_table_kvp {
   void *value;
 } symbol_table_kvp;
 
+
+/**
+ * @brief The union type for the code stored in instr_func_map
+ */
+union instr_code {
+  uint8_t dataproc_opcode; // Opcode for data processing instruction
+  uint8_t branch_cond; // Condition for branch
+  uint8_t sdt_l; // L bit for SDT
+  uint8_t mul_a; // A bit for multiply
+};
+
+/**
+ * @brief The function map for instruction names
+ */
 typedef struct instr_func_map {
-  uint8_t opcode;
-  void (*function)(void*);
+  union instr_code code;
+  void (*function)(void*,union instr_code, void*);
 } instr_func_map;
 
 #endif

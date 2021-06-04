@@ -29,7 +29,7 @@ void parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   instruction_t *branch_instr = calloc(1, sizeof(instruction_t));
   node *node = ll_node;
   token_list *tokens = node->value;
-  branch_instr->data.branch.cond = code;
+  branch_instr->data.branch.cond = code.branch_cond;
   for (int i = 0; i < tokens->size; i++) {
     if (tokens->list[i].type == LABEL) {
       uint32_t *label_address = (uint32_t*) st_retrieve(st, tokens->list[i].data.label);

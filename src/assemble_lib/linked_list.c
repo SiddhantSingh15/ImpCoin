@@ -56,3 +56,16 @@ void change_node(linked_list *list, int pos, void *val) {
   node *node_to_change = traverse_linked_list(list, pos);
   node_to_change->value = val;
 }
+
+void free_linked_list(linked_list *list){
+  assert(list);
+
+  node *curr = list->root;
+  for(int i = 0; i < list->size; i++){
+    node *temp = curr;
+    curr = curr->next;
+    free(temp->value);
+    free(temp);
+  }
+  free(list);
+}

@@ -377,7 +377,7 @@ void test_st_collision(int *passing, int *total) {
 }
 
 // Placeholder function for testing the storing of functions
-void placeholder_function(void *a, union instr_code b, void *c) {
+void placeholder_function(void *a, union instr_code b, symbol_table *c) {
   return;
 }
 

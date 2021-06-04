@@ -130,7 +130,7 @@ union instr_code {
  */
 typedef struct instr_func_map {
   union instr_code code;
-  void (*function)(void*,union instr_code, void*);
+  void (*function)(void*,union instr_code, symbol_table*);
 } instr_func_map;
 
 #endif

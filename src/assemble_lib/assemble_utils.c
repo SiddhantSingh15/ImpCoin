@@ -15,7 +15,7 @@ void write_file(uint32_t *instr_array, int array_size, char *save_name) {
   fclose(file);
 }
 
-void placeholder_decipher(void *x, union instr_code y, void *z) {
+void placeholder_decipher(void *x, union instr_code y, symbol_table *z) {
   return;
 }
 

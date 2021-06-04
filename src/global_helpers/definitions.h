@@ -97,4 +97,15 @@
 /* Symbol Table */
 #define TABLE_CAPACITY 16
 
+/* Tokenizer definitions */
+#define DELIMITERS " ,[]#=+-"
+#define BLANK_SPACE " "
+#define COMMA_SPACE ", "
+#define REGISTER_SYMB 'r'
+#define LINE_TERMINATOR '\0'
+#define BINARY 2
+#define OCTAL 8
+#define DENARY 10
+#define HEX 16
+
 #endif // DEFINITIONS_H

@@ -50,7 +50,7 @@ void append_to_linked_list(linked_list *list, void *val, uint32_t addr);
 node *traverse_linked_list(linked_list *list, int pos);
 
 /**
- * @brief Changes the value of the node in tge given linked list at a specified
+ * @brief Changes the value of the node in the given linked list at a specified
  * position.
  *
  * @param list The linked list to where the node to be changed is present.
@@ -58,5 +58,13 @@ node *traverse_linked_list(linked_list *list, int pos);
  * @param val The new value to be assigned to the node.
  */
 void change_node(linked_list *list, int pos, void *val);
+
+/**
+ * @brief Frees the allocated memory of given list, all nodes contained in it
+ * and the components associated to each node.
+ *
+ * @param list The list to be freed.
+ */
+void free_linked_list(linked_list *list);
 
 #endif

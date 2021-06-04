@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include "symbol_table_utils.h"
 
@@ -230,3 +231,18 @@ void populate_st_instructions(symbol_table *st) {
   };
   st_insert(st, "ble", &ble, vsize);
 }
+
+int8_t is_shift(char *token) {
+  if (!strcmp(token, "lsl")) {
+    return LSL;
+  } else if (!strcmp(token, "lsr")) {
+    return LSR;
+  } else if (!strcmp(token, "asr")) {
+    return ASR;
+  } else if (!strcmp(token, "ror")) {
+    return ROR;
+  } else {
+    return -1;
+  }
+}
+

@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 #include "tokens.h"
 #include "tokenizer.h"
+#include "assemble_utils.h"
 
 token_list *tokenizer(char *instr_line) {
   // pre: instr_line is not a label, only an instruction
@@ -42,16 +44,18 @@ token_list *tokenizer(char *instr_line) {
       type = EXPRESSION;
       data.exp = parse_int(token);
 
+    } else if (is_shift(*token) >= 0) {
+      type = SHIFTNAME;
+      data.shift_name = is_shift(*token);
+
+    } else if (is_alpha(*token)) {
+      type = LABEL;
+      data.label = *token;
+
+    } else {
+      type = TOKERR;
+      data.error = *token;
     }
-
-    // TODO: if token is shiftname, initialize shiftname
-    // shiftname is always strlen() == 3
-
-    // TODO: if token is cond, initialize cond
-    // cond is always strlen() == 2
-
-    // TODO: how to distinguish between label and invalid token?
-    // label is apparently not always alphabetic
 
     free(token);
     tokens->list[count].type = type;
@@ -64,16 +68,16 @@ token_list *tokenizer(char *instr_line) {
 }
 
 /*
-  // s      = "[r1, r2]"
-  // delims = "[], "
-  // save_pointer = &s
-  //
-  // token 1: [        0       rest: r1, r2]
-  // token 2: r1       2       rest: , r2]
-  // token 3: ,        0       rest:  r2]
-  // token 4:          0       rest: r2]
-  // token 5: r2       2       rest: ]
-  // token 6: ]        0       rest:
+  s      = "[r1, r2]"
+  delims = "[], "
+  save_pointer = &s
+
+  token 1: [        0       rest: r1, r2]
+  token 2: r1       2       rest: , r2]
+  token 3: ,        0       rest:  r2]
+  token 4:          0       rest: r2]
+  token 5: r2       2       rest: ]
+  token 6: ]        0       rest:
 */
 char *strbrk_r(char *s, const char *delims, char **save_pointer) {
 
@@ -104,5 +108,23 @@ uint32_t parse_int(char *str) {
   // this should be able to parse hexadecimal numbers with `0x` prefix
   //
   // use strtol and cast to uint32_t
-  return 0;
+
+  int base = 10;
+  
+  if (strlen(str) == 1) {
+    return strtol(str, NULL, base);
+  }
+
+  switch (str[1]) {
+    case 'x':
+      base = 16;
+    case 'b':
+      base = 2;
+    case 'o':
+      base = 8;
+    default:
+      base = 10;
+  }
+
+  return strtol(str, NULL, base);
 }

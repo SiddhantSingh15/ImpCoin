@@ -16,34 +16,35 @@ token_list *tokenizer(char *instr_line) {
 
   uint8_t count = 0;
   char *token;
-  char *rest = malloc(strlen(instr_line) + 1);
-  strcpy(rest, instr_line);
+  char *rest_start = malloc(strlen(instr_line) + 1);
+  strcpy(rest_start, instr_line);
+  char *rest = rest_start;
 
   char *instr_name = strbrk_r(rest, " ", &rest);
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;
 
-  while ((token = strbrk_r(rest, ",[]#=+-", &rest))) {
+  while ((token = strbrk_r(rest, " ,[]#=+-", &rest))) {
 
     enum token_type type;
     union token_data data;
 
-    if (strcspn(token, ",") == 0) {
+    if (strcspn(token, ", ") == 0) {
       continue;
     }
 
-    if (strlen(token) == 1) {
-      type = SEPARATOR;
-      data.separator = *token;
+    if (isdigit(*token)) {
+      type = EXPRESSION;
+      data.exp = parse_int(token);
 
     } else if (*token == 'r' && isdigit(token[1])) {
       type = REG;
       data.reg = (uint8_t) parse_int(token + 1);
 
-    } else if (isdigit(*token)) {
-      type = EXPRESSION;
-      data.exp = parse_int(token);
+    } else if (strlen(token) == 1) {
+      type = SEPARATOR;
+      data.separator = *token;
 
     } else if (is_shift(token) >= 0) {
       type = SHIFTNAME;
@@ -64,7 +65,8 @@ token_list *tokenizer(char *instr_line) {
     count++;
   }
 
-  free(rest);
+  free(rest_start);
+  tokens->size = count;
   return tokens;
 }
 
@@ -97,7 +99,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
   assert(tok_size <= strlen(s));
   *token = '\0';
   strncat(token, s, tok_size);
-  token = realloc(token, sizeof(char) * strlen(token));
+  token = realloc(token, sizeof(char) * (strlen(token) + 1));
 
   *save_pointer += tok_size;
 
@@ -105,11 +107,6 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
 }
 
 uint32_t parse_int(char *str) {
-  // TODO: implement this
-  // this should be able to parse hexadecimal numbers with `0x` prefix
-  //
-  // use strtol and cast to uint32_t
-
   int base = 10;
 
   if (strlen(str) == 1) {

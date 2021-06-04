@@ -44,17 +44,17 @@ token_list *tokenizer(char *instr_line) {
       type = EXPRESSION;
       data.exp = parse_int(token);
 
-    } else if (is_shift(*token) >= 0) {
+    } else if (is_shift(token) >= 0) {
       type = SHIFTNAME;
-      data.shift_name = is_shift(*token);
+      data.shift_name = is_shift(token);
 
-    } else if (is_alpha(*token)) {
+    } else if (isalpha(*token)) {
       type = LABEL;
-      data.label = *token;
+      data.label = token;
 
     } else {
       type = TOKERR;
-      data.error = *token;
+      data.error = token;
     }
 
     free(token);
@@ -110,7 +110,7 @@ uint32_t parse_int(char *str) {
   // use strtol and cast to uint32_t
 
   int base = 10;
-  
+
   if (strlen(str) == 1) {
     return strtol(str, NULL, base);
   }

@@ -3,7 +3,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-void append(struct linked_list *list, void *val, uint32_t addr) {
+linked_list *init_linked_list(void) {
+  linked_list *list = malloc(sizeof(linked_list));
+  list->root = NULL;
+  list->size = 0;
+  return list;
+}
+
+void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
   assert(val);
 
   node *new_node = malloc(sizeof(node));
@@ -17,7 +24,7 @@ void append(struct linked_list *list, void *val, uint32_t addr) {
     return;
   }
 
-  struct node *curr = list->root;
+  node *curr = list->root;
 
   while (curr->next != NULL) {
     curr = curr->next;
@@ -26,7 +33,7 @@ void append(struct linked_list *list, void *val, uint32_t addr) {
   list->size += 1;
 }
 
-node *traverse(struct linked_list *list, int pos) {
+node *traverse_linked_list(linked_list *list, int pos) {
   assert(list);
   assert(pos);
   assert((0 <= pos) < list->size);
@@ -46,6 +53,6 @@ void change_node(linked_list *list, int pos, void *val) {
   assert(list);
   assert((0 <= pos) < list->size);
 
-  node *node_to_change = traverse(list, pos);
+  node *node_to_change = traverse_linked_list(list, pos);
   node_to_change->value = val;
 }

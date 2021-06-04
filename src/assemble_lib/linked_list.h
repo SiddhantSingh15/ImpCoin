@@ -24,6 +24,11 @@ typedef struct linked_list {
 } linked_list;
 
 /**
+ * @brief Initialises a new linked list with a null root node and size of 0.
+ */
+linked_list *init_linked_list(void);
+
+/**
  * @brief Adds a new node to the linked list. Generally used when the file is
  * first read and the lines of the file must be seperated into nodes as strings.
  *
@@ -31,7 +36,7 @@ typedef struct linked_list {
  * @param val The value of the node to be appended.
  * @param addr The address of the value.
  */
-void append(linked_list *list, void *val, uint32_t addr);
+void append_to_linked_list(linked_list *list, void *val, uint32_t addr);
 
 /**
  * @brief Traverses the given linked list and returns the node at a specified
@@ -42,7 +47,7 @@ void append(linked_list *list, void *val, uint32_t addr);
  *
  * @return A pointer to node at specified position 'pos'.
  */
-node *traverse(linked_list *list, int pos);
+node *traverse_linked_list(linked_list *list, int pos);
 
 /**
  * @brief Changes the value of the node in tge given linked list at a specified

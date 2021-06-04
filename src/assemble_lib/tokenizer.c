@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "tokens.h"
 #include "tokenizer.h"
+#include "assemble_utils.h"
 
 token_list *tokenizer(char *instr_line) {
   // pre: instr_line is not a label, only an instruction
@@ -42,6 +43,17 @@ token_list *tokenizer(char *instr_line) {
       type = EXPRESSION;
       data.exp = parse_int(token);
 
+    } else if (is_shift(*token) >= 0) {
+      type = SHIFTNAME;
+      data.shift_name = is_shift(*token);
+
+    } else if () {
+      type = LABEL;
+      data.label = ;
+
+    } else if () {
+      type = TOKERR;
+      data.error = ;
     }
 
     // TODO: if token is shiftname, initialize shiftname
@@ -104,5 +116,23 @@ uint32_t parse_int(char *str) {
   // this should be able to parse hexadecimal numbers with `0x` prefix
   //
   // use strtol and cast to uint32_t
-  return 0;
+
+  int base = 10;
+  
+  if (strlen(str) == 1) {
+    return strtol(str, NULL, base);
+  }
+
+  switch (str[1]) {
+    case 'x':
+      base = 16;
+    case 'b':
+      base = 2;
+    case 'o':
+      base = 8;
+    default:
+      base = 10;
+  }
+
+  return strtol(str, NULL, base);
 }

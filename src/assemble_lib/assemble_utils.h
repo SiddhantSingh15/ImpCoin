@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "symbol_table_utils.h"
 #include "linked_list.h"
 
@@ -19,5 +20,7 @@ void write_file(uint32_t *instr_array, int array_size, char *save_name);
 void read_asm(char *filename, linked_list *instructions, symbol_table *symbols);
 
 void populate_st_instructions(symbol_table *st);
+
+int8_t is_shift(char *token);
 
 #endif /* ASSEMBLUE_UTILS_H */

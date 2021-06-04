@@ -107,7 +107,7 @@ typedef struct symbol_table {
 } symbol_table;
 
 /**
- * @brief The key-value pair structure for the symbol table 
+ * @brief The key-value pair structure for the symbol table
  */
 typedef struct symbol_table_kvp {
   char *key;
@@ -130,7 +130,7 @@ union instr_code {
  */
 typedef struct instr_func_map {
   union instr_code code;
-  void (*function)(void*,union instr_code, symbol_table*);
+  uint32_t (*function)(void*,union instr_code, symbol_table*);
 } instr_func_map;
 
 #endif

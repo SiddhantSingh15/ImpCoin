@@ -6,7 +6,6 @@
 linked_list *init_linked_list(void) {
   linked_list *list = malloc(sizeof(linked_list));
   list->root = NULL;
-  list->size = 0;
   return list;
 }
 
@@ -19,7 +18,6 @@ void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
   new_node->next = NULL;
 
   if (list->root == NULL) {
-    list->size = 1;
     list->root = new_node;
     return;
   }
@@ -30,38 +28,38 @@ void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
     curr = curr->next;
   }
   curr->next = new_node;
-  list->size += 1;
 }
 
 node *traverse_linked_list(linked_list *list, int pos) {
   assert(list);
   assert(pos);
-  assert((0 <= pos) < list->size);
+  assert(0 <= pos);
 
   struct node *curr;
   curr = list->root;
 
-  while (pos >= 0) {
+  while (pos >= 0 && curr != NULL) {
     pos--;
     curr = curr->next;
   }
-
   return curr;
 }
 
 void change_node(linked_list *list, int pos, void *val) {
   assert(list);
-  assert((0 <= pos) < list->size);
+  assert(0 <= pos);
 
   node *node_to_change = traverse_linked_list(list, pos);
-  node_to_change->value = val;
+  if(node_to_change != NULL){
+    node_to_change->value = val;
+  }
 }
 
 void free_linked_list(linked_list *list){
   assert(list);
 
   node *curr = list->root;
-  for(int i = 0; i < list->size; i++){
+  while(curr){
     node *temp = curr;
     curr = curr->next;
     free(temp->value);

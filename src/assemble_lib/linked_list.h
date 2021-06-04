@@ -20,7 +20,6 @@ typedef struct node {
  */
 typedef struct linked_list {
   struct node *root;
-  int size;
 } linked_list;
 
 /**

@@ -16,8 +16,17 @@ int main(int argc, char **argv) {
 
   read_asm(file, instructions, labels);
 
+  FILE *to_write = fopen(argv[2], "wb");
+
   // loop through the instructions (token_list) and decipher them
   // loop through the instructions (uint32_t) and write them
+  
+  /* Comes inside the FOR loop */
+  uint32_t binary_instr = 0;
+  write_file(to_write, binary_instr);
+  /*     */
+  
+  fclose(to_write);
 
   return EXIT_SUCCESS;
 }

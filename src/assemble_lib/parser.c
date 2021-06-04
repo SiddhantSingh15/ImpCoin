@@ -69,8 +69,27 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
   multiply_t mult_instr = {0};
   node *node = ll_node;
   token_list *tokens = node->value;
-  mult_instr.accumulate = code.mul_a;
+  uint32_t line = node->address;
+
   mult_instr.cond = AL;
+
+  assert_token(tokens->list[1].type == REG), 1, line);
+  mult_instr.rd = tokens->list[1].data.reg;
+
+  assert_token(tokens->list[2].type == REG), 2, line);
+  mult_instr.rm = tokens->list[2].data.reg;
+
+  assert_token(tokens->list[3].type == REG), 3, line);
+  mult_instr.rs = tokens->list[3].data.reg;
+
+  if (tokens->size == 5) {
+    assert_token(tokens->list[4].type == REG), 4, line);
+    mult_instr.rn = tokens->list[4].data.reg;
+  }
+
+  mult_instr.accumulate = code.mul_a;
+  
+  mult_instr.set_cond = !SET;
 
   return construct_mult_binary(&mult_instr);
 }

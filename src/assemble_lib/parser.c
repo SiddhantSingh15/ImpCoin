@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include "tokenizer.h"
+#include "definitions.h"
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
 
@@ -65,9 +66,13 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) 
 }
 
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
-  assert (st == NULL);
   multiply_t mult_instr = {0};
-  return 0;
+  node *node = ll_node;
+  token_list *tokens = node->value;
+  mult_instr.accumulate = code.mul_a;
+  mult_instr.cond = AL;
+
+  return construct_mult_binary(&mult_instr);
 }
 
 uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {

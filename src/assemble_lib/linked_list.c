@@ -1,67 +1,69 @@
 #include "linked_list.h"
 #include <assert.h>
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 linked_list *init_linked_list(void) {
   linked_list *list = malloc(sizeof(linked_list));
   list->root = NULL;
-  list->size = 0;
   return list;
 }
 
-void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
+void append_via_root(node *root, void *val, uint32_t addr) {
   assert(val);
 
-  node *new_node = malloc(sizeof(node));
-  new_node->value = val;
-  new_node->address = addr;
-  new_node->next = NULL;
+  node *to_append = malloc(sizeof(node));
+  to_append->value = val;
+  to_append->address = addr;
+  to_append->next = NULL;
 
-  if (list->root == NULL) {
-    list->size = 1;
-    list->root = new_node;
+  if (root == NULL) {
+    root = to_append;
     return;
   }
 
-  node *curr = list->root;
+  node *curr = root;
 
   while (curr->next != NULL) {
     curr = curr->next;
   }
-  curr->next = new_node;
-  list->size += 1;
+  curr->next = to_append;
+}
+
+void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
+  append_via_root(list->root, val, addr);
 }
 
 node *traverse_linked_list(linked_list *list, int pos) {
   assert(list);
   assert(pos);
-  assert((0 <= pos) < list->size);
+  assert(0 <= pos);
 
   struct node *curr;
   curr = list->root;
 
-  while (pos >= 0) {
+  while (pos >= 0 && curr != NULL) {
     pos--;
     curr = curr->next;
   }
-
   return curr;
 }
 
 void change_node(linked_list *list, int pos, void *val) {
   assert(list);
-  assert((0 <= pos) < list->size);
+  assert(0 <= pos);
 
   node *node_to_change = traverse_linked_list(list, pos);
-  node_to_change->value = val;
+  if (node_to_change != NULL) {
+    node_to_change->value = val;
+  }
 }
 
-void free_linked_list(linked_list *list){
+void free_linked_list(linked_list *list) {
   assert(list);
 
   node *curr = list->root;
-  for(int i = 0; i < list->size; i++){
+  while (curr) {
     node *temp = curr;
     curr = curr->next;
     free(temp->value);

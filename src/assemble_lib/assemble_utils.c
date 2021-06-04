@@ -46,7 +46,7 @@ void read_asm(char *filename, linked_list *instructions,
 
     if (buffer[strlen(buffer) - 1] == ':') {
       // it is a label, add to symbol table
-      // TODO: add to symbol table
+      st_insert(symbols, buffer, &mem_address, sizeof(uint32_t));
       continue;
     }
 

@@ -275,43 +275,49 @@ void test_bit_operations(int *passing, int *total) {
 void test_st_insert(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
+  uint8_t first = 5;
+  uint8_t second = 10;
+  uint8_t third = 11;
+  uint32_t fourth = 102;
+  uint32_t fifth = 30;
 
-  insert_to_symbol_table(st, "first", 5);
-  insert_to_symbol_table(st, "second", 10);
-  insert_to_symbol_table(st, "third", 11);
-  insert_to_symbol_table(st, "fourth", 102);
-  insert_to_symbol_table(st, "fifth", 30);
-  uint32_t *first = retrieve_address(st, "first");
-  uint32_t *second = retrieve_address(st, "second");
-  uint32_t *third = retrieve_address(st, "third");
-  uint32_t *fourth = retrieve_address(st, "fourth");
-  uint32_t *fifth = retrieve_address(st, "fifth");
-  uint32_t *missing = retrieve_address(st, "missing");
+  st_insert(st, "first", &first, 1);
+  st_insert(st, "second", &second, 1);
+  st_insert(st, "third", &third, 1);
+  st_insert(st, "fourth", &fourth, 4);
+  st_insert(st, "fifth", &fifth, 4);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "first");
+  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "second");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "third");
+  uint32_t *result_4 = (uint32_t*) st_retrieve(st, "fourth");
+  uint32_t *result_5 = (uint32_t*) st_retrieve(st, "fifth");
+  uint32_t *missing = (uint32_t*) st_retrieve(st, "missing");
 
+  // Tests for value in memory
   track_test(
     test_bool(
-      *first == 5,
-      "First insertion works correctly"
+      first == *result_1,
+      "(\"first\", 5) maps properly (5 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *second == 10,
-      "Second insertion works correctly"
+      second == *result_2,
+      "(\"second\", 10) maps properly (10 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *third == 11,
-      "Third insertion works correctly"
+      third == *result_3,
+      "(\"third\", 11) maps properly (11 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *fourth == 102,
-      "Fourth insertion works correctly"
+      fourth == *result_4,
+      "(\"fourth\", 102) maps properly (102 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *fifth == 30,
-      "Fifth insertion works correctly"
+      fifth == *result_5,
+      "(\"fifth\", 30) maps properly (30 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
@@ -325,12 +331,13 @@ void test_st_insert_varying_input(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
   char extended[511] = "first";
-  insert_to_symbol_table(st, "first", 5);
-  uint32_t *first = retrieve_address(st, extended);
+  uint8_t first = 5;
+  st_insert(st, "first", &first, 1);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, extended);
 
   track_test(
     test_bool(
-      *first == 5,
+      first == *result_1,
       "extended[511] = \"first\" and raw \"first\" are the same"
     ), passing, total);
   free_symbol_table(st);
@@ -340,41 +347,93 @@ void test_st_collision(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
 
-  insert_to_symbol_table(st, "abcd", 5);
-  insert_to_symbol_table(st, "badc", 10);
-  insert_to_symbol_table(st, "dabc", 11);
-  insert_to_symbol_table(st, "abdc", 102);
-  insert_to_symbol_table(st, "dcba", 30);
-  uint32_t *first = retrieve_address(st, "abcd");
-  uint32_t *second = retrieve_address(st, "badc");
-  uint32_t *third = retrieve_address(st, "dabc");
-  uint32_t *fourth = retrieve_address(st, "abdc");
-  uint32_t *fifth = retrieve_address(st, "dcba");
+  uint8_t first = 29;
+  uint8_t second = 30;
+  uint8_t third = 31;
 
+  st_insert(st, "abcd", &first, 1);
+  st_insert(st, "badc", &second, 1);
+  st_insert(st, "dabc", &third, 1);
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "abcd");
+  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "badc");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "dabc");
+
+  // Test for value
   track_test(
     test_bool(
-      *first == 5,
-      "\"abcd\" insertion works correctly"
+      first == *result_1,
+      "(\"abcd\", 29) maps properly (29 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *second == 10,
-      "\"badc\" insertion rehashes and works correctly"
+      second == *result_2,
+      "(\"badc\", 30) maps properly (30 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *third == 11,
-      "\"dabc\" insertion rehashes and works correctly"
+      third == *result_3,
+      "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
+    ), passing, total);
+}
+
+// Placeholder function for testing the storing of functions
+void placeholder_function(void *a, union instr_code b, symbol_table *c) {
+  return;
+}
+
+void test_st_different_value_pointers(int *passing, int *total) {
+  symbol_table *st = init_symbol_table();
+
+  uint8_t first = 29;
+  instr_func_map second = {
+    .code.dataproc_opcode = 10,
+    .function = NULL
+  };
+  uint8_t third = 31;
+  instr_func_map fourth = {
+    .code.dataproc_opcode = 0xA,
+    .function = &placeholder_function
+  };
+
+  st_insert(st, "alpha_num", &first, 1);
+  st_insert(st, "alpha_func", &second, sizeof(instr_func_map));
+  st_insert(st, "beta_num", &third, 1);
+  st_insert(st, "beta_func", &fourth, sizeof(instr_func_map));
+  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "alpha_num");
+  instr_func_map *result_2 = (instr_func_map*) st_retrieve(st, "alpha_func");
+  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "beta_num");
+  instr_func_map *result_4 = (instr_func_map*) st_retrieve(st, "beta_func");
+
+  // Test for value
+  track_test(
+    test_bool(
+      first == *result_1,
+      "(\"alpha_num\", 29) maps properly (29 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *fourth == 102,
-      "\"abdc\" insertion rehashes and works correctly"
+      second.code.dataproc_opcode == result_2->code.dataproc_opcode,
+      "(\"alpha_func\", {instr_func_map}) maps properly (opcode = 10)"
     ), passing, total);
   track_test(
     test_bool(
-      *fifth == 30,
-      "\"dcba\" insertion rehashes and works correctly"
+      second.function == result_2->function,
+      "(\"alpha_func\", {instr_func_map}) maps properly (function points to NULL)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      third == *result_3,
+      "(\"beta_num\", 31) maps properly (31 is a uint8_t here)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth.code.dataproc_opcode == result_4->code.dataproc_opcode,
+      "(\"beta_func\", {function struct}) maps properly (opcode = 0xA)"
+    ), passing, total);
+  track_test(
+    test_bool(
+      fourth.function == result_4->function,
+      "(\"beta_func\", {function struct}) maps properly (function points to &test_st_insert)"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -391,6 +450,7 @@ void test_symbol_table(int *passing, int*total) {
   test_st_insert(&internal_passing, &internal_total);
   test_st_insert_varying_input(&internal_passing, &internal_total);
   test_st_collision(&internal_passing, &internal_total);
+  test_st_different_value_pointers(&internal_passing, &internal_total);
 
   printf("---------------------------------------------------------------------"
          "\n");

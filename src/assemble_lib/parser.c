@@ -26,18 +26,21 @@ void parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
 }
 
 void parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
-  instruction_t *branch_instr = calloc(1, sizeof(instruction_t));
+  branch_t *branch_instr = calloc(1, sizeof(branch_t));
   node *node = ll_node;
   token_list *tokens = node->value;
-  branch_instr->data.branch.cond = code.branch_cond;
+  branch_instr->cond = code.branch_cond;
   for (int i = 0; i < tokens->size; i++) {
     if (tokens->list[i].type == LABEL) {
       uint32_t *label_address = (uint32_t*) st_retrieve(st, tokens->list[i].data.label);
-      branch_instr->data.branch.offset = node->address - *label_address;
+      branch_instr->offset = node->address - *label_address;
     }
   }
   free(node->value);
-  node->value = branch_instr;
+
+  // Encode
+
+  // Write
 }
 
 // Should we have a 5th parser for LSL and ANDEQ?

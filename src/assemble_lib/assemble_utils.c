@@ -61,10 +61,6 @@ void read_asm(char *filename, linked_list *instructions,
   fclose(fptr);
 }
 
-void placeholder_decipher(void *x, union instr_code y, symbol_table *z) {
-  return;
-}
-
 void populate_st_instructions(symbol_table *st) {
   uint32_t vsize = sizeof(instr_func_map);
   // DATAPROC insertions

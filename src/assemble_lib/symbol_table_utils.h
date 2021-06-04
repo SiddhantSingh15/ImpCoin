@@ -19,7 +19,7 @@ symbol_table *init_symbol_table();
  * @param key The key of the key-pair to be inserted
  * @param value The value of the key-pair to be inserted
  */
-void st_insert (symbol_table *st, char* key, void *value);
+void st_insert (symbol_table *st, char* key, void *value, uint32_t vsize);
 
 /**
  * @brief Retrieves the address from a symbol table

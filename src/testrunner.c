@@ -275,22 +275,17 @@ void test_bit_operations(int *passing, int *total) {
 void test_st_insert(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
-  uint8_t *first = malloc(sizeof(uint8_t));
-  *first = 5;
-  uint8_t *second = malloc(sizeof(uint8_t));
-  *second = 10;
-  uint8_t *third = malloc(sizeof(uint8_t));
-  *third = 11;
-  uint32_t *fourth = malloc(sizeof(uint32_t));
-  *fourth = 102;
-  uint32_t *fifth = malloc(sizeof(uint32_t));
-  *fifth = 30;
+  uint8_t first = 5;
+  uint8_t second = 10;
+  uint8_t third = 11;
+  uint32_t fourth = 102;
+  uint32_t fifth = 30;
 
-  st_insert(st, "first", first);
-  st_insert(st, "second", second);
-  st_insert(st, "third", third);
-  st_insert(st, "fourth", fourth);
-  st_insert(st, "fifth", fifth);
+  st_insert(st, "first", &first, 1);
+  st_insert(st, "second", &second, 1);
+  st_insert(st, "third", &third, 1);
+  st_insert(st, "fourth", &fourth, 4);
+  st_insert(st, "fifth", &fifth, 4);
   uint8_t *result_1 = (uint8_t*) st_retrieve(st, "first");
   uint8_t *result_2 = (uint8_t*) st_retrieve(st, "second");
   uint8_t *result_3 = (uint8_t*) st_retrieve(st, "third");
@@ -301,60 +296,33 @@ void test_st_insert(int *passing, int *total) {
   // Tests for value in memory
   track_test(
     test_bool(
-      *first == *result_1,
+      first == *result_1,
       "(\"first\", 5) maps properly (5 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *second == *result_2,
+      second == *result_2,
       "(\"second\", 10) maps properly (10 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *third == *result_3,
+      third == *result_3,
       "(\"third\", 11) maps properly (11 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *fourth == *result_4,
+      fourth == *result_4,
       "(\"fourth\", 102) maps properly (102 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *fifth == *result_5,
+      fifth == *result_5,
       "(\"fifth\", 30) maps properly (30 is a uint32_t here)"
     ), passing, total);
   track_test(
     test_bool(
       missing == NULL,
       "Invalid insertion correctly produces NULL pointer"
-    ), passing, total);
-
-  // Tests for memory
-  track_test(
-    test_bool(
-      first == result_1,
-      "Retrieved memory for \"first\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      second == result_2,
-      "Retrieved memory for \"second\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      third == result_3,
-      "Retrieved memory for \"third\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fourth == result_4,
-      "Retrieved memory for \"fourth\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fifth == result_5,
-      "Retrieved memory for \"fifth\" is equal to provided memory"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -363,21 +331,14 @@ void test_st_insert_varying_input(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
   char extended[511] = "first";
-  uint8_t *first = malloc(sizeof(uint8_t));
-  *first = 5;
-  st_insert(st, "first", first);
+  uint8_t first = 5;
+  st_insert(st, "first", &first, 1);
   uint8_t *result_1 = (uint8_t*) st_retrieve(st, extended);
 
   track_test(
     test_bool(
-      *first == *result_1,
+      first == *result_1,
       "extended[511] = \"first\" and raw \"first\" are the same"
-    ), passing, total);
-
-  track_test(
-    test_bool(
-      first == result_1,
-      "memory of extended[511] and raw \"first\" are the same"
     ), passing, total);
   free_symbol_table(st);
 }
@@ -386,17 +347,13 @@ void test_st_collision(int *passing, int *total) {
 
   symbol_table *st = init_symbol_table();
 
-  uint8_t *first = malloc(sizeof(uint8_t));
-  uint8_t *second = malloc(sizeof(uint8_t));
-  uint8_t *third = malloc(sizeof(uint8_t));
+  uint8_t first = 29;
+  uint8_t second = 30;
+  uint8_t third = 31;
 
-  *first = 29;
-  *second = 30;
-  *third = 31;
-
-  st_insert(st, "abcd", first);
-  st_insert(st, "badc", second);
-  st_insert(st, "dabc", third);
+  st_insert(st, "abcd", &first, 1);
+  st_insert(st, "badc", &second, 1);
+  st_insert(st, "dabc", &third, 1);
   uint8_t *result_1 = (uint8_t*) st_retrieve(st, "abcd");
   uint8_t *result_2 = (uint8_t*) st_retrieve(st, "badc");
   uint8_t *result_3 = (uint8_t*) st_retrieve(st, "dabc");
@@ -404,63 +361,44 @@ void test_st_collision(int *passing, int *total) {
   // Test for value
   track_test(
     test_bool(
-      *first == *result_1,
+      first == *result_1,
       "(\"abcd\", 29) maps properly (29 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *second == *result_2,
+      second == *result_2,
       "(\"badc\", 30) maps properly (30 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      *third == *result_3,
+      third == *result_3,
       "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
     ), passing, total);
-
-  // Test for memory
-  track_test(
-    test_bool(
-      first == result_1,
-      "Retrieved memory for \"abcd\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      *second == *result_2,
-      "Retrieved memory for \"badc\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      *third == *result_3,
-      "Retrieved memory for \"dabc\" is equal to provided memory"
-    ), passing, total);
-  free_symbol_table(st);
 }
 
 // Placeholder function for testing the storing of functions
-void placeholder_function(void * a) {
+void placeholder_function(void *a, union instr_code b, void *c) {
   return;
 }
 
 void test_st_different_value_pointers(int *passing, int *total) {
   symbol_table *st = init_symbol_table();
 
-  uint8_t *first = malloc(sizeof(uint8_t));
-  instr_func_map *second = malloc(sizeof(instr_func_map));
-  uint8_t *third = malloc(sizeof(uint8_t));
-  instr_func_map *fourth = malloc(sizeof(instr_func_map));
+  uint8_t first = 29;
+  instr_func_map second = {
+    .code.dataproc_opcode = 10,
+    .function = NULL
+  };
+  uint8_t third = 31;
+  instr_func_map fourth = {
+    .code.dataproc_opcode = 0xA,
+    .function = &placeholder_function
+  };
 
-  *first = 29;
-  second->opcode = 10;
-  second->function = NULL;
-  *third = 31;
-  fourth->opcode = 0xA;
-  fourth->function = &placeholder_function;
-
-  st_insert(st, "alpha_num", first);
-  st_insert(st, "alpha_func", second);
-  st_insert(st, "beta_num", third);
-  st_insert(st, "beta_func", fourth);
+  st_insert(st, "alpha_num", &first, 1);
+  st_insert(st, "alpha_func", &second, sizeof(instr_func_map));
+  st_insert(st, "beta_num", &third, 1);
+  st_insert(st, "beta_func", &fourth, sizeof(instr_func_map));
   uint8_t *result_1 = (uint8_t*) st_retrieve(st, "alpha_num");
   instr_func_map *result_2 = (instr_func_map*) st_retrieve(st, "alpha_func");
   uint8_t *result_3 = (uint8_t*) st_retrieve(st, "beta_num");
@@ -469,55 +407,33 @@ void test_st_different_value_pointers(int *passing, int *total) {
   // Test for value
   track_test(
     test_bool(
-      *first == *result_1,
+      first == *result_1,
       "(\"alpha_num\", 29) maps properly (29 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      second->opcode == result_2->opcode,
+      second.code.dataproc_opcode == result_2->code.dataproc_opcode,
       "(\"alpha_func\", {instr_func_map}) maps properly (opcode = 10)"
     ), passing, total);
   track_test(
     test_bool(
-      second->function == result_2->function,
+      second.function == result_2->function,
       "(\"alpha_func\", {instr_func_map}) maps properly (function points to NULL)"
     ), passing, total);
   track_test(
     test_bool(
-      *third == *result_3,
+      third == *result_3,
       "(\"beta_num\", 31) maps properly (31 is a uint8_t here)"
     ), passing, total);
   track_test(
     test_bool(
-      fourth->opcode == result_4->opcode,
+      fourth.code.dataproc_opcode == result_4->code.dataproc_opcode,
       "(\"beta_func\", {function struct}) maps properly (opcode = 0xA)"
     ), passing, total);
   track_test(
     test_bool(
-      fourth->function == result_4->function,
+      fourth.function == result_4->function,
       "(\"beta_func\", {function struct}) maps properly (function points to &test_st_insert)"
-    ), passing, total);
-
-  // Test for memory
-  track_test(
-    test_bool(
-      first == result_1,
-      "Retrieved memory for \"alpha_num\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      second == result_2,
-      "Retrieved memory for \"alpha_func\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      third == result_3,
-      "Retrieved memory for \"beta_num\" is equal to provided memory"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fourth == result_4,
-      "Retrieved memory for \"beta_func\" is equal to provided memory"
     ), passing, total);
   free_symbol_table(st);
 }

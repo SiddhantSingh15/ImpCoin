@@ -46,18 +46,21 @@ void *st_retrieve (symbol_table *st, char* key) {
   return st->kvps[hashcode]->value;
 }
 
-void st_insert (symbol_table *st, char* key, void* value) {
+void st_insert (symbol_table *st, char* key, void* value, uint32_t vsize) {
   if (st->count == st->capacity) {
     fprintf(stderr, "Symbol Table is at full capacity.\n");
     exit(EXIT_FAILURE);
   }
+
+  void *st_value = malloc(vsize);
+  memcpy(st_value, value, vsize);
 
   // Create the key-value pair
   symbol_table_kvp *kvp = calloc(1, sizeof(symbol_table_kvp));
   char* new_key = malloc(strlen(key) + 1);
   strcpy(new_key, key);
   kvp->key = new_key;
-  kvp->value = value;
+  kvp->value = st_value;
 
   // Apply hash function
   uint32_t hashcode = hash(key);

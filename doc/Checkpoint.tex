@@ -1,30 +1,88 @@
-\documentclass[11pt]{article}
+\documentclass[a4paper]{article}
 
-\usepackage{fullpage}
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lipsum}
+% \renewcommand\Authfont{\fontsize{12}{14.4}\selectfont}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=1.5cm,bottom=1.75cm,left=1.5cm,right=1.5cm,marginparwidth=2cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{\textbf{ARM11 Emulator Checkpoint}}
+\author{
+  Ashvin Arsakularatne\\
+  \texttt{aa9220@ic.ac.uk}
+  \and
+  Kavya Chopra\\
+  \texttt{kc2320@ic.ac.uk}
+  \and
+  Siddhant Singh\\
+  \texttt{ss5120@ic.ac.uk}
+  \and
+  Ye Lun Yang\\
+  \texttt{yly19@ic.ac.uk}
+}
 
 \begin{document}
-
-\title{ARM Checkpoint... }
-\author{TODO}
-
 \maketitle
+% SID
+\section{Division of Labour \& Coordination}
+\subsection{How we have divided tasks}
+Before we could start implementing the 4 types of instructions, we needed to build the binary file loader and specify type definitions of our pipeline, instructions and ARM11 machine. We split these tasks and our group into two and worked on the binary file loader (Ye Lun and Siddhant) and the type definitions (Kavya and Ashvin) concurrently. Once we successfully finished, we naturally transitioned to making the pipeline (Kavya, Ashvin and Ye Lun) and general constant definitions (Siddhant). We now had a solid foundation to build the instructions upon so every one of us took an instruction to work on: Data Processing (Siddhant), Single Data Transfter (Kavya), Multiply (Ye Lun) and Branch (Ashvin). As Ashvin finished his part quickly, he got started on the in-house test suite which tests our utility methods to make sure they function correctly. Kavya joined him to add edge cases and further improve testing. Once all the instructions were implemented, we spent a day combining all branches and fixing any bugs we came across. By and large, the work was as evenly divided as we could have without causing confusion and we hope to continue similar practices during our assembler implementation.
 
-\section{Group Organisation}
+\subsection{Methods of coordination}
+Throughout our project, we have been using some great tools to improve our efficiency. We use Discord for all communications; our server is designed in such a way that we have channels dedicated to code snippets, git logs, planning and important links. This allows the chat to remain clear and succinct. The server also contains 3 voice channels (1 as a lounge where people can come to simply hang out and get to know each other, and 2 to facilitate pair programming). We have also employed a git logging bot which sends a message every time a successful merge or a push occurs (uses the RSS feed from \texttt{gitlab.com}). This allows us to know when we must pull as we are all working around the clock, our time zones span from \texttt{GMT+2} to \texttt{GMT+7} which gives us an extra 5 hours of working time in a day. At the start, we set out a target of meeting at a specific time for an hour everyday but that evolved to being on call at all times - we get on a call every time we must plan, fix a bug, refactor, or just hang out. This relaxed approach is working well for us as it allows us to set our own rules and also opens the group to a more collaborative and informal experience.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+% KAVYA
+\section{Evaluating Collaboration}
+\subsection{How well we are working}
+Every member of our group successfully managed to achieve the targets we set for ourselves within the given time-frame. The time-limit we set for a task takes into consideration the size of the task, its overlap with other concurrent and future tasks, and the difference in time zone for the member in charge of it. 
 
-\section{Implementation Strategies}
+Multiple voice calls are held ensure that everyone is working on the right track. Following the division of work, we generally work together on call in groups of two to maintain pace and work efficiency.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+Additionally, we have formed a Discord server where we can ask each other questions or general doubts regarding aspects in our tasks, share any important links or information we think may be useful to other members, or even suggest ideas to refactor other members' code. Decisions regarding important design choices and basic algorithms are decided as a group before work can be done individually.
+
+All team members assemble on call to review any team-member's work before merging their branch with the master branch.
+
+Overall, the even division of tasks, and our relaxed yet precise approach to the project has helped us maintain a less than stressful environment while allowing flexibility, high levels of productivity and informal yet professional collaboration. These factors also led us to completing the emulator a week ahead of the deadline.
+
+\subsection{What we can change for the future}
+Our team could work on pacing the work more efficiently to ensure we have made the best possible design choices with the tools available to us to optimize the code simplicity and run-time. Although this may lead to us taking longer to complete tasks, it would allow us to extract more from this learning opportunity through exploring different ideas. Furthermore, a slower pace would not pose a threat to completing tasks before the deadline, considering the productivity of the group during the build of the emulator.
+
+Additionally, the group could work on being more collaborative while working on design features or refactoring that had not been discussed with the other members before-hand. This would ensure that the decisions we make will in-fact lead to better usability of the code and are worth the time and effort before moving on to further tasks.
+
+% Ye Lun
+\section{Emulator Structure \& Re-usability}
+\subsection{Structure of the emulator}
+The emulator is split into four main segments, the first of which is the pipeline where instructions are are fetched, decoded and executed. The other three segments are the code for fetching, decoding and execution.
+
+Individually, the fetching, decoding and execution functions take in instructions and produce intended results. Combined with the pipeline, instructions are cycled into these functions until termination.
+
+Every segment of the emulator makes use of utility functions to ensure clean and modular code. Utility functions for execution are separated from the utility functions of the other segments because the execution process uses a larger amount of code that is not reusable for the other segments. As such, two utility files are created to contain these functions. Furthermore, two header files contain defined variables and data types. These header files are included in almost the entire codebase for emulation.
+
+\subsection{Code we can use for the assembler}
+Immediately the emulator and assembler use some of the same data types, which naturally leads to our definitions and types being reusable for the assembler. Moreover, decoding instructions and executing instructions in the emulator and encoding instructions in the assembler both require our bitwise functions, which make them prime candidates for code reuse.
+
+Other utility functions may be reusable if we run into situations that require them while working on the assembler. Reused code should be indicated as such to avoid confusion, so we can refactor the code to group these shared utility functions in the same folder for a cleaner repository.
+
+% ASHVIN
+\section{Tackling Difficult Tasks Ahead}
+\subsection{Tasks that may cause trouble}
+A difficult task ahead would be a potential Makefile refactor. Since we started are project with a flat directory, and refactored this to a suitable structure later on, we decided on a non-recursive Makefile structure. This could potentially be difficult to scale, as our project grows larger and more complex, with the addition of the assembler.
+
+Another challenging aspect could be implementing the symbol table ADT. An ideal candidate for this would be a hash table, but this could prove more difficult than expected, since none of us have prior experience implementing this particular data structure. Moreover, since we are used to a predominantly object-oriented style, doing so in an imperative fashion could prove challenging.
+
+\subsection{Our solution}
+We are actively looking for better ways to refactor our Makefile. This is done by working to better understand and make use of more advanced aspects of make, such as implicit rules, string substitution and recursive-make. Another point to consider here, would be common directory structures and Makefiles used in other C open source projects. By learning from time tested techniques, we hope to have a more scalable and efficient system in place shortly after a basic implementation of the assembler.
+
+On the latter point, we are preparing ourselves by individual study into the idioms of imperative languages, and how data structures are implemented in them. We expect that working through the lexis past papers and further study online would help us overcome this challenge without significant trouble. Furthermore, this would translate to better code quality overall, which would greatly benefit our project.
 
 \end{document}

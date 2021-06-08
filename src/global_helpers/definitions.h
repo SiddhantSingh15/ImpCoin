@@ -97,7 +97,7 @@
 /* Symbol Table */
 #define TABLE_CAPACITY 64
 
-/* Tokenizer definitions */
+/* Tokenizer */
 #define DELIMITERS " ,[]#=+-"
 #define BLANK_SPACE " "
 #define COMMA_SPACE ", "
@@ -107,5 +107,8 @@
 #define OCTAL 8
 #define DENARY 10
 #define HEX 16
+
+/* File Write */
+#define WRITE_SIZE 1
 
 #endif // DEFINITIONS_H

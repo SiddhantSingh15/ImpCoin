@@ -84,7 +84,8 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
     // 2. 00 00 0x x0 -> rotate = 16 - 1
     // 3. 00 00 00 xx -> no rotation
     uint16_t rotate_count = 16;
-    // Rotate only if it is required
+    // Rotate only if it is required - If value is less than 0xFF,
+    // no rotation is needed
     if (tokens->list[i + 1].data.exp > 0xFF) {
       while (!(tokens->list[i + 1].data.exp & 3)) {
         rotate_count--;

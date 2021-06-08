@@ -30,6 +30,9 @@ void append_via_root(linked_list *ll, void *val, uint32_t addr) {
   curr->next = to_append;
 }
 
+// NOTE
+// Might not need this middleman function now that append_via_root calls the linked
+// list directly
 void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
   append_via_root(list, val, addr);
 }

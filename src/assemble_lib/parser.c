@@ -285,7 +285,31 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   return construct_branch_binary(&branch_instr);
 }
 
-// Should we have a 5th parser for LSL and ANDEQ?
-// void parse_special(void *ll_node, instr_code code, symbol_table *st) {
-//   return;
-// }
+
+uint32_t parse_special(void *ll_node, union instr_code code, symbol_table *st) {
+  dataproc_t special_instr = {0};
+  node *node = ll_node;
+  token_list *tokens = node->value;
+  uint32_t line = node->address;
+  uint8_t currptr;
+  
+  // for ANDEQ
+  if (code.dataproc_opcode == AND) {
+    return 0;
+  }
+
+  // for LSL
+  
+  assert_token(tokens->list[1].type == REG, 1, line);
+  special_instr.rn = tokens->list[1].data.reg;
+  if (tokens->list[2].type == SEPARATOR) {
+    assert_token(tokens->list[2].data.separator == '#', 2, line);
+    special_instr.is_immediate = SET;
+  }
+  currptr = 2;
+  special_instr.op2 = parse_operand2(tokens, &currptr, line);
+  special_instr.opcode = code.dataproc_opcode;
+  special_instr.cond = AL;
+
+  return construct_dataproc_binary(&special_instr);
+}

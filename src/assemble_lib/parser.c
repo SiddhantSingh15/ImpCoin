@@ -272,9 +272,10 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
 }
 
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
-  branch_t branch_instr = {0};
   node *node = ll_node;
   token_list *tokens = node->value;
+  assert_token(tokens->list[1].type == '[', 1, node->address);
+  branch_t branch_instr = {0};
   branch_instr.cond = code.branch_cond;
   uint32_t *label_address = (uint32_t*) st_retrieve(st, tokens->list[1].data.label);
   branch_instr.offset = node->address - *label_address;

@@ -44,9 +44,11 @@ void read_asm(char *filename, linked_list *instructions,
       continue;
     }
 
-    // tokenize, and add it to the instruction list
-    token_list *tokens = tokenizer(buffer);
-    append_to_linked_list(instructions, tokens, mem_address);
+    if(strlen(buffer) != 0) {
+      // tokenize, and add it to the instruction list
+      token_list *tokens = tokenizer(buffer);
+      append_to_linked_list(instructions, tokens, mem_address);
+    }
 
     mem_address += 4;
   }

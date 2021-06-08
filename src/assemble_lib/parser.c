@@ -72,14 +72,27 @@ void assert_token(bool token_cond, uint8_t pos, uint32_t line) {
 }
 
 uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
-
   uint8_t i = *index;
 
   if (tokens->list[i].type == SEPARATOR) {
     assert_token(tokens->list[i].data.separator == '#', i, line);
     assert_token(tokens->list[i + 1].type == EXPRESSION, i + 1, line);
     *index = i + 2;
-    return (uint16_t) tokens->list[i + 1].data.exp;
+    // Set up rotate byte
+    // Rotation example
+    // 1. 00 00 xx 00 -> rotate = 16 - 2
+    // 2. 00 00 0x x0 -> rotate = 16 - 1
+    // 3. 00 00 00 xx -> no rotation
+    uint16_t rotate_count = 16;
+    // Rotate only if it is required
+    if (tokens->list[i + 1].data.exp > 0xFF) {
+      while (!(tokens->list[i + 1].data.exp & 3)) {
+        rotate_count--;
+        tokens->list[i + 1].data.exp >>= 2;
+      }
+    }
+    rotate_count <<= 8;
+    return rotate_count | tokens->list[i + 1].data.exp;
   }
 
   assert_token(tokens->list[i].type == REG, i, line);
@@ -105,7 +118,6 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
     shift++;
     *index = i + 3;
   }
-
   uint16_t base = 0;
   base |= rm;
   base |= shift << 4;

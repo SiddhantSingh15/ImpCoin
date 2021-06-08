@@ -73,7 +73,7 @@ void assert_token(bool token_cond, uint8_t pos, uint32_t line) {
 
 uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
   uint8_t i = *index;
-
+  // If op2 is an immediate value ('#' identified)
   if (tokens->list[i].type == SEPARATOR) {
     assert_token(tokens->list[i].data.separator == '#', i, line);
     assert_token(tokens->list[i + 1].type == EXPRESSION, i + 1, line);
@@ -87,33 +87,43 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
     // Rotate only if it is required - If value is less than 0xFF,
     // no rotation is needed
     if (tokens->list[i + 1].data.exp > 0xFF) {
-      while (!(tokens->list[i + 1].data.exp & 3)) {
+      // 0x3 = 11 in binary, this while loop checks to see if the last  any of the
+      // 2 bits are set
+      // E.G. 1100 is not valid, 0011 is valid, 0110 is valid
+      while (!(tokens->list[i + 1].data.exp & 0x3)) {
         rotate_count--;
-        tokens->list[i + 1].data.exp >>= 2;
+        tokens->list[i + 1].data.exp >>= SHIFT_MULTIPLIER;
       }
     }
-    rotate_count <<= 8;
+    rotate_count <<= ONE_B;
     return rotate_count | tokens->list[i + 1].data.exp;
   }
-
+  // op2 is not immediate, first token will be a register
   assert_token(tokens->list[i].type == REG, i, line);
   uint8_t rm = tokens->list[i].data.reg;
 
+  // No shift present
   if (tokens->size == i || tokens->list[i + 1].type != SHIFTNAME) {
     *index = i + 1;
     return (uint16_t) rm;
   }
 
+  // Shift present
   assert_token(tokens->list[i + 1].type == SHIFTNAME, i + 1, line);
   uint8_t shift = tokens->list[i + 1].data.shift_name << 1;
   assert(shift < 4);
 
+  // Structure of shift
+  // 1. <shiftname> <#expression> - 3 tokens
+  // 2. <shiftname> <register> - 2 tokens
   if (tokens->list[i + 2].type == SEPARATOR) {
+    // Case 1: <shiftname> <register> - 3 tokens
     assert_token(tokens->list[i + 2].data.separator == '#', i + 2, line);
     assert_token(tokens->list[i + 3].type == EXPRESSION, i + 3, line);
     shift |= tokens->list[i + 3].data.exp << 3;
     *index = i + 4;
   } else {
+    // Case 2: <shiftname> <#expression> - 2 tokens
     assert_token(tokens->list[i + 2].type == REG, i + 2, line);
     shift |= tokens->list[i + 2].data.reg << 4;
     shift++;

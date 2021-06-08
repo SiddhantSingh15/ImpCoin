@@ -1,18 +1,18 @@
+#include "../global_helpers/definitions.h"
+#include "../global_helpers/types.h"
+#include "tokenizer.h"
+#include "tokens.h"
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include "tokenizer.h"
-#include "../global_helpers/definitions.h"
-#include "../global_helpers/types.h"
-#include "tokens.h"
 
 // All parsing functions should look like this
 // void parse_function (void* ll_node, union instr_code code, symbol_table* st);
 
-uint32_t construct_dataproc_binary (dataproc_t *instr) {
+uint32_t construct_dataproc_binary(dataproc_t *instr) {
   // Base - 0000 0000 0000 0000 0000 0000 0000 0000
   uint32_t dataproc_base = 0x00000000;
   dataproc_base |= instr->op2 << OP2_POS;
@@ -25,7 +25,7 @@ uint32_t construct_dataproc_binary (dataproc_t *instr) {
   return dataproc_base;
 }
 
-uint32_t construct_mult_binary (multiply_t *instr) {
+uint32_t construct_mult_binary(multiply_t *instr) {
   // Base - 0000 0000 0000 0000 0000 0000 1001 0000
   uint32_t mult_base = 0x00000090;
   mult_base |= instr->rm << RM_POS;
@@ -38,7 +38,7 @@ uint32_t construct_mult_binary (multiply_t *instr) {
   return mult_base;
 }
 
-uint32_t construct_sdt_binary (sdt_t *instr) {
+uint32_t construct_sdt_binary(sdt_t *instr) {
   // Base - 0000 0100 0000 0000 0000 0000 0000 0000
   uint32_t sdt_base = 0x04000000;
   sdt_base |= instr->offset << OFFSET_POS;
@@ -52,7 +52,7 @@ uint32_t construct_sdt_binary (sdt_t *instr) {
   return sdt_base;
 }
 
-uint32_t construct_branch_binary (branch_t *instr) {
+uint32_t construct_branch_binary(branch_t *instr) {
   // Base - 0000 1010 0000 0000 0000 0000 0000 0000
   uint32_t branch_base = 0x0A000000;
   branch_base |= instr->offset << OFFSET_POS;
@@ -87,9 +87,8 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
     // Rotate only if it is required - If value is less than 0xFF,
     // no rotation is needed
     if (tokens->list[i + 1].data.exp > 0xFF) {
-      // 0x3 = 11 in binary, this while loop checks to see if the last  any of the
-      // 2 bits are set
-      // E.G. 1100 is not valid, 0011 is valid, 0110 is valid
+      // 0x3 = 11 in binary, this while loop checks to see if the last  any of
+      // the 2 bits are set E.G. 1100 is not valid, 0011 is valid, 0110 is valid
       while (!(tokens->list[i + 1].data.exp & 0x3)) {
         rotate_count--;
         tokens->list[i + 1].data.exp >>= SHIFT_MULTIPLIER;
@@ -105,7 +104,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
   // No shift present
   if (tokens->size == i || tokens->list[i + 1].type != SHIFTNAME) {
     *index = i + 1;
-    return (uint16_t) rm;
+    return (uint16_t)rm;
   }
 
   // Shift present
@@ -135,7 +134,8 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
   return base;
 }
 
-uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) {
+uint32_t parse_dataproc(void *ll_node, union instr_code code,
+                        symbol_table *st) {
   dataproc_t dataproc_instr = {0};
   node *node = ll_node;
   uint32_t line = node->address;
@@ -277,7 +277,8 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   assert_token(tokens->list[1].type == LABEL, 1, node->address);
   branch_t branch_instr = {0};
   branch_instr.cond = code.branch_cond;
-  uint32_t *label_address = (uint32_t*) st_retrieve(st, tokens->list[1].data.label);
+  uint32_t *label_address =
+      (uint32_t *)st_retrieve(st, tokens->list[1].data.label);
   branch_instr.offset = node->address - *label_address + 8;
   return construct_branch_binary(&branch_instr);
 }

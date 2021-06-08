@@ -275,7 +275,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   if (tokens->size == 5) {
     sdt_instr.is_shift_R = !SET;
     sdt_instr.offset = 0;
-    sdt_instr.up_bit = !SET;
+    sdt_instr.up_bit = SET;
     return construct_sdt_binary(&sdt_instr);
   }
 
@@ -308,7 +308,7 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   branch_instr.cond = code.branch_cond;
   uint32_t *label_address =
       (uint32_t *)st_retrieve(st, tokens->list[1].data.label);
-  branch_instr.offset = node->address - *label_address + 8;
+  branch_instr.offset = ((int32_t)*label_address - (int32_t)node->address - 8) >> 2;
   return construct_branch_binary(&branch_instr);
 }
 

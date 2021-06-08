@@ -82,6 +82,7 @@
 #define CMP 0xA
 #define ORR 0xC
 #define MOV 0xD
+#define ANDEQ 0xE
 
 /* Shift Operations */
 #define SHIFT_MULTIPLIER 2

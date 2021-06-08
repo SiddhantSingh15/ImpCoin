@@ -2,6 +2,7 @@
 #include "../global_helpers/types.h"
 #include "tokenizer.h"
 #include "tokens.h"
+#include "linked_list.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -138,6 +139,11 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
 
 uint32_t parse_dataproc(void *ll_node, union instr_code code,
                         symbol_table *st) {
+  
+  if (code.dataproc_opcode == ANDEQ) {
+    return 0;
+  }
+
   dataproc_t dataproc_instr = {0};
   node *node = ll_node;
   uint32_t line = node->address / 4;
@@ -155,7 +161,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
     }
     currptr = 2;
     dataproc_instr.op2 = parse_operand2(tokens, &currptr, line);
-  } else if (code.dataproc_opcode == 0xD) {
+  } else if (code.dataproc_opcode == MOV) {
     // Check for MOV
     // 0 - INSTR, 1 - RD, 2  - <#expression>
     assert_token(tokens->list[1].type == REG, 1, line);
@@ -313,30 +319,29 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
 }
 
 
-uint32_t parse_special(void *ll_node, union instr_code code, symbol_table *st) {
-  dataproc_t special_instr = {0};
-  node *node = ll_node;
-  token_list *tokens = node->value;
-  uint32_t line = node->address;
-  uint8_t currptr;
+uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
+  char fake_input[511];
+  node *old_node = ll_node;
+  token_list *tokens = old_node->value;
 
-  // for ANDEQ
-  if (code.dataproc_opcode == AND) {
-    return 0;
-  }
+  sprintf(fake_input, "mov r%d,r%d, lsl #%d"
+    , tokens->list[1].data.reg
+    , tokens->list[1].data.reg
+    , tokens->list[3].data.exp);
 
-  // for LSL
+  token_list *new_tokens = tokenizer(fake_input);
+  
+  /* Stack based assignment of new_node */
+  // node new_node;
+  // new_node.address = old_node->address;
+  // new_node.value = new_tokens;
 
-  assert_token(tokens->list[1].type == REG, 1, line);
-  special_instr.rn = tokens->list[1].data.reg;
-  if (tokens->list[2].type == SEPARATOR) {
-    assert_token(tokens->list[2].data.separator == '#', 2, line);
-    special_instr.is_immediate = SET;
-  }
-  currptr = 2;
-  special_instr.op2 = parse_operand2(tokens, &currptr, line);
-  special_instr.opcode = code.dataproc_opcode;
-  special_instr.cond = AL;
+  /* Hardcore malloc'd version */
+  node *new_node = init_node(old_node->address, new_tokens);
+  uint32_t result = parse_dataproc(new_node, code, st);
 
-  return construct_dataproc_binary(&special_instr);
+  /* With hardcore freeing */
+  free(new_node);
+
+  return result;
 }

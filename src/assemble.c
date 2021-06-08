@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
   /* Comes inside the FOR loop */
   token_list *tokens;
-  node *curr = instructions->root;
+  node *curr = instructions->head;
   instr_func_map *func_map;
   uint32_t binary_instr;
   while (curr != NULL) {

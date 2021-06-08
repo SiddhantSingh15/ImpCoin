@@ -5,8 +5,8 @@
 
 int main(int argc, char **argv) {
 
-  if (argc != 2) {
-    printf("Please provide only 1 argument\n");
+  if (argc != 3) {
+    printf("Please provide only 2 arguments\n");
     return EXIT_FAILURE;
   }
   char *file = argv[1];
@@ -22,10 +22,19 @@ int main(int argc, char **argv) {
   // loop through the instructions (uint32_t) and write them
 
   /* Comes inside the FOR loop */
-  uint32_t binary_instr = 0;
-  write_file(to_write, &binary_instr);
-  /*     */
-
+  char *instr_name;
+  node *curr = instructions->root;
+  instr_func_map *func_map;
+  uint32_t binary_instr;
+  while (curr != NULL) {
+    binary_instr = 0;
+    instr_name = curr->value;
+    func_map = st_retrieve(labels, instr_name);
+    binary_instr = func_map->function(curr, func_map->code, labels);
+    printf("%x", binary_instr);
+    curr = curr->next;
+    write_file(to_write, &binary_instr);
+  }
   fclose(to_write);
 
   return EXIT_SUCCESS;

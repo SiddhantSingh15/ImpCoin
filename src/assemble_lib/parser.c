@@ -262,8 +262,6 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
       branch_instr.offset = node->address - *label_address;
     }
   }
-
-  // Encode
   return construct_branch_binary(&branch_instr);
 }
 

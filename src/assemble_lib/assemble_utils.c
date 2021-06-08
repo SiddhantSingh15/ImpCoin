@@ -22,13 +22,15 @@ void read_asm(char *filename, linked_list *instructions,
 
   FILE *fptr;
   char buffer[511];
-  uint32_t mem_address;
+  uint32_t mem_address = 0;
 
   if ((fptr = fopen(filename, "r")) == NULL) {
     printf("Error opening file.\n");
     exit(EXIT_FAILURE);
   }
-
+  // First read
+  // - Add labels into symbol table
+  // - Convert each instruction into array of tokens
   while (fgets(buffer, 511, fptr)) {
 
     // remove trailing newline

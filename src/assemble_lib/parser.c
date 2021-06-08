@@ -30,8 +30,8 @@ uint32_t construct_mult_binary(multiply_t *instr) {
   uint32_t mult_base = 0x00000090;
   mult_base |= instr->rm << RM_POS;
   mult_base |= instr->rs << RS_POS;
-  mult_base |= instr->rn << RN_POS;
-  mult_base |= instr->rd << RD_POS;
+  mult_base |= instr->rn << MULTIPLY_RN_POS;
+  mult_base |= instr->rd << MULTIPLY_RD_POS;
   mult_base |= instr->set_cond << S_POS;
   mult_base |= instr->accumulate << A_POS;
   mult_base |= instr->cond << COND_POS;
@@ -203,7 +203,7 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
   assert_token(tokens->list[3].type == REG, 3, line);
   mult_instr.rs = tokens->list[3].data.reg;
 
-  if (tokens->size == 5) {
+  if (code.mul_a) {
     assert_token(tokens->list[4].type == REG, 4, line);
     mult_instr.rn = tokens->list[4].data.reg;
   }

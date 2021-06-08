@@ -38,6 +38,8 @@ void read_asm(char *filename, linked_list *instructions,
 
     if (buffer[strlen(buffer) - 1] == ':') {
       // it is a label, add it to the symbol table
+      // replace ':' with terminating character
+      buffer[strlen(buffer) - 1] = '\0';
       st_insert(symbols, buffer, &mem_address, sizeof(uint32_t));
       continue;
     }

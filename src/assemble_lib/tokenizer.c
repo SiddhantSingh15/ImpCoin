@@ -1,13 +1,12 @@
+#include "tokenizer.h"
+#include "assemble_utils.h"
+#include "tokens.h"
+#include <assert.h>
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include "tokens.h"
-#include "tokenizer.h"
-#include "assemble_utils.h"
 
 token_list *tokenizer(char *instr_line) {
   // pre: instr_line is not a label, only an instruction
@@ -20,7 +19,8 @@ token_list *tokenizer(char *instr_line) {
   strcpy(rest_start, instr_line);
   char *rest = rest_start;
 
-  char *instr_name = strbrk_r(rest, BLANK_SPACE, &rest);
+  char *instr_name = malloc(strlen(instr_line + 1));
+  strcpy(instr_name, strbrk_r(rest, BLANK_SPACE, &rest));
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;
@@ -31,6 +31,7 @@ token_list *tokenizer(char *instr_line) {
     union token_data data;
 
     if (strcspn(token, COMMA_SPACE) == 0) {
+      free(token);
       continue;
     }
 
@@ -40,28 +41,32 @@ token_list *tokenizer(char *instr_line) {
 
     } else if (*token == REGISTER_SYMB && isdigit(token[1])) {
       type = REG;
-      data.reg = (uint8_t) parse_int(token + 1);
-
-    } else if (strlen(token) == 1) {
-      type = SEPARATOR;
-      data.separator = *token;
+      data.reg = (uint8_t)parse_int(token + 1);
 
     } else if (is_shift(token) >= 0) {
       type = SHIFTNAME;
       data.shift_name = is_shift(token);
 
-    } else if (isalpha(*token)) {
-      type = LABEL;
-      data.label = token;
-
     } else {
-      type = TOKERR;
-      data.error = token;
+      char *token_dupe = malloc(strlen(token) + 1);
+      strcpy(token_dupe, token);
+      if (strlen(token) == 1) {
+        type = SEPARATOR;
+        data.separator = *token_dupe;
+
+      } else if (isalpha(*token)) {
+        type = LABEL;
+        data.label = token_dupe;
+
+      } else {
+        type = TOKERR;
+        data.error = token_dupe;
+      }
     }
 
-    free(token);
     tokens->list[count].type = type;
     tokens->list[count].data = data;
+    free(token);
     count++;
   }
 
@@ -114,17 +119,17 @@ uint32_t parse_int(char *str) {
   }
 
   switch (str[1]) {
-    case 'x':
-      base = HEX;
-      break;
-    case 'b':
-      base = BINARY;
-      break;
-    case 'o':
-      base = OCTAL;
-      break;
-    default:
-      base = DENARY;
+  case 'x':
+    base = HEX;
+    break;
+  case 'b':
+    base = BINARY;
+    break;
+  case 'o':
+    base = OCTAL;
+    break;
+  default:
+    base = DENARY;
   }
 
   return strtol(str, NULL, base);

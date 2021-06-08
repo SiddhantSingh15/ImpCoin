@@ -116,10 +116,13 @@ uint32_t parse_int(char *str) {
   switch (str[1]) {
     case 'x':
       base = HEX;
+      break;
     case 'b':
       base = BINARY;
+      break;
     case 'o':
       base = OCTAL;
+      break;
     default:
       base = DENARY;
   }

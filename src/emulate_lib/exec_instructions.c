@@ -3,6 +3,7 @@
 #include "emulate_utils.h"
 #include "exec_utils.h"
 #include "dataproc_operations.h"
+#include "gpio.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -95,6 +96,16 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
       to_uint8_array(state->register_file[instr.rd],
                      &state->main_memory[mem_address]);
     }
+  } else if (mem_address == FIRST_TEN) {
+    printf("One GPIO pin from 0 to 9 has been accessed\n");
+  } else if (mem_address == SECOND_TEN) {
+    printf("One GPIO pin from 10 to 19 has been accessed\n");
+  } else if (mem_address == THIRD_TEN) {
+    printf("One GPIO pin from 20 to 29 has been accessed\n");
+  } else if (mem_address == PIN_ON) {
+    printf("PIN ON\n");
+  } else if (mem_address == PIN_OFF) {
+    printf("PIN OFF\n");
   } else {
     printf("Error: Out of bounds memory access at address 0x%08x\n",
            mem_address);

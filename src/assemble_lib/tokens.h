@@ -23,7 +23,7 @@ union token_data {
  * @brief Enum for the type of token.
  */
 enum token_type {
-  INSTRNAME, /* Instruction name */
+  INSTRNAME = 1, /* Instruction name */
   REG, /* Register */
   EXPRESSION, /* Expression */
   SHIFTNAME, /* Shift name */

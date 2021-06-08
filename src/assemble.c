@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "assemble_lib/assemble_utils.h"
@@ -25,14 +26,25 @@ int main(int argc, char **argv) {
 
   /* Comes inside the FOR loop */
   token_list *tokens;
-  node *curr = instructions->root;
+  node *curr = instructions->head;
   instr_func_map *func_map;
   uint32_t binary_instr;
   while (curr != NULL) {
     binary_instr = 0;
     tokens = curr->value;
-    func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
-    binary_instr = func_map->function(curr, func_map->code, labels);
+
+    if (tokens->list[0].type == INSTRNAME) {
+      // curr->value is a token_list, and the first token has been correctly
+      // initialised to type INSTRNAME.
+      func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
+      binary_instr = func_map->function(curr, func_map->code, labels);
+
+    } else {
+      // curr-> value is not a token_list, but a constant binary value.
+      binary_instr = *(uint32_t *)curr->value;
+
+    }
+
     curr = curr->next;
     write_file(to_write, &binary_instr);
   }

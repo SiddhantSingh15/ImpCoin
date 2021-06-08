@@ -47,7 +47,7 @@ void read_asm(char *filename, linked_list *instructions,
     if(strlen(buffer) != 0) {
       // tokenize, and add it to the instruction list
       token_list *tokens = tokenizer(buffer);
-      append_to_linked_list(instructions, tokens, mem_address);
+      append_to_linked_list(instructions, tokens);
     }
 
     mem_address += 4;
@@ -138,14 +138,14 @@ void populate_st_instructions(symbol_table *st) {
   // SPECIAL: LSL - OPCODE = MOV = 1101
   instr_func_map lsl = {
     .code.dataproc_opcode = MOV,
-    .function = &parse_dataproc
+    .function = &parse_special
   };
   st_insert(st, "lsl", &lsl, vsize);
 
   // SPECIAL: ANDEQ - OPCODE = AND = 0000
   instr_func_map andeq = {
     .code.dataproc_opcode = AND,
-    .function = &parse_dataproc
+    .function = &parse_special
   };
   st_insert(st, "andeq", &andeq, vsize);
 

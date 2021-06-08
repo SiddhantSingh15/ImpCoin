@@ -19,23 +19,31 @@ typedef struct node {
  * instr_t or as tokens.
  */
 typedef struct linked_list {
-  struct node *root;
+  struct node *head;
 } linked_list;
 
 /**
- * @brief Initialises a new linked list with a null root node and size of 0..
+ * @brief Initialises a new linked list with a null head node.
  */
 linked_list *init_linked_list(void);
 
 /**
- * @brief Adds a new node with given value and address to the list. The list is
- * accessed via the given root node.
- *
- * @param root The root node of the list.
- * @param val The value to node to be appended.
- * @param addr The address of node to be appended.
+ * @brief Initialises a new linked list node with a specified address and val,
+ * pointing to a next node of NULL.
  */
-void append_via_root(linked_list *ll, void *val, uint32_t addr);
+node *init_node(uint32_t address, void *val);
+
+/**
+ * @brief Appends a new node with given value and address to the list. The list is
+ * accessed via the given entry node.
+ *
+ * @param entry The node through which we access the list.
+ * @param val The value to node to be appended.
+ *
+ * @return The memory address of the appended node, i.e. its position in the
+ * linked list time 4.
+ */
+uint32_t append_via_node(node *entry, void *val);
 
 /**
  * @brief Adds a new node to the linked list. Generally used when the file is
@@ -43,30 +51,32 @@ void append_via_root(linked_list *ll, void *val, uint32_t addr);
  *
  * @param list The list to which the node must be added.
  * @param val The value of the node to be appended.
- * @param addr The address of the value.
+ *
+ * @return The memory address of the appended node, i.e. its position in the
+ * linked list time 4.
  */
-void append_to_linked_list(linked_list *list, void *val, uint32_t addr);
+uint32_t append_to_linked_list(linked_list *list, void *val);
 
 /**
  * @brief Traverses the given linked list and returns the node at a specified
- * position.
+ * address.
  *
  * @param list The linked list to be traversed.
- * @param pos The position of the node that must be returned.
+ * @param address The address of the node that must be returned.
  *
- * @return A pointer to node at specified position 'pos'.
+ * @return A pointer to node at specified address.
  */
-node *traverse_linked_list(linked_list *list, int pos);
+node *traverse_linked_list(linked_list *list, uint32_t address);
 
 /**
  * @brief Changes the value of the node in the given linked list at a specified
- * position.
+ * address.
  *
  * @param list The linked list to where the node to be changed is present.
- * @param pos The position of the node to be changed.
+ * @param pos The address of the node to be changed.
  * @param val The new value to be assigned to the node.
  */
-void change_node(linked_list *list, int pos, void *val);
+void change_node(linked_list *list, uint32_t address, void *val);
 
 /**
  * @brief Frees the allocated memory of given list, all nodes contained in it

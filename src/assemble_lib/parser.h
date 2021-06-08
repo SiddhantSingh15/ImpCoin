@@ -9,6 +9,6 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st);
 
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st);
 
-uint32_t parse_special(void *ll_node, union instr_code code, symbol_table *st);
+uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st);
 
 #endif // PARSER_H

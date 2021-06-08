@@ -330,9 +330,18 @@ uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
     , tokens->list[3].data.exp);
 
   token_list *new_tokens = tokenizer(fake_input);
-  node new_node;
-  new_node.address = old_node->address;
-  new_node.value = new_tokens;
-  uint32_t result = parse_dataproc(&new_node, code, st);
+  
+  /* Stack based assignment of new_node */
+  // node new_node;
+  // new_node.address = old_node->address;
+  // new_node.value = new_tokens;
+
+  /* Hardcore malloc'd version */
+  node *new_node = init_node(old_node->address, new_tokens);
+  uint32_t result = parse_dataproc(new_node, code, st);
+
+  /* With hardcore freeing */
+  free(new_node);
+
   return result;
 }

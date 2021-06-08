@@ -13,7 +13,7 @@
 #include "../global_helpers/definitions.h"
 
 void write_file(FILE *file, uint32_t *binary_instr) {
-  fwrite(&binary_instr, INSTR_SIZE, 1, file);
+  fwrite(binary_instr, 4, 1, file);
 }
 
 // reads the assembly file and populates the linked list and symbol table

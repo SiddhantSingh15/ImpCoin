@@ -35,7 +35,7 @@ linked_list *init_linked_list(void);
  * @param val The value to node to be appended.
  * @param addr The address of node to be appended.
  */
-void append_via_root(node *root, void *val, uint32_t addr);
+void append_via_root(linked_list *ll, void *val, uint32_t addr);
 
 /**
  * @brief Adds a new node to the linked list. Generally used when the file is

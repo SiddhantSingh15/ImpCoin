@@ -113,7 +113,6 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *index, uint8_t line) {
 }
 
 uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) {
-  assert (st == NULL);
   dataproc_t dataproc_instr = {0};
   node *node = ll_node;
   uint32_t line = node->address;
@@ -150,7 +149,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st) 
     assert_token(tokens->list[2].type == REG, 2, line);
     dataproc_instr.rn = tokens->list[2].data.reg;
     if (tokens->list[3].type == SEPARATOR) {
-      assert_token(tokens->list[2].data.separator == '#', 3, line);
+      assert_token(tokens->list[3].data.separator == '#', 3, line);
       dataproc_instr.is_immediate = SET;
     }
     currptr = 3;
@@ -192,8 +191,6 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
 }
 
 uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
-  assert (st == NULL);
-
   sdt_t sdt_instr = {0};
   node *node = ll_node;
   token_list *tokens = node->value;

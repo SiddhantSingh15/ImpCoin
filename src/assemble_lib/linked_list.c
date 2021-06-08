@@ -9,16 +9,16 @@ linked_list *init_linked_list(void) {
   return list;
 }
 
-void append_via_root(node *root, void *val, uint32_t addr) {
+void append_via_root(linked_list *ll, void *val, uint32_t addr) {
   assert(val);
-
+  node *root = ll->root;
   node *to_append = malloc(sizeof(node));
   to_append->value = val;
   to_append->address = addr;
   to_append->next = NULL;
 
   if (root == NULL) {
-    root = to_append;
+    ll->root = to_append;
     return;
   }
 
@@ -31,7 +31,7 @@ void append_via_root(node *root, void *val, uint32_t addr) {
 }
 
 void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
-  append_via_root(list->root, val, addr);
+  append_via_root(list, val, addr);
 }
 
 node *traverse_linked_list(linked_list *list, int pos) {

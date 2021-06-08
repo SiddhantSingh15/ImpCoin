@@ -5,58 +5,62 @@
 
 linked_list *init_linked_list(void) {
   linked_list *list = malloc(sizeof(linked_list));
-  list->root = NULL;
+  list->head = NULL;
   return list;
 }
 
-void append_via_root(linked_list *ll, void *val, uint32_t addr) {
+node *init_node(uint32_t address, void *val) {
+  node *new_node = malloc(sizeof(node));
+  new_node->address = address;
+  new_node->value = val;
+  new_node->next = NULL;
+  return new_node;
+}
+
+uint32_t append_via_node(node *entry, void *val) {
+
+  assert(entry != NULL);
   assert(val);
-  node *root = ll->root;
-  node *to_append = malloc(sizeof(node));
-  to_append->value = val;
-  to_append->address = addr;
-  to_append->next = NULL;
 
-  if (root == NULL) {
-    ll->root = to_append;
-    return;
-  }
-
-  node *curr = root;
-
+  node *curr = entry;
   while (curr->next != NULL) {
     curr = curr->next;
   }
-  curr->next = to_append;
+
+  uint32_t new_address = curr->address + 4;
+  curr->next = init_node(new_address, val);
+
+  return new_address;
 }
 
-// NOTE
-// Might not need this middleman function now that append_via_root calls the linked
-// list directly
-void append_to_linked_list(linked_list *list, void *val, uint32_t addr) {
-  append_via_root(list, val, addr);
+uint32_t append_to_linked_list(linked_list *list, void *val) {
+  if (list->head == NULL) {
+    list->head = init_node(0, val);
+    return 0;
+  }
+
+  return append_via_node(list->head, val);
 }
 
-node *traverse_linked_list(linked_list *list, int pos) {
+node *traverse_linked_list(linked_list *list, uint32_t address) {
   assert(list);
-  assert(pos);
-  assert(0 <= pos);
+  assert(0 <= address && address % 4 == 0);
 
-  struct node *curr;
-  curr = list->root;
+  node *curr;
+  curr = list->head;
 
-  while (pos >= 0 && curr != NULL) {
-    pos--;
+  while (address >= 0 && curr != NULL) {
+    address -= 4;
     curr = curr->next;
   }
   return curr;
 }
 
-void change_node(linked_list *list, int pos, void *val) {
+void change_node(linked_list *list, uint32_t address, void *val) {
   assert(list);
-  assert(0 <= pos);
+  assert(0 <= address && address % 4 == 0);
 
-  node *node_to_change = traverse_linked_list(list, pos);
+  node *node_to_change = traverse_linked_list(list, address);
   if (node_to_change != NULL) {
     node_to_change->value = val;
   }
@@ -65,7 +69,7 @@ void change_node(linked_list *list, int pos, void *val) {
 void free_linked_list(linked_list *list) {
   assert(list);
 
-  node *curr = list->root;
+  node *curr = list->head;
   while (curr) {
     node *temp = curr;
     curr = curr->next;

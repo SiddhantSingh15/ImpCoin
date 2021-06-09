@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "../global_helpers/types.h"
 
-symbol_table *init_symbol_table() {
+symbol_table *init_symbol_table(void) {
   symbol_table *st = calloc(1, sizeof(symbol_table));
   st->capacity = TABLE_CAPACITY;
   for (int i = 0; i < TABLE_CAPACITY; i++) {

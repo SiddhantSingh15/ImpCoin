@@ -4,6 +4,8 @@
 #include "emulate_lib/exec_utils.h"
 #include "testing/test_utils.h"
 #include "assemble_lib/symbol_table_utils.h"
+#include "assemble_lib/tokenizer.h"
+#include <string.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -374,11 +376,13 @@ void test_st_collision(int *passing, int *total) {
       third == *result_3,
       "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
     ), passing, total);
+
+  free_symbol_table(st);
 }
 
 // Placeholder function for testing the storing of functions
-void placeholder_function(void *a, union instr_code b, symbol_table *c) {
-  return;
+uint32_t placeholder_function(void *a, union instr_code b, symbol_table *c) {
+  return 0;
 }
 
 void test_st_different_value_pointers(int *passing, int *total) {
@@ -392,7 +396,7 @@ void test_st_different_value_pointers(int *passing, int *total) {
   uint8_t third = 31;
   instr_func_map fourth = {
     .code.dataproc_opcode = 0xA,
-    .function = &placeholder_function
+    .function = placeholder_function
   };
 
   st_insert(st, "alpha_num", &first, 1);
@@ -438,7 +442,7 @@ void test_st_different_value_pointers(int *passing, int *total) {
   free_symbol_table(st);
 }
 
-void test_symbol_table(int *passing, int*total) {
+void test_symbol_table(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
          "\n");
   printf("-----%sSYMBOL TABLE "
@@ -464,12 +468,74 @@ void test_symbol_table(int *passing, int*total) {
   *total = *total + internal_total;
 }
 
+void test_strbrk_r(int *passing, int *total) {
+  char str[] = "[r1, r2]";
+  // char *instruction = strdup(str);
+  char *instruction = malloc(strlen(str) + 1);
+  strcpy(instruction, str);
+  char *rest = instruction;
+  const char delims[] = "[], ";
+  char *first_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string("[", first_token, "First token works"), passing,
+             total);
+  free(first_token);
+  char *second_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string("r1", second_token, "Second token works"), passing,
+             total);
+  free(second_token);
+  char *third_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string(",", third_token, "Third token works"), passing,
+             total);
+  free(third_token);
+  char *fourth_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string(" ", fourth_token, "Fourth token works"), passing,
+             total);
+  free(fourth_token);
+  char *fifth_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string("r2", fifth_token, "Fifth token works"), passing,
+             total);
+  free(fifth_token);
+  char *sixth_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string("]", sixth_token, "Sixth token works"), passing,
+             total);
+  free(sixth_token);
+  char *extra_token = strbrk_r(rest, delims, &rest);
+  track_test(test_string(NULL, extra_token, "Extra token works"), passing,
+             total);
+  free(instruction);
+}
+
+void test_tokenizer(int *passing, int *total) {
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("-----%sTOKENIZER "
+         "TESTS%s----------------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+  int internal_passing = 0;
+  int internal_total = 0;
+
+  test_strbrk_r(&internal_passing, &internal_total);
+
+
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
+
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+}
+
 int main(void) {
   int passing = 0;
   int total = 0;
   test_decoder(&passing, &total);
   test_bit_operations(&passing, &total);
   test_symbol_table(&passing, &total);
+  test_tokenizer(&passing, &total);
   printf(
       "%s---------------------------------------------------------------------%"
       "s\n",

@@ -82,6 +82,7 @@
 #define CMP 0xA
 #define ORR 0xC
 #define MOV 0xD
+#define ANDEQ 0xE
 
 /* Shift Operations */
 #define SHIFT_MULTIPLIER 2
@@ -95,6 +96,20 @@
 #define ROR 0x3
 
 /* Symbol Table */
-#define TABLE_CAPACITY 16
+#define TABLE_CAPACITY 64
+
+/* Tokenizer */
+#define DELIMITERS " ,[]#=+-"
+#define BLANK_SPACE " "
+#define COMMA_SPACE ", "
+#define REGISTER_SYMB 'r'
+#define LINE_TERMINATOR '\0'
+#define BINARY 2
+#define OCTAL 8
+#define DENARY 10
+#define HEX 16
+
+/* File Write */
+#define WRITE_SIZE 1
 
 #endif // DEFINITIONS_H

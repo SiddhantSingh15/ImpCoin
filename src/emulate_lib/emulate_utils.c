@@ -36,7 +36,9 @@ void print_size(void) {
 
 arm11_state_t *init_state() {
   arm11_state_t *new_state = calloc(1, sizeof(arm11_state_t));
+  PTR_CHECK(new_state, "memory allocation failure");
   pipeline_t *pipeline = calloc(1, sizeof(pipeline_t));
+  PTR_CHECK(pipeline, "memory allocation failure");
 
   *new_state = (arm11_state_t){.pipeline = pipeline};
 

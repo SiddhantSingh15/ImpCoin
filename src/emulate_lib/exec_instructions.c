@@ -112,6 +112,7 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
       to_uint8_array(state->register_file[instr.rd],
                      &state->main_memory[mem_address]);
     }
+  }
 
 
   if (instr.is_preindexed == 0) {

@@ -49,7 +49,7 @@ int32_t twos_comp(int32_t x) {
 }
 
 int32_t signed_24_to_32(uint32_t num) {
-  if (num >> TWENTY_FOUR_MSP) {
+  if (num >> TWENTY_FOUR_MSB) {
     return (int32_t) (TOP_EIGHT_BITMASK | num);
   }
   return (int32_t) num;

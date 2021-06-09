@@ -7,7 +7,7 @@
 #define NUM_GENERAL 12
 #define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
-#define TWENTY_FOUR_MSP 23
+#define TWENTY_FOUR_MSB 23
 
 #define PC 15
 #define CPSR 16

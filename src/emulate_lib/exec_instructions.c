@@ -85,7 +85,6 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
     mem_address +=
         (instr.up_bit ? interpreted_offset : twos_comp(interpreted_offset));
   }
-
   if (mem_address <= MEM_SIZE) {
     if (instr.load) {
       // Loads the memory to R[instr.rd], after converting it to word size
@@ -97,24 +96,23 @@ void exec_sdt(sdt_t instr, arm11_state_t *state) {
                      &state->main_memory[mem_address]);
     }
 
-    // TODO: refactor this
-  } else if (mem_address == FIRST_TEN) {
-    printf("One GPIO pin from 0 to 9 has been accessed\n");
-    state->register_file[instr.rd] = mem_address;
-  } else if (mem_address == SECOND_TEN) {
-    printf("One GPIO pin from 10 to 19 has been accessed\n");
-    state->register_file[instr.rd] = mem_address;
-  } else if (mem_address == THIRD_TEN) {
-    printf("One GPIO pin from 20 to 29 has been accessed\n");
-    state->register_file[instr.rd] = mem_address;
-  } else if (mem_address == PIN_ON) {
-    printf("PIN ON\n");
-  } else if (mem_address == PIN_OFF) {
-    printf("PIN OFF\n");
+  } else if ((mem_address >> GPIO_BITMASK) == GPIO_INDIC) {
+    gpio_access(state, instr.rd, mem_address);
   } else {
     printf("Error: Out of bounds memory access at address 0x%08x\n",
            mem_address);
   }
+  if (mem_address <= MEM_SIZE) {
+    if (instr.load) {
+      // Loads the memory to R[instr.rd], after converting it to word size
+      state->register_file[instr.rd] =
+          to_uint32_reg(&state->main_memory[mem_address]);
+    } else {
+      // Stores the value at instr.rd, after converting it to a byte array
+      to_uint8_array(state->register_file[instr.rd],
+                     &state->main_memory[mem_address]);
+    }
+
 
   if (instr.is_preindexed == 0) {
     state->register_file[instr.rn] +=

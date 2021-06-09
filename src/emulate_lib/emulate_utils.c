@@ -1,6 +1,7 @@
 #include "emulate_utils.h"
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
+#include "gpio.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -115,5 +116,32 @@ void to_uint8_array(uint32_t word, uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   for (int i = 0; i < WORD_SIZE_IN_BYTES; i++) {
     byte_array[i] = (word & mask) >> (ONE_B * i);
     mask <<= ONE_B;
+  }
+}
+
+void gpio_access(arm11_state_t *state, uint8_t rd, uint32_t mem_address) {
+
+  if (mem_address == PIN_ON) {
+    printf("PIN ON\n");
+    return;
+  } else if (mem_address == PIN_OFF) {
+    printf("PIN OFF\n");
+    return;
+  } else {
+
+    int start_pin = (mem_address == FIRST_TEN)
+                        ? 0
+                        : (mem_address == SECOND_TEN)
+                        ? 10
+                        : (mem_address == THIRD_TEN) ? 20 : -1;
+
+    if (start_pin != -1) {
+      printf("One GPIO pin from %d to %d has been accessed\n", start_pin,
+             start_pin + 9);
+      state->register_file[rd] = mem_address;
+    } else {
+      printf("Error: Out of bounds memory access at address 0x%08x\n",
+             mem_address);
+    }
   }
 }

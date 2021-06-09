@@ -5,7 +5,7 @@
 #include "global_helpers/types.h"
 #include "emulate_lib/decoder.h"
 #include "emulate_lib/emulate_utils.h"
-#include "emulate_lib/exec_instructions.h"
+#include "emulate_lib/executer.h"
 
 int main(int argc, char **argv) {
 	if (argc != 2) {

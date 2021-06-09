@@ -52,6 +52,7 @@ void free_state_memory(arm11_state_t *state) {
 
 void fetch_next(arm11_state_t *state) {
   instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
+  PTR_CHECK(fetched_instruction, "memory allocation failure");
   int curr = (state->register_file)[PC];
   assert(curr < MEM_SIZE - 1);
   // Set up the union data

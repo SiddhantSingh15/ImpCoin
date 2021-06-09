@@ -129,11 +129,10 @@ void gpio_access(arm11_state_t *state, uint8_t rd, uint32_t mem_address) {
     return;
   } else {
 
-    int start_pin = (mem_address == FIRST_TEN)
-                        ? 0
-                        : (mem_address == SECOND_TEN)
-                        ? 10
-                        : (mem_address == THIRD_TEN) ? 20 : -1;
+    int start_pin = (mem_address == FIRST_TEN) ? 0
+                        : (mem_address == SECOND_TEN) ? 10
+                        : (mem_address == THIRD_TEN) ? 20 
+                        : -1;
 
     if (start_pin != -1) {
       printf("One GPIO pin from %d to %d has been accessed\n", start_pin,

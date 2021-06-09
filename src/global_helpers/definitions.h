@@ -2,6 +2,7 @@
 #define DEFINITIONS_H
 
 #define MEM_SIZE 65536
+#define READ_SIZE 63356
 #define NUM_REGS 17
 #define NUM_GENERAL 12
 #define INSTR_SIZE 32

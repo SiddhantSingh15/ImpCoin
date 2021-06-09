@@ -142,15 +142,8 @@ void exec_mult(multiply_t instr, arm11_state_t *state) {
   state->register_file[instr.rd] = result;
 
   if (instr.set_cond) {
-    if (instr.set_cond) {
-      set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
-
-      if (result == 0) {
-        set_flag(state->register_file, SET, Z_FLAG);
-      } else {
-        set_flag(state->register_file, RESET, Z_FLAG);
-      }
-    }
+    set_flag(state->register_file, EXTRACT_BIT(result, N_FLAG), N_FLAG);
+    set_flag(state->register_file, result == 0, Z_FLAG);
   }
 }
 

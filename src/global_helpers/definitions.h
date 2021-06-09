@@ -20,6 +20,10 @@
 #define C_FLAG 29
 #define Z_FLAG 30
 #define N_FLAG 31
+#define INSTR_FLAG 26
+#define DP_FLAG 0x0
+#define SDT_FLAG 0x1
+#define BRANCH_FLAG 0x2
 
 /* Different byte sizes to use somewhere */
 #define ONE_B 8
@@ -47,6 +51,8 @@
 #define IMM_VALUE_SIZE 8
 
 /* Multiply  */
+#define ZERO_POS 22 
+#define NINE_POS 4
 #define RM_POS 0
 #define RS_POS 8
 #define MULTIPLY_RN_POS 12

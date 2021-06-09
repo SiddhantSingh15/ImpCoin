@@ -1,7 +1,6 @@
 #ifndef EMULATE_H
 #define EMULATE_H
 #include <stdint.h>
-#include "definitions.h"
 
 /**
  * @brief Data processing instruction type

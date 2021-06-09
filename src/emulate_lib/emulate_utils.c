@@ -1,6 +1,6 @@
-#include "emulate_utils.h"
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
+#include "emulate_utils.h"
 #include "gpio.h"
 #include <assert.h>
 #include <stdbool.h>

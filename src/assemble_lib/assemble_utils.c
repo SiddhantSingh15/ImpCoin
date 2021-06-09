@@ -1,3 +1,5 @@
+#include "../global_helpers/definitions.h"
+#include "../global_helpers/types.h"
 #include "linked_list.h"
 #include "symbol_table_utils.h"
 #include "tokenizer.h"
@@ -10,7 +12,7 @@
 #include "symbol_table_utils.h"
 #include "parser.h"
 
-#include "../global_helpers/definitions.h"
+
 
 void write_file(FILE *file, uint32_t *binary_instr) {
   fwrite(binary_instr, WORD_SIZE_IN_BYTES, WRITE_SIZE, file);

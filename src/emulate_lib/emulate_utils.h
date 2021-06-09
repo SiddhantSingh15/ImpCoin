@@ -1,7 +1,6 @@
 #ifndef SRC_IOUTILS_H
 #define SRC_IOUTILS_H
 
-#include "../global_helpers/types.h"
 #include <stdint.h>
 #include <stdio.h>
 // ---------------- IO Functions ----------------

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "global_helpers/types.h"
 #include "global_helpers/definitions.h"
+#include "global_helpers/types.h"
 #include "emulate_lib/decoder.h"
 #include "emulate_lib/emulate_utils.h"
 #include "emulate_lib/exec_instructions.h"

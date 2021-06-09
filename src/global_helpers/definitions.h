@@ -7,12 +7,14 @@
 #define NUM_GENERAL 12
 #define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
+#define TWENTY_FOUR_MSP 23
 
 #define PC 15
 #define CPSR 16
 
 /* Macro for creating 32-bit set-masks of size n */
 #define MASK(n) (uint32_t) ((1 << n) - 1)
+#define TOP_EIGHT_BITMASK 0xFF000000
 
 /* FLAGS */
 #define SET 1

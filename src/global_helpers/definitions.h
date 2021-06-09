@@ -121,4 +121,11 @@
 /* File Write */
 #define WRITE_SIZE 1
 
+/* Error Check */
+#define PTR_CHECK(ptr, msg) \
+if (!ptr) {                 \
+  perror(msg);              \
+  exit(EXIT_FAILURE);       \
+}
+
 #endif // DEFINITIONS_H

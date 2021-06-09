@@ -14,7 +14,7 @@ void read_file(char *filename, arm11_state_t *state) {
     exit(EXIT_FAILURE);
   }
 
-  fread(state->main_memory, 63356, 1, fptr);
+  fread(state->main_memory, READ_SIZE, 1, fptr);
 
   if (ferror(fptr)) {
     perror("Error occurred when reading file\n");
@@ -86,7 +86,7 @@ void print_arm11_state(arm11_state_t *state) {
 
   /* Looping through non-0 locations */
   printf("Non-zero memory:\n");
-  for (int i = 0; i < MEM_SIZE; i += 4) {
+  for (int i = 0; i < MEM_SIZE; i += WORD_SIZE_IN_BYTES) {
     uint32_t word = to_uint32_print(&state->main_memory[i]);
     if (word != 0) {
       printf("0x%08x: 0x%08x\n", i, word);
@@ -97,7 +97,7 @@ void print_arm11_state(arm11_state_t *state) {
 uint32_t to_uint32_reg(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t word = 0;
   for (int i = WORD_SIZE_IN_BYTES - 1; i >= 0; i--) {
-    word = (word << 8) | byte_array[i];
+    word = (word << ONE_B) | byte_array[i];
   }
   return word;
 }
@@ -105,15 +105,15 @@ uint32_t to_uint32_reg(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
 uint32_t to_uint32_print(uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t word = 0;
   for (int i = 0; i < WORD_SIZE_IN_BYTES; i++) {
-    word = (word << 8) | byte_array[i];
+    word = (word << ONE_B) | byte_array[i];
   }
   return word;
 }
 
 void to_uint8_array(uint32_t word, uint8_t byte_array[WORD_SIZE_IN_BYTES]) {
   uint32_t mask = 0xff;
-  for (int i = 0; i < 4; i++) {
-    byte_array[i] = (word & mask) >> (8 * i);
-    mask <<= 8;
+  for (int i = 0; i < WORD_SIZE_IN_BYTES; i++) {
+    byte_array[i] = (word & mask) >> (ONE_B * i);
+    mask <<= ONE_B;
   }
 }

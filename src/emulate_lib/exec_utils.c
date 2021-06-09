@@ -49,8 +49,8 @@ int32_t twos_comp(int32_t x) {
 }
 
 int32_t signed_24_to_32(uint32_t num) {
-  if (num >> 23) {
-    return (int32_t) (0xFF000000 | num);
+  if (num >> TWENTY_FOUR_MSP) {
+    return (int32_t) (TOP_EIGHT_BITMASK | num);
   }
   return (int32_t) num;
 }
@@ -99,7 +99,7 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
     to_shift = register_file[EXTRACT_BITS(offset, OP2_POS, REG_SIZE)];
     uint8_t shift = EXTRACT_BITS(offset, REG_SIZE, IMM_VALUE_SIZE);
 
-    if ((shift & 0x1) == 0) {
+    if ((shift & LSR) == 0) {
       shift_amt = EXTRACT_BITS(offset, SHIFT_VAL, SHIFT_VAL_SIZE);
     } else {
       // Shift amount is the bottom byte of the register specified
@@ -117,6 +117,6 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
   assert(shift_amt > 0);
   const shift_operation shifts[] = {lsl, lsr, asr, ror};
 
-  assert(shift_type >= 0 && shift_type < 4);
+  assert(shift_type >= LSL && shift_type <= ROR);
   return shifts[shift_type](to_shift, shift_amt, carry_out);
 }

@@ -1,7 +1,7 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
 #include "emulate_utils.h"
-#include "dataproc_operations.h"
+#include "alu.h"
 #include "exec_instructions.h"
 #include "gpio.h"
 #include <assert.h>

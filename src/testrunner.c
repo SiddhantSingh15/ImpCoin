@@ -5,7 +5,7 @@
 #include "emulate_lib/decoder.h"
 #include "emulate_lib/emulate_utils.h"
 #include "testing/test_utils.h"
-#include "emulate_lib/dataproc_operations.h"
+#include "emulate_lib/alu.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>

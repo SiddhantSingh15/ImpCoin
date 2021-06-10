@@ -1,9 +1,6 @@
 #ifndef ASSEMBLE_UTILS_H
 #define ASSEMBLE_UTILS_H
 
-#include "../global_helpers/definitions.h"
-#include "linked_list.h"
-#include "symbol_table.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

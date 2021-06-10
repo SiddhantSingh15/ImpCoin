@@ -1,7 +1,6 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
-#include "../global_helpers/types.h"
 #include <stdint.h>
 #include <stdlib.h>
 

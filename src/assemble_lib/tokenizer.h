@@ -1,9 +1,6 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
-#include "../global_helpers/definitions.h"
-#include "assemble_utils.h"
-#include "tokens.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdint.h>

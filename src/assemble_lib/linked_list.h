@@ -24,12 +24,19 @@ typedef struct linked_list {
 
 /**
  * @brief Initialises a new linked list with a null head node.
+ * 
+ * @return The initialised linked list.
  */
 linked_list *init_linked_list(void);
 
 /**
  * @brief Initialises a new linked list node with a specified address and val,
  * pointing to a next node of NULL.
+ *
+ * @param address The address of the initialised node.
+ * @param val The value to be stored in the node.
+ *
+ * @return The initialized node.
  */
 node *init_node(uint32_t address, void *val);
 

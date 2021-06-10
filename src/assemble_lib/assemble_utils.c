@@ -2,8 +2,6 @@
 #include "../global_helpers/types.h"
 #include "linked_list.h"
 #include "symbol_table.h"
-#include "tokens.h"
-#include "tokenizer.h"
 #include "parser.h"
 #include "assemble_utils.h"
 #include <stdint.h>
@@ -17,57 +15,6 @@ void write_file(FILE *file, uint32_t *binary_instr) {
     perror("Error with writing file\n");
     exit(EXIT_FAILURE);
   }
-}
-
-// reads the assembly file and populates the linked list and symbol table
-void read_asm(char *filename, linked_list *instructions,
-              symbol_table *symbols) {
-
-  FILE *fptr;
-  char buffer[INSTR_BUFFER];
-  uint32_t mem_address = 0;
-
-  if ((fptr = fopen(filename, "r")) == NULL) {
-    printf("Error opening file.\n");
-    exit(EXIT_FAILURE);
-  }
-  // First read
-  // - Add labels into symbol table
-  // - Convert each instruction into array of tokens
-  while (fgets(buffer, INSTR_BUFFER, fptr)) {
-
-    // remove trailing newline
-    buffer[strcspn(buffer, "\n")] = '\0';
-
-    if (buffer[strlen(buffer) - 1] == ':') {
-      // it is a label, add it to the symbol table
-      // replace ':' with terminating character
-      buffer[strlen(buffer) - 1] = '\0';
-      st_insert(symbols, buffer, &mem_address, sizeof(uint32_t));
-      continue;
-    }
-
-    if(strlen(buffer) != 0) {
-      // tokenize, and add it to the instruction list
-      token_list *tokens = tokenizer(buffer);
-      PTR_CHECK(tokens, "Error in tokenizer\n");
-      // append_to_linked_list returns a memory that should be equal to 
-      // mem_address 
-      if (append_to_linked_list(instructions, tokens) != mem_address){
-        perror("Error appending to linked list\n");
-        exit(EXIT_FAILURE);
-      }
-    }
-
-    mem_address += WORD_SIZE_IN_BYTES;
-  }
-
-  if (ferror(fptr)) {
-    perror("Error occurred when reading file\n");
-    exit(EXIT_FAILURE);
-  }
-
-  fclose(fptr);
 }
 
 void populate_st_instructions(symbol_table *st) {

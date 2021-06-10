@@ -14,7 +14,10 @@
 
 
 void write_file(FILE *file, uint32_t *binary_instr) {
-  fwrite(binary_instr, WORD_SIZE_IN_BYTES, WRITE_SIZE, file);
+  if (fwrite(binary_instr, WORD_SIZE_IN_BYTES, WRITE_SIZE, file) != WRITE_SIZE){
+    perror("Error with writing file\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 // reads the assembly file and populates the linked list and symbol table
@@ -52,7 +55,7 @@ void read_asm(char *filename, linked_list *instructions,
       // append_to_linked_list returns a memory that should be equal to 
       // mem_address 
       if (append_to_linked_list(instructions, tokens) != mem_address){
-        perror("Error appending to linked list");
+        perror("Error appending to linked list\n");
         exit(EXIT_FAILURE);
       }
     }

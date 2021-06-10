@@ -1,7 +1,6 @@
 #ifndef SRC_IOUTILS_H
 #define SRC_IOUTILS_H
 
-#include "../global_helpers/types.h"
 #include <stdint.h>
 #include <stdio.h>
 // ---------------- IO Functions ----------------
@@ -77,6 +76,15 @@ uint32_t to_uint32_print(uint8_t byte_array[WORD_SIZE_IN_BYTES]);
  * @param byte_array The byte array.
  */
 void to_uint8_array(uint32_t word, uint8_t byte_array[WORD_SIZE_IN_BYTES]);
+
+/**
+ * @brief Prints GPIO accesses to standard output.
+ *
+ * @param state The current state of the ARM11 machine.
+ * @param rd The address of the Rd register in memory.
+ * @param mem_address The current memory address.
+ */
+void gpio_access(arm11_state_t *state, uint8_t rd, uint32_t mem_address);
 
 #define EXTRACT_BITS(raw, from, size)                                          \
   (uint32_t)((raw >> (uint8_t)from) & ((1 << (uint8_t)size) - 1))

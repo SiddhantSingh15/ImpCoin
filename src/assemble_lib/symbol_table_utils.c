@@ -1,10 +1,11 @@
+#include "../global_helpers/definitions.h"
+#include "../global_helpers/types.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
-#include "../global_helpers/types.h"
 
 symbol_table *init_symbol_table(void) {
   symbol_table *st = calloc(1, sizeof(symbol_table));

@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "global_helpers/definitions.h"
 #include "assemble_lib/assemble_utils.h"
 #include "assemble_lib/linked_list.h"
 #include "assemble_lib/tokens.h"

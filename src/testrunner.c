@@ -1,15 +1,16 @@
-#include "emulate_lib/decoder.h"
+#include "global_helpers/definitions.h"
 #include "global_helpers/types.h"
-#include "emulate_lib/emulate_utils.h"
-#include "emulate_lib/exec_utils.h"
-#include "testing/test_utils.h"
 #include "assemble_lib/symbol_table_utils.h"
 #include "assemble_lib/tokenizer.h"
-#include <string.h>
+#include "emulate_lib/decoder.h"
+#include "emulate_lib/emulate_utils.h"
+#include "testing/test_utils.h"
+#include "emulate_lib/alu.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void test_decoder_halt(int *passing, int *total) {
   // tests for HALT

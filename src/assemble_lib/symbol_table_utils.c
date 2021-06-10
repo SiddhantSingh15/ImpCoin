@@ -1,5 +1,6 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
+#include "symbol_table_utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>

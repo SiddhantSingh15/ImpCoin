@@ -1,6 +1,5 @@
 #include "../global_helpers/definitions.h"
 #include "tokenizer.h"
-#include "assemble_utils.h"
 #include "tokens.h"
 #include <assert.h>
 #include <ctype.h>

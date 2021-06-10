@@ -3,14 +3,13 @@
 #include "linked_list.h"
 #include "symbol_table_utils.h"
 #include "tokenizer.h"
+#include "parser.h"
 #include "tokens.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "symbol_table_utils.h"
-#include "parser.h"
 
 
 

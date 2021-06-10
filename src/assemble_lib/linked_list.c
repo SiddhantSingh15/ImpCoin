@@ -1,16 +1,19 @@
 #include "linked_list.h"
+#include "../global_helpers/definitions.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 linked_list *init_linked_list(void) {
   linked_list *list = malloc(sizeof(linked_list));
+  PTR_CHECK(list, "Memory allocation failure\n");
   list->head = NULL;
   return list;
 }
 
 node *init_node(uint32_t address, void *val) {
   node *new_node = malloc(sizeof(node));
+  PTR_CHECK(list, "Memory allocation failure\n");
   new_node->address = address;
   new_node->value = val;
   new_node->next = NULL;

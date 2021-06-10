@@ -69,9 +69,8 @@ void throw_parse_error(uint8_t pos, uint32_t line) {
 bool assert_token(bool token_cond, uint8_t pos, uint32_t line) {
   if (!token_cond) {
     throw_parse_error(pos, line);
-    return false;
   }
-  return true;
+  return token_cond;
 }
 
 bool assert_separator(struct token tok, char separator, uint8_t pos,
@@ -95,13 +94,13 @@ bool match_separator(struct token tok, char separator) {
 }
 
 union token_data get_and_move(struct token tok, enum token_type expected,
-                               uint8_t *pos, uint8_t line){
+                               uint8_t *pos, uint8_t line) {
     cond_move(assert_token(tok.type == expected, *pos, line), pos);;
     return tok.data;
 }
 
 union token_data match_and_get(struct token tok, enum token_type expected,
-                               uint8_t pos, uint8_t line){
+                               uint8_t pos, uint8_t line) {
     assert_token(tok.type == expected, pos, line);
     return tok.data;
 }

@@ -9,6 +9,7 @@
 
 symbol_table *init_symbol_table(void) {
   symbol_table *st = calloc(1, sizeof(symbol_table));
+  PTR_CHECK(st,"Memory allocation failure\n");
   st->capacity = TABLE_CAPACITY;
   for (int i = 0; i < TABLE_CAPACITY; i++) {
     st->kvps[i] = NULL;
@@ -54,11 +55,13 @@ void st_insert (symbol_table *st, char* key, void* value, uint32_t vsize) {
   }
 
   void *st_value = malloc(vsize);
+  PTR_CHECK(st_value, "Memory allocation failure\n");
   memcpy(st_value, value, vsize);
 
   // Create the key-value pair
   symbol_table_kvp *kvp = calloc(1, sizeof(symbol_table_kvp));
   char* new_key = malloc(strlen(key) + 1);
+  PTR_CHECK(new_key, "Memory allocation failure\n");
   strcpy(new_key, key);
   kvp->key = new_key;
   kvp->value = st_value;

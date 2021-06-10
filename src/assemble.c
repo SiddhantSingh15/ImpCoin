@@ -1,6 +1,6 @@
 #include "assemble_lib/assemble_utils.h"
 #include "assemble_lib/linked_list.h"
-#include "assemble_lib/symbol_table_utils.h"
+#include "assemble_lib/symbol_table.h"
 #include "assemble_lib/tokens.h"
 #include "global_helpers/definitions.h"
 #include <stdint.h>

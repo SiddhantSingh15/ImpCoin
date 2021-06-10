@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 linked_list *init_linked_list(void) {
   linked_list *list = malloc(sizeof(linked_list));
@@ -13,7 +14,7 @@ linked_list *init_linked_list(void) {
 
 node *init_node(uint32_t address, void *val) {
   node *new_node = malloc(sizeof(node));
-  PTR_CHECK(list, "Memory allocation failure\n");
+  PTR_CHECK(new_node, "Memory allocation failure\n");
   new_node->address = address;
   new_node->value = val;
   new_node->next = NULL;

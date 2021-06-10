@@ -1,5 +1,6 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
+#include "symbol_table.h"
 #include "parser.h"
 #include "tokenizer.h"
 #include "tokens.h"

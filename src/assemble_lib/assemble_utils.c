@@ -11,8 +11,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-
-
 void write_file(FILE *file, uint32_t *binary_instr) {
   if (fwrite(binary_instr, WORD_SIZE_IN_BYTES, WRITE_SIZE, file) != WRITE_SIZE){
     perror("Error with writing file\n");

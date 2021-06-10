@@ -1,6 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "symbol_table_utils.h"
+#include <stdint.h>
+
 uint32_t parse_dataproc(void *ll_node, union instr_code code, symbol_table *st);
 
 uint32_t parse_mult(void *ll_node, union instr_code, symbol_table *st);

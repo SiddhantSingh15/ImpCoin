@@ -1,12 +1,12 @@
 #ifndef ASSEMBLE_UTILS_H
 #define ASSEMBLE_UTILS_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include "../global_helpers/definitions.h"
 #include "symbol_table_utils.h"
 #include "linked_list.h"
-
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /**
  * @brief Saves the instruction array into the specified binary file.

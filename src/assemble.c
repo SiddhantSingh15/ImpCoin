@@ -45,7 +45,6 @@ int main(int argc, char **argv) {
     } else {
       // curr-> value is not a token_list, but a constant binary value.
       binary_instr = *(uint32_t *)curr->value;
-
     }
 
     curr = curr->next;

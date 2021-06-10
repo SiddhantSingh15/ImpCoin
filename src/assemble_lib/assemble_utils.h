@@ -3,7 +3,7 @@
 
 #include "../global_helpers/definitions.h"
 #include "linked_list.h"
-#include "symbol_table_utils.h"
+#include "symbol_table.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

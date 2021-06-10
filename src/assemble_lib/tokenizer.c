@@ -12,14 +12,18 @@ token_list *tokenizer(char *instr_line) {
   // pre: instr_line is not a label, only an instruction
 
   token_list *tokens = calloc(1, sizeof(token_list));
+  PTR_CHECK(tokens, "Memory allocation failure\n");
 
   uint8_t count = 0;
   char *token;
   char *rest_start = malloc(strlen(instr_line) + 1);
+  PTR_CHECK(rest_start, "Memory allocation failure\n");
   strcpy(rest_start, instr_line);
   char *rest = rest_start;
 
   char *instr_name = malloc(strlen(instr_line + 1));
+  PTR_CHECK(instr_name, "Memory allocation failure\n");
+
   strcpy(instr_name, strbrk_r(rest, BLANK_SPACE, &rest));
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
@@ -49,6 +53,7 @@ token_list *tokenizer(char *instr_line) {
 
     } else {
       char *token_dupe = malloc(strlen(token) + 1);
+      PTR_CHECK(token_dupe, "Memory allocation failure\n");
       strcpy(token_dupe, token);
       if (strlen(token) == 1) {
         type = SEPARATOR;
@@ -98,6 +103,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
   }
 
   char *token = malloc(sizeof(s));
+  PTR_CHECK(token, "Memory allocation failure\n");
   int tok_size = strcspn(s, delims);
   tok_size = tok_size == 0 ? 1 : tok_size;
 
@@ -105,6 +111,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
   *token = LINE_TERMINATOR;
   strncat(token, s, tok_size);
   token = realloc(token, sizeof(char) * (strlen(token) + 1));
+  PTR_CHECK(token, "Memory allocation failure\n");
 
   *save_pointer += tok_size;
 

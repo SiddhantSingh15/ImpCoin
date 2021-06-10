@@ -1,6 +1,6 @@
 #include "global_helpers/definitions.h"
 #include "global_helpers/types.h"
-#include "assemble_lib/symbol_table_utils.h"
+#include "assemble_lib/symbol_table.h"
 #include "assemble_lib/tokenizer.h"
 #include "emulate_lib/decoder.h"
 #include "emulate_lib/emulate_utils.h"

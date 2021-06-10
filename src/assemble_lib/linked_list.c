@@ -31,7 +31,7 @@ uint32_t append_via_node(node *entry, void *val) {
     curr = curr->next;
   }
 
-  uint32_t new_address = curr->address + 4;
+  uint32_t new_address = curr->address + WORD_SIZE_IN_BYTES;
   curr->next = init_node(new_address, val);
 
   return new_address;
@@ -48,13 +48,13 @@ uint32_t append_to_linked_list(linked_list *list, void *val) {
 
 node *traverse_linked_list(linked_list *list, uint32_t address) {
   assert(list);
-  assert(0 <= address && address % 4 == 0);
+  assert(0 <= address && address % WORD_SIZE_IN_BYTES == 0);
 
   node *curr;
   curr = list->head;
 
   while (address >= 0 && curr != NULL) {
-    address -= 4;
+    address -= WORD_SIZE_IN_BYTES;
     curr = curr->next;
   }
   return curr;
@@ -62,7 +62,7 @@ node *traverse_linked_list(linked_list *list, uint32_t address) {
 
 void change_node(linked_list *list, uint32_t address, void *val) {
   assert(list);
-  assert(0 <= address && address % 4 == 0);
+  assert(0 <= address && address % WORD_SIZE_IN_BYTES == 0);
 
   node *node_to_change = traverse_linked_list(list, address);
   if (node_to_change != NULL) {

@@ -22,7 +22,7 @@ void read_asm(char *filename, linked_list *instructions,
               symbol_table *symbols) {
 
   FILE *fptr;
-  char buffer[511];
+  char buffer[INSTR_BUFFER];
   uint32_t mem_address = 0;
 
   if ((fptr = fopen(filename, "r")) == NULL) {
@@ -32,7 +32,7 @@ void read_asm(char *filename, linked_list *instructions,
   // First read
   // - Add labels into symbol table
   // - Convert each instruction into array of tokens
-  while (fgets(buffer, 511, fptr)) {
+  while (fgets(buffer, INSTR_BUFFER, fptr)) {
 
     // remove trailing newline
     buffer[strcspn(buffer, "\n")] = '\0';
@@ -51,7 +51,7 @@ void read_asm(char *filename, linked_list *instructions,
       append_to_linked_list(instructions, tokens);
     }
 
-    mem_address += 4;
+    mem_address += WORD_SIZE_IN_BYTES;
   }
 
   if (ferror(fptr)) {

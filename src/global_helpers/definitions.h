@@ -118,6 +118,9 @@
 #define DENARY 10
 #define HEX 16
 
+/* File Read */
+#define INSTR_BUFFER 511
+
 /* File Write */
 #define WRITE_SIZE 1
 

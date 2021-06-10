@@ -48,6 +48,7 @@ void read_asm(char *filename, linked_list *instructions,
     if(strlen(buffer) != 0) {
       // tokenize, and add it to the instruction list
       token_list *tokens = tokenizer(buffer);
+      PTR_CHECK(tokens, "Error in tokenizer\n");
       append_to_linked_list(instructions, tokens);
     }
 

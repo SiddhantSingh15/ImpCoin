@@ -2,8 +2,8 @@
 #include "../global_helpers/types.h"
 #include "symbol_table.h"
 #include "parser.h"
-#include "tokenizer.h"
 #include "tokens.h"
+#include "tokenizer.h"
 #include "linked_list.h"
 #include <assert.h>
 #include <stdbool.h>

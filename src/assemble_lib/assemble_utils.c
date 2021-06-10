@@ -2,10 +2,10 @@
 #include "../global_helpers/types.h"
 #include "linked_list.h"
 #include "symbol_table.h"
-#include "assemble_utils.h"
+#include "tokens.h"
 #include "tokenizer.h"
 #include "parser.h"
-#include "tokens.h"
+#include "assemble_utils.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

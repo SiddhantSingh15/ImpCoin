@@ -36,9 +36,9 @@ void print_size(void) {
 
 arm11_state_t *init_state() {
   arm11_state_t *new_state = calloc(1, sizeof(arm11_state_t));
-  PTR_CHECK(new_state, "memory allocation failure");
+  PTR_CHECK(new_state, "Memory allocation failure\n");
   pipeline_t *pipeline = calloc(1, sizeof(pipeline_t));
-  PTR_CHECK(pipeline, "memory allocation failure");
+  PTR_CHECK(pipeline, "Memory allocation failure\n");
 
   *new_state = (arm11_state_t){.pipeline = pipeline};
 
@@ -52,7 +52,7 @@ void free_state_memory(arm11_state_t *state) {
 
 void fetch_next(arm11_state_t *state) {
   instruction_t *fetched_instruction = malloc(sizeof(instruction_t));
-  PTR_CHECK(fetched_instruction, "memory allocation failure");
+  PTR_CHECK(fetched_instruction, "Memory allocation failure\n");
   int curr = (state->register_file)[PC];
   assert(curr < MEM_SIZE - 1);
   // Set up the union data

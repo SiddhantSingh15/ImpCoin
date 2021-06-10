@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "assemble_lib/symbol_table_utils.h"
 #include "global_helpers/definitions.h"
 #include "assemble_lib/assemble_utils.h"
 #include "assemble_lib/linked_list.h"
@@ -38,6 +39,7 @@ int main(int argc, char **argv) {
       // curr->value is a token_list, and the first token has been correctly
       // initialised to type INSTRNAME.
       func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
+      PTR_CHECK(func_map, "Value does not exist in symbol table\n");
       binary_instr = func_map->function(curr, func_map->code, labels);
 
     } else {

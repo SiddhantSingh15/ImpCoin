@@ -49,7 +49,12 @@ void read_asm(char *filename, linked_list *instructions,
       // tokenize, and add it to the instruction list
       token_list *tokens = tokenizer(buffer);
       PTR_CHECK(tokens, "Error in tokenizer\n");
-      append_to_linked_list(instructions, tokens);
+      // append_to_linked_list returns a memory that should be equal to 
+      // mem_address 
+      if (append_to_linked_list(instructions, tokens) != mem_address){
+        perror("Error appending to linked list");
+        exit(EXIT_FAILURE);
+      }
     }
 
     mem_address += WORD_SIZE_IN_BYTES;

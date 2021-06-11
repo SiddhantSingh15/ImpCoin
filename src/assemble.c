@@ -17,6 +17,7 @@ void read_asm(char *filename, linked_list *instructions,
   FILE *fptr;
   char buffer[INSTR_BUFFER];
   uint32_t mem_address = 0;
+  uint32_t buffer_len;
 
   if ((fptr = fopen(filename, "r")) == NULL) {
     printf("Error opening file.\n");
@@ -26,28 +27,32 @@ void read_asm(char *filename, linked_list *instructions,
   // - Add labels into symbol table
   // - Convert each instruction into array of tokens
   while (fgets(buffer, INSTR_BUFFER, fptr)) {
-
     // remove trailing newline
     buffer[strcspn(buffer, "\n")] = '\0';
+    // get length of buffer without newline
+    buffer_len = strlen(buffer);
 
-    if (buffer[strlen(buffer) - 1] == ':') {
+    // If source file has gaps in program, skip that line
+    if (buffer_len == 0) {
+      continue;
+    }
+
+    if (buffer[buffer_len - 1] == ':') {
       // it is a label, add it to the symbol table
       // replace ':' with terminating character
-      buffer[strlen(buffer) - 1] = '\0';
+      buffer[buffer_len - 1] = '\0';
       st_insert(symbols, buffer, &mem_address, sizeof(uint32_t));
       continue;
     }
 
-    if(strlen(buffer) != 0) {
-      // tokenize, and add it to the instruction list
-      token_list *tokens = tokenizer(buffer);
-      PTR_CHECK(tokens, "Error in tokenizer\n");
-      // append_to_linked_list returns a memory that should be equal to 
-      // mem_address 
-      if (append_to_linked_list(instructions, tokens) != mem_address){
-        perror("Error appending to linked list\n");
-        exit(EXIT_FAILURE);
-      }
+    // tokenize, and add it to the instruction list
+    token_list *tokens = tokenizer(buffer);
+    PTR_CHECK(tokens, "Error in tokenizer\n");
+    // append_to_linked_list returns a memory that should be equal to 
+    // mem_address 
+    if (append_to_linked_list(instructions, tokens) != mem_address){
+      perror("Error appending to linked list\n");
+      exit(EXIT_FAILURE);
     }
 
     mem_address += WORD_SIZE_IN_BYTES;

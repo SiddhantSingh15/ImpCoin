@@ -257,14 +257,17 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
       return construct_dataproc_binary(&dataproc_instr);
 
     } else {
-      uint32_t *val = calloc(1, sizeof(uint32_t));
+      token_list *val = calloc(1, sizeof(token_list));
+      val->list[0].type = EXPRESSION;
+      val->list[0].data.exp = to_load;
+      // uint32_t *val = calloc(1, sizeof(uint32_t));
       sdt_instr.offset = append_via_node(ll_node, val) - (node->address + 8);
       sdt_instr.is_shift_R = !SET;
       sdt_instr.is_preindexed = SET;
       sdt_instr.up_bit = SET;
       sdt_instr.rn = PC;
       sdt_instr.rd = sdt_instr.rd;
-      *val = to_load;
+      // *val = to_load;
       return construct_sdt_binary(&sdt_instr);
     }
   }

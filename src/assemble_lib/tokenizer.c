@@ -135,7 +135,7 @@ char *strbrk_r(char *s, const char *delims, char **save_pointer) {
     return NULL;
   }
 
-  char *token = malloc(sizeof(s));
+  char *token = malloc(strlen(s) + 1);
   PTR_CHECK(token, "Memory allocation failure\n");
   int tok_size = strcspn(s, delims);
   tok_size = tok_size == 0 ? 1 : tok_size;

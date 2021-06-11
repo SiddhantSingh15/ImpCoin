@@ -93,17 +93,20 @@ int main(int argc, char **argv) {
   while (curr != NULL) {
     binary_instr = 0;
     tokens = curr->value;
-
     if (tokens->list[0].type == INSTRNAME) {
       // curr->value is a token_list, and the first token has been correctly
       // initialised to type INSTRNAME.
       func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
       PTR_CHECK(func_map, "Value does not exist in symbol table\n");
       binary_instr = func_map->function(curr, func_map->code, labels);
-
-    } else {
-      // curr-> value is not a token_list, but a constant binary value.
-      binary_instr = *(uint32_t *)curr->value;
+    }
+    // curr-> value is not a token_list, but a constant binary value.
+    else {
+      if (tokens->list[0].type != EXPRESSION) {
+        perror("Invalid leading token.\n");
+        exit(EXIT_FAILURE);
+      }
+      binary_instr = tokens->list[0].data.exp;
     }
 
     curr = curr->next;

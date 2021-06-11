@@ -216,7 +216,6 @@ void test_to_uint8_array(int *passing, int *total) {
              passing, total);
 }
 
-
 void test_to_uint32_reg(int *passing, int *total) {
   uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0x31, 0xea, 0x85, 0xd6};
   track_test(test_uint32(0xd685ea31, to_uint32_reg(byte_array),
@@ -224,14 +223,12 @@ void test_to_uint32_reg(int *passing, int *total) {
              passing, total);
 }
 
-
 void test_to_uint32_print(int *passing, int *total) {
   uint8_t byte_array[WORD_SIZE_IN_BYTES] = {0xd6, 0x85, 0xea, 0x31};
   track_test(test_uint32(0xd685ea31, to_uint32_print(byte_array),
                          "to_uint32_print works correctly"),
              passing, total);
 }
-
 
 void test_overflow(int *passing, int *total) {
   track_test(test_bool(!overflow(2, 2), "2 + 2 doesn't overflow"), passing,
@@ -244,11 +241,9 @@ void test_overflow(int *passing, int *total) {
              passing, total);
   track_test(test_bool(!overflow(-420, 420), "-420 + 420 doesn't overflow"),
              passing, total);
-      track_test(
-          test_bool(overflow(INT_MIN, -6969), "INT_MIN - 6969 overflows"),
-          passing, total);
+  track_test(test_bool(overflow(INT_MIN, -6969), "INT_MIN - 6969 overflows"),
+             passing, total);
 }
-
 
 void test_bit_operations(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
@@ -290,44 +285,33 @@ void test_st_insert(int *passing, int *total) {
   st_insert(st, "third", &third, 1);
   st_insert(st, "fourth", &fourth, 4);
   st_insert(st, "fifth", &fifth, 4);
-  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "first");
-  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "second");
-  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "third");
-  uint32_t *result_4 = (uint32_t*) st_retrieve(st, "fourth");
-  uint32_t *result_5 = (uint32_t*) st_retrieve(st, "fifth");
-  uint32_t *missing = (uint32_t*) st_retrieve(st, "missing");
+  uint8_t *result_1 = (uint8_t *)st_retrieve(st, "first");
+  uint8_t *result_2 = (uint8_t *)st_retrieve(st, "second");
+  uint8_t *result_3 = (uint8_t *)st_retrieve(st, "third");
+  uint32_t *result_4 = (uint32_t *)st_retrieve(st, "fourth");
+  uint32_t *result_5 = (uint32_t *)st_retrieve(st, "fifth");
+  uint32_t *missing = (uint32_t *)st_retrieve(st, "missing");
 
   // Tests for value in memory
+  track_test(test_bool(first == *result_1,
+                       "(\"first\", 5) maps properly (5 is a uint8_t here)"),
+             passing, total);
+  track_test(test_bool(second == *result_2,
+                       "(\"second\", 10) maps properly (10 is a uint8_t here)"),
+             passing, total);
+  track_test(test_bool(third == *result_3,
+                       "(\"third\", 11) maps properly (11 is a uint8_t here)"),
+             passing, total);
   track_test(
-    test_bool(
-      first == *result_1,
-      "(\"first\", 5) maps properly (5 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      second == *result_2,
-      "(\"second\", 10) maps properly (10 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      third == *result_3,
-      "(\"third\", 11) maps properly (11 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fourth == *result_4,
-      "(\"fourth\", 102) maps properly (102 is a uint32_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fifth == *result_5,
-      "(\"fifth\", 30) maps properly (30 is a uint32_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      missing == NULL,
-      "Invalid insertion correctly produces NULL pointer"
-    ), passing, total);
+      test_bool(fourth == *result_4,
+                "(\"fourth\", 102) maps properly (102 is a uint32_t here)"),
+      passing, total);
+  track_test(test_bool(fifth == *result_5,
+                       "(\"fifth\", 30) maps properly (30 is a uint32_t here)"),
+             passing, total);
+  track_test(test_bool(missing == NULL,
+                       "Invalid insertion correctly produces NULL pointer"),
+             passing, total);
   free_symbol_table(st);
 }
 
@@ -337,13 +321,12 @@ void test_st_insert_varying_input(int *passing, int *total) {
   char extended[511] = "first";
   uint8_t first = 5;
   st_insert(st, "first", &first, 1);
-  uint8_t *result_1 = (uint8_t*) st_retrieve(st, extended);
+  uint8_t *result_1 = (uint8_t *)st_retrieve(st, extended);
 
   track_test(
-    test_bool(
-      first == *result_1,
-      "extended[511] = \"first\" and raw \"first\" are the same"
-    ), passing, total);
+      test_bool(first == *result_1,
+                "extended[511] = \"first\" and raw \"first\" are the same"),
+      passing, total);
   free_symbol_table(st);
 }
 
@@ -358,26 +341,20 @@ void test_st_collision(int *passing, int *total) {
   st_insert(st, "abcd", &first, 1);
   st_insert(st, "badc", &second, 1);
   st_insert(st, "dabc", &third, 1);
-  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "abcd");
-  uint8_t *result_2 = (uint8_t*) st_retrieve(st, "badc");
-  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "dabc");
+  uint8_t *result_1 = (uint8_t *)st_retrieve(st, "abcd");
+  uint8_t *result_2 = (uint8_t *)st_retrieve(st, "badc");
+  uint8_t *result_3 = (uint8_t *)st_retrieve(st, "dabc");
 
   // Test for value
-  track_test(
-    test_bool(
-      first == *result_1,
-      "(\"abcd\", 29) maps properly (29 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      second == *result_2,
-      "(\"badc\", 30) maps properly (30 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      third == *result_3,
-      "(\"dabc\", 31) maps properly (31 is a uint8_t here)"
-    ), passing, total);
+  track_test(test_bool(first == *result_1,
+                       "(\"abcd\", 29) maps properly (29 is a uint8_t here)"),
+             passing, total);
+  track_test(test_bool(second == *result_2,
+                       "(\"badc\", 30) maps properly (30 is a uint8_t here)"),
+             passing, total);
+  track_test(test_bool(third == *result_3,
+                       "(\"dabc\", 31) maps properly (31 is a uint8_t here)"),
+             passing, total);
 
   free_symbol_table(st);
 }
@@ -391,56 +368,47 @@ void test_st_different_value_pointers(int *passing, int *total) {
   symbol_table *st = init_symbol_table();
 
   uint8_t first = 29;
-  instr_func_map second = {
-    .code.dataproc_opcode = 10,
-    .function = NULL
-  };
+  instr_func_map second = {.code.dataproc_opcode = 10, .function = NULL};
   uint8_t third = 31;
-  instr_func_map fourth = {
-    .code.dataproc_opcode = 0xA,
-    .function = placeholder_function
-  };
+  instr_func_map fourth = {.code.dataproc_opcode = 0xA,
+                           .function = placeholder_function};
 
   st_insert(st, "alpha_num", &first, 1);
   st_insert(st, "alpha_func", &second, sizeof(instr_func_map));
   st_insert(st, "beta_num", &third, 1);
   st_insert(st, "beta_func", &fourth, sizeof(instr_func_map));
-  uint8_t *result_1 = (uint8_t*) st_retrieve(st, "alpha_num");
-  instr_func_map *result_2 = (instr_func_map*) st_retrieve(st, "alpha_func");
-  uint8_t *result_3 = (uint8_t*) st_retrieve(st, "beta_num");
-  instr_func_map *result_4 = (instr_func_map*) st_retrieve(st, "beta_func");
+  uint8_t *result_1 = (uint8_t *)st_retrieve(st, "alpha_num");
+  instr_func_map *result_2 = (instr_func_map *)st_retrieve(st, "alpha_func");
+  uint8_t *result_3 = (uint8_t *)st_retrieve(st, "beta_num");
+  instr_func_map *result_4 = (instr_func_map *)st_retrieve(st, "beta_func");
 
   // Test for value
   track_test(
-    test_bool(
-      first == *result_1,
-      "(\"alpha_num\", 29) maps properly (29 is a uint8_t here)"
-    ), passing, total);
+      test_bool(first == *result_1,
+                "(\"alpha_num\", 29) maps properly (29 is a uint8_t here)"),
+      passing, total);
   track_test(
-    test_bool(
-      second.code.dataproc_opcode == result_2->code.dataproc_opcode,
-      "(\"alpha_func\", {instr_func_map}) maps properly (opcode = 10)"
-    ), passing, total);
+      test_bool(
+          second.code.dataproc_opcode == result_2->code.dataproc_opcode,
+          "(\"alpha_func\", {instr_func_map}) maps properly (opcode = 10)"),
+      passing, total);
+  track_test(test_bool(second.function == result_2->function,
+                       "(\"alpha_func\", {instr_func_map}) maps properly "
+                       "(function points to NULL)"),
+             passing, total);
   track_test(
-    test_bool(
-      second.function == result_2->function,
-      "(\"alpha_func\", {instr_func_map}) maps properly (function points to NULL)"
-    ), passing, total);
+      test_bool(third == *result_3,
+                "(\"beta_num\", 31) maps properly (31 is a uint8_t here)"),
+      passing, total);
   track_test(
-    test_bool(
-      third == *result_3,
-      "(\"beta_num\", 31) maps properly (31 is a uint8_t here)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fourth.code.dataproc_opcode == result_4->code.dataproc_opcode,
-      "(\"beta_func\", {function struct}) maps properly (opcode = 0xA)"
-    ), passing, total);
-  track_test(
-    test_bool(
-      fourth.function == result_4->function,
-      "(\"beta_func\", {function struct}) maps properly (function points to &test_st_insert)"
-    ), passing, total);
+      test_bool(
+          fourth.code.dataproc_opcode == result_4->code.dataproc_opcode,
+          "(\"beta_func\", {function struct}) maps properly (opcode = 0xA)"),
+      passing, total);
+  track_test(test_bool(fourth.function == result_4->function,
+                       "(\"beta_func\", {function struct}) maps properly "
+                       "(function points to &test_st_insert)"),
+             passing, total);
   free_symbol_table(st);
 }
 
@@ -517,7 +485,6 @@ void test_tokenizer(int *passing, int *total) {
   int internal_total = 0;
 
   test_strbrk_r(&internal_passing, &internal_total);
-
 
   printf("---------------------------------------------------------------------"
          "\n");

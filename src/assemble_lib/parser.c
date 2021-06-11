@@ -218,7 +218,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
   node *node = ll_node;
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   multiply_t mult_instr = {
       .cond = AL,
@@ -307,7 +307,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   /* No offset
    * Instruction is of the form <sdt> [R], so there are no more tokens
    * to point to. */
-  if (tokens->size == pos - 1) {
+  if (tokens->size == pos + 1) {
     instr.is_shift_R = !SET;
     instr.offset = 0;
     instr.up_bit = SET;

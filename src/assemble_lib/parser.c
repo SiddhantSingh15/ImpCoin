@@ -233,7 +233,7 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
 
 uint32_t parse_sdt_immediate(node *node, union instr_code code) {
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   uint8_t pos = 1;
   uint8_t rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
@@ -271,7 +271,7 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
       .up_bit = SET,
       .rn = PC,
       .rd = rd,
-      .offset = append_via_node(node, val) - (node->address + 8),
+      .offset = append_via_node(node, val) - (node->address + PIPELINE_OFFSET),
   };
   return construct_sdt_binary(&instr);
 }
@@ -304,7 +304,9 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   instr.is_preindexed = match_separator(tokens->list[tokens->size - 1], ']');
 
   // No offset
-  if (tokens->size == 5) {
+  /* Instruction is of the form <sdt> [R], so there are no more tokens
+  ** to point to */
+  if (tokens->size == pos - 1) {
     instr.is_shift_R = !SET;
     instr.offset = 0;
     instr.up_bit = SET;
@@ -351,7 +353,7 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
 
 
 uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
-  char fake_input[511];
+  char fake_input[INSTR_BUFFER];
   node *old_node = ll_node;
   token_list *tokens = old_node->value;
 

@@ -359,6 +359,8 @@ uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
   uint32_t result = parse_dataproc(new_node, code, st);
 
   /* With hardcore freeing */
+  free_token_list(new_tokens);
+  free(new_tokens);
   free(new_node);
 
   return result;

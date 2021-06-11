@@ -98,7 +98,6 @@ bool match_separator(struct token tok, char separator) {
 union token_data get_and_move(struct token tok, enum token_type expected,
                               uint8_t *pos, uint8_t line) {
   cond_move(assert_token(tok.type == expected, *pos, line), pos);
-  ;
   return tok.data;
 }
 

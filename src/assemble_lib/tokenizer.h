@@ -17,6 +17,14 @@
  */
 token_list *tokenizer(char *instr_line);
 
+
+/**
+ * @brief Frees the memory of the contents of a token_list, and then frees the
+ *        token_list itself
+ * @param tl The pointer to the token that is being freed
+ */
+void free_token_list(token_list *tl);
+
 /**
  * @brief In-house string breaking function. strtok_r could not be used due to
  *        its lack of portability. strtok_r and strdup dont work on Mac OS.

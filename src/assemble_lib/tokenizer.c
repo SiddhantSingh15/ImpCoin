@@ -92,6 +92,20 @@ token_list *tokenizer(char *instr_line) {
   return tokens;
 }
 
+void free_token_list (token_list *tl) {
+  token_t *token;
+  for (int i = 0; i < tl->size; i++) {
+    token = tl->list[i];
+    if (token->type == SEPARATOR ||
+        token->type == LABEL ||
+        token_type == TOKERR) {
+      free(token->data);
+    }
+    free(token);
+  }
+}
+free(tl);
+
 /*
   s      = "[r1, r2]"
   delims = "[], "

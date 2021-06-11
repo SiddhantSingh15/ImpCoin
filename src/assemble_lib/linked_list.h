@@ -69,11 +69,10 @@ uint32_t append_to_linked_list(linked_list *list, void *val);
  * address.
  *
  * @param list The linked list to be traversed.
- * @param address The address of the node that must be returned.
  *
  * @return A pointer to node at specified address.
  */
-node *traverse_linked_list(linked_list *list, uint32_t address);
+node *traverse_linked_list(linked_list *list);
 
 /**
  * @brief Changes the value of the node in the given linked list at a specified

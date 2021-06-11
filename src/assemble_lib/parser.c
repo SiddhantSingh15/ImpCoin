@@ -83,7 +83,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *curr_token, uint8_t line) {
     // 1. 00 00 xx 00 -> rotate = 16 - 2
     // 2. 00 00 0x x0 -> rotate = 16 - 1
     // 3. 00 00 00 xx -> no rotation
-    uint16_t rotate_count = 16;
+    uint16_t rotate_count = ROTATE_COUNT;
     // Rotate only if it is required - If value is less than 0xFF,
     // no rotation is needed
     if (tokens->list[i].data.exp > 0xFF) {
@@ -105,7 +105,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *curr_token, uint8_t line) {
   // No shift present
   if (tokens->size == i || tokens->list[i + 1].type != SHIFTNAME) {
     *curr_token = i + 1;
-    return (uint16_t)rm;
+    return (uint16_t) rm;
   }
 
   // Shift present
@@ -131,7 +131,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *curr_token, uint8_t line) {
   }
   uint16_t base = 0;
   base |= rm;
-  base |= shift << 4;
+  base |= shift << SHIFT_OFFSET;
   return base;
 }
 
@@ -226,7 +226,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   sdt_t sdt_instr = {0};
   node *node = ll_node;
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   sdt_instr.cond = AL;
   sdt_instr.load = code.sdt_l;
@@ -260,14 +260,13 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
       token_list *val = calloc(1, sizeof(token_list));
       val->list[0].type = EXPRESSION;
       val->list[0].data.exp = to_load;
-      // uint32_t *val = calloc(1, sizeof(uint32_t));
-      sdt_instr.offset = append_via_node(ll_node, val) - (node->address + 8);
+      sdt_instr.offset = append_via_node(ll_node, val);
+      sdt_instr.offset -= (node->address + PIPELINE_OFFSET);
       sdt_instr.is_shift_R = !SET;
       sdt_instr.is_preindexed = SET;
       sdt_instr.up_bit = SET;
       sdt_instr.rn = PC;
       sdt_instr.rd = sdt_instr.rd;
-      // *val = to_load;
       return construct_sdt_binary(&sdt_instr);
     }
   }
@@ -333,9 +332,10 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   branch_t branch_instr = {0};
   branch_instr.cond = code.branch_cond;
   uint32_t *label_address =
-      (uint32_t *)st_retrieve(st, tokens->list[1].data.label);
+      (uint32_t *) st_retrieve(st, tokens->list[1].data.label);
   branch_instr.offset =
-      ((int32_t)*label_address - (int32_t)node->address - 8) >> 2;
+      ((int32_t) *label_address - (int32_t) node->address - PIPELINE_OFFSET)
+      >> BRANCH_SHIFT;
   return construct_branch_binary(&branch_instr);
 }
 

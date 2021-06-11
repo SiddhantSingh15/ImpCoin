@@ -94,15 +94,18 @@ int main(int argc, char **argv) {
     binary_instr = 0;
     tokens = curr->value;
     if (tokens->list[0].type == INSTRNAME) {
-      // curr->value is a token_list, and the first token has been correctly
-      // initialised to type INSTRNAME.
+      // The leading token INSTRNAME - This token is inserted when
+      // reading form the source file
       func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
       PTR_CHECK(func_map, "Value does not exist in symbol table\n");
       binary_instr = func_map->function(curr, func_map->code, labels);
     }
-    // curr-> value is not a token_list, but a constant binary value.
     else {
+      // The leading token is EXPRESSION - This token is inserted when
+      // carrying out a parse_sdt instruction
       if (tokens->list[0].type != EXPRESSION) {
+        // There are no other possible leading token types. If any have been
+        // found, return an error
         perror("Invalid leading token.\n");
         exit(EXIT_FAILURE);
       }

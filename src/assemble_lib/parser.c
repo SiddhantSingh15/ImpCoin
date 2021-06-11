@@ -1,10 +1,10 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
 #include "symbol_table.h"
-#include "parser.h"
 #include "tokens.h"
 #include "tokenizer.h"
 #include "linked_list.h"
+#include "parser.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,16 +68,49 @@ void throw_parse_error(uint8_t pos, uint32_t line) {
   exit(1);
 }
 
-void assert_token(bool token_cond, uint8_t pos, uint32_t line) {
+bool assert_token(bool token_cond, uint8_t pos, uint32_t line) {
   if (!token_cond) {
     throw_parse_error(pos, line);
   }
+  return token_cond;
 }
 
-uint16_t parse_operand2(token_list *tokens, uint8_t *curr_token, uint8_t line) {
-  uint8_t i = *curr_token;
+bool assert_separator(struct token tok, char separator, uint8_t pos,
+                      uint8_t line) {
+  if (tok.type != SEPARATOR || tok.data.separator != separator) {
+    throw_parse_error(pos, line);
+    return false;
+  }
+  return true;
+}
+
+bool cond_move(bool cond, uint8_t *pos) {
+  if (cond) {
+    (*pos)++;
+  }
+  return cond;
+}
+
+bool match_separator(struct token tok, char separator) {
+  return tok.type == SEPARATOR && tok.data.separator == separator;
+}
+
+union token_data get_and_move(struct token tok, enum token_type expected,
+                               uint8_t *pos, uint8_t line) {
+    cond_move(assert_token(tok.type == expected, *pos, line), pos);;
+    return tok.data;
+}
+
+union token_data match_and_get(struct token tok, enum token_type expected,
+                               uint8_t pos, uint8_t line) {
+    assert_token(tok.type == expected, pos, line);
+    return tok.data;
+}
+
+uint16_t parse_operand2(token_list *tokens, uint8_t line, uint8_t *pos) {
+
   // If op2 is an immediate value (EXPR identified)
-  if (tokens->list[i].type == EXPRESSION) {
+  if (tokens->list[*pos].type == EXPRESSION) {
     // Set up rotate byte
     // Rotation example
     // 1. 00 00 xx 00 -> rotate = 16 - 2
@@ -86,51 +119,46 @@ uint16_t parse_operand2(token_list *tokens, uint8_t *curr_token, uint8_t line) {
     uint16_t rotate_count = ROTATE_COUNT;
     // Rotate only if it is required - If value is less than 0xFF,
     // no rotation is needed
-    if (tokens->list[i].data.exp > 0xFF) {
+    if (tokens->list[*pos].data.exp > 0xFF) {
       // 0x3 = 11 in binary, this while loop checks to see if the last  any of
       // the 2 bits are set E.G. 1100 is not valid, 0011 is valid, 0110 is valid
-      while (!(tokens->list[i].data.exp & 0x3)) {
+      while (!(tokens->list[*pos].data.exp & 0x3)) {
         rotate_count--;
-        tokens->list[i].data.exp >>= SHIFT_MULTIPLIER;
+        tokens->list[*pos].data.exp >>= SHIFT_MULTIPLIER;
       }
     }
+
     rotate_count <<= ONE_B;
-    *curr_token = i + 1;
-    return rotate_count | tokens->list[i].data.exp;
+    (*pos)++;
+    return rotate_count | tokens->list[*pos - 1].data.exp;
   }
+
   // op2 is not immediate, first token will be a register
-  assert_token(tokens->list[i].type == REG, i, line);
-  uint8_t rm = tokens->list[i].data.reg;
+  uint8_t rm = get_and_move(tokens->list[*pos], REG, pos, line).reg;
 
   // No shift present
-  if (tokens->size == i || tokens->list[i + 1].type != SHIFTNAME) {
-    *curr_token = i + 1;
-    return (uint16_t) rm;
+  if (tokens->size == *pos - 1 || tokens->list[*pos].type != SHIFTNAME) {
+    return (uint16_t)rm;
   }
 
   // Shift present
-  assert_token(tokens->list[i + 1].type == SHIFTNAME, i + 1, line);
-  uint8_t shift = tokens->list[i + 1].data.shift_name << 1;
-  assert(shift < 4);
+  uint8_t shift =
+      get_and_move(tokens->list[*pos], SHIFTNAME, pos, line).shift_name << 1;
 
   // Structure of shift
   // 1. <shiftname> <#expression> - 3 tokens
   // 2. <shiftname> <register> - 2 tokens
-  if (tokens->list[i + 2].type == SEPARATOR) {
+  if (tokens->list[*pos].type == SEPARATOR) {
     // Case 1: <shiftname> <register> - 3 tokens
-    assert_token(tokens->list[i + 2].data.separator == '#', i + 2, line);
-    assert_token(tokens->list[i + 3].type == EXPRESSION, i + 3, line);
-    shift |= tokens->list[i + 3].data.exp << 3;
-    *curr_token = i + 4;
+    cond_move(assert_separator(tokens->list[*pos], '#', *pos, line), pos);
+    shift |= get_and_move(tokens->list[*pos], EXPRESSION, pos, line).exp << 3;
   } else {
     // Case 2: <shiftname> <#expression> - 2 tokens
-    assert_token(tokens->list[i + 2].type == REG, i + 2, line);
-    shift |= tokens->list[i + 2].data.reg << 4;
+    shift |= get_and_move(tokens->list[*pos], REG, pos, line).reg << 4;
     shift++;
-    *curr_token = i + 3;
   }
-  uint16_t base = 0;
-  base |= rm;
+
+  uint16_t base = rm;
   base |= shift << SHIFT_OFFSET;
   return base;
 }
@@ -142,200 +170,182 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
     return 0;
   }
 
-  dataproc_t dataproc_instr = {0};
+  dataproc_t instr = {0};
   node *node = ll_node;
-  uint32_t line = node->address / 4;
   token_list *tokens = node->value;
-  uint8_t currptr;
+
+  uint32_t line = (node->address / 4) + 1;
+  uint8_t pos = 1;
+
+  instr.opcode = code.dataproc_opcode;
+  instr.cond = AL;
+
   if (code.dataproc_opcode <= 0xA && code.dataproc_opcode >= 0x8) {
     // Check for TST, TEQ, CMP
     // 0 - INSTR, 1 - RD, 2  - <#expression>
-    dataproc_instr.set_cond = SET;
-    assert_token(tokens->list[1].type == REG, 1, line);
-    dataproc_instr.rn = tokens->list[1].data.reg;
-    currptr = 2;
-    if (tokens->list[2].type == SEPARATOR) {
-      assert_token(tokens->list[2].data.separator == '#', 2, line);
-      dataproc_instr.is_immediate = SET;
-      currptr++;
-    }
-    dataproc_instr.op2 = parse_operand2(tokens, &currptr, line);
-  } else if (code.dataproc_opcode == MOV) {
+    instr.set_cond = SET;
+    instr.rn = get_and_move(tokens->list[pos], REG, &pos, line).reg;
+    instr.is_immediate =
+        cond_move(match_separator(tokens->list[pos], '#'), &pos);
+
+    instr.op2 = parse_operand2(tokens, line, &pos);
+    return construct_dataproc_binary(&instr);
+  }
+
+  if (code.dataproc_opcode == MOV) {
     // Check for MOV
     // 0 - INSTR, 1 - RD, 2  - <#expression>
-    assert_token(tokens->list[1].type == REG, 1, line);
-    dataproc_instr.rd = tokens->list[1].data.reg;
-    currptr = 2;
-    if (tokens->list[2].type == SEPARATOR) {
-      assert_token(tokens->list[2].data.separator == '#', 2, line);
-      dataproc_instr.is_immediate = SET;
-      currptr++;
-    }
-    dataproc_instr.op2 = parse_operand2(tokens, &currptr, line);
-  } else {
-    // Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
-    // 0 - INSTR, 1 - RD, 2 - RN, 3 - <#expression>
-    assert_token(tokens->list[1].type == REG, 1, line);
-    dataproc_instr.rd = tokens->list[1].data.reg;
-    assert_token(tokens->list[2].type == REG, 2, line);
-    dataproc_instr.rn = tokens->list[2].data.reg;
-    currptr = 3;
-    if (tokens->list[3].type == SEPARATOR) {
-      assert_token(tokens->list[3].data.separator == '#', 3, line);
-      dataproc_instr.is_immediate = SET;
-      currptr++;
-    }
-    dataproc_instr.op2 = parse_operand2(tokens, &currptr, line);
-  }
-  dataproc_instr.opcode = code.dataproc_opcode;
-  dataproc_instr.cond = AL;
+    instr.rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
+    instr.is_immediate =
+        cond_move(match_separator(tokens->list[pos], '#'), &pos);
 
-  return construct_dataproc_binary(&dataproc_instr);
+    instr.op2 = parse_operand2(tokens, line, &pos);
+    return construct_dataproc_binary(&instr);
+  }
+
+  // Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
+  // 0 - INSTR, 1 - RD, 2 - RN, 3 - <#expression>
+  instr.rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
+  instr.rn = get_and_move(tokens->list[pos], REG, &pos, line).reg;
+  instr.is_immediate = cond_move(match_separator(tokens->list[pos], '#'), &pos);
+
+  instr.op2 = parse_operand2(tokens, line, &pos);
+  return construct_dataproc_binary(&instr);
 }
 
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
-  multiply_t mult_instr = {0};
   node *node = ll_node;
   token_list *tokens = node->value;
-  uint32_t line = node->address;
+  uint32_t line = (node->address / 4) + 1;
 
-  mult_instr.cond = AL;
-
-  assert_token(tokens->list[1].type == REG, 1, line);
-  mult_instr.rd = tokens->list[1].data.reg;
-
-  assert_token(tokens->list[2].type == REG, 2, line);
-  mult_instr.rm = tokens->list[2].data.reg;
-
-  assert_token(tokens->list[3].type == REG, 3, line);
-  mult_instr.rs = tokens->list[3].data.reg;
-
-  if (code.mul_a) {
-    assert_token(tokens->list[4].type == REG, 4, line);
-    mult_instr.rn = tokens->list[4].data.reg;
-  }
-
-  mult_instr.accumulate = code.mul_a;
-
-  mult_instr.set_cond = !SET;
+  multiply_t mult_instr = {
+      .cond = AL,
+      .rd = match_and_get(tokens->list[1], REG, 1, line).reg,
+      .rm = match_and_get(tokens->list[2], REG, 2, line).reg,
+      .rs = match_and_get(tokens->list[3], REG, 3, line).reg,
+      .rn =
+          (code.mul_a) ? match_and_get(tokens->list[4], REG, 4, line).reg : 0,
+      .accumulate = code.mul_a,
+      .set_cond = !SET};
 
   return construct_mult_binary(&mult_instr);
 }
 
-uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
-  sdt_t sdt_instr = {0};
-  node *node = ll_node;
+uint32_t parse_sdt_immediate(node *node, union instr_code code) {
   token_list *tokens = node->value;
-  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
+  uint32_t line = (node->address / 4) + 1;
 
-  sdt_instr.cond = AL;
-  sdt_instr.load = code.sdt_l;
+  uint8_t pos = 1;
+  uint8_t rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
 
-  // The first operand is always Rd
-  assert_token(tokens->list[1].type == REG, 1, line);
-  sdt_instr.rd = tokens->list[1].data.reg;
+  // This function only takes immediate sdt instructions.
+  assert_separator(tokens->list[pos], '=', pos, line);
+  // This is only available for ldr instructions.
+  cond_move(assert_token(code.sdt_l == SET, pos, line), &pos);
 
-  // The next token must be '=' or '['
-  assert_token(tokens->list[2].type == SEPARATOR, 2, line);
-  if (tokens->list[2].data.separator == '=') {
-    // '=' is only available for ldr instructions
-    assert_token(code.sdt_l == 1, 2, line);
-    assert_token(tokens->list[3].type == EXPRESSION, 3, line);
+  uint32_t to_load =
+      match_and_get(tokens->list[pos], EXPRESSION, pos, line).exp;
 
-    uint32_t to_load = tokens->list[3].data.exp;
+  if (to_load <= 0xff) {
+    // Since the value to load fits inside a mov instruction, we assemble it as
+    // such, and return immediately.
+    dataproc_t dataproc_instr = {
+        .cond = AL,
+        .is_immediate = SET,
+        .opcode = MOV,
+        .rd = rd,
+    };
 
-    if (to_load <= 0xff) {
-      // we assemble this as a mov instruction and return immediately
-      dataproc_t dataproc_instr = {0};
-      dataproc_instr.cond = AL;
-      dataproc_instr.is_immediate = SET;
-      dataproc_instr.opcode = MOV;
-      dataproc_instr.rd = sdt_instr.rd;
-
-      uint8_t currptr = 3;
-      dataproc_instr.op2 = parse_operand2(tokens, &currptr, line);
-      return construct_dataproc_binary(&dataproc_instr);
-
-    } else {
-      token_list *val = calloc(1, sizeof(token_list));
-      val->list[0].type = EXPRESSION;
-      val->list[0].data.exp = to_load;
-      sdt_instr.offset = append_via_node(ll_node, val);
-      sdt_instr.offset -= (node->address + PIPELINE_OFFSET);
-      sdt_instr.is_shift_R = !SET;
-      sdt_instr.is_preindexed = SET;
-      sdt_instr.up_bit = SET;
-      sdt_instr.rn = PC;
-      sdt_instr.rd = sdt_instr.rd;
-      return construct_sdt_binary(&sdt_instr);
-    }
+    dataproc_instr.op2 = parse_operand2(tokens, line, &pos);
+    return construct_dataproc_binary(&dataproc_instr);
   }
 
-  assert_token(tokens->list[2].data.separator == '[', 3, line);
-  assert_token(tokens->list[3].type == REG, 4, line);
-  sdt_instr.rn = tokens->list[3].data.reg;
+  token_list *val = calloc(1, sizeof(token_list));
+  val->list[0].type = EXPRESSION;
+  val->list[0].data.exp = to_load;
+
+  sdt_t instr = {
+      .cond = AL,
+      .load = code.sdt_l,
+      .is_preindexed = SET,
+      .up_bit = SET,
+      .rn = PC,
+      .rd = rd,
+      .offset = append_via_node(node, val) - (node->address + 8),
+  };
+  return construct_sdt_binary(&instr);
+}
+
+uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
+  sdt_t instr = {0};
+  node *node = ll_node;
+  token_list *tokens = node->value;
+
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
+  uint8_t pos = 1;
+
+  instr.cond = AL;
+  instr.load = code.sdt_l;
+
+  // The first operand is always Rd
+  instr.rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
+
+  if (match_separator(tokens->list[pos], '=')) {
+    // Immediate SDT is only available for ldr instructions
+    assert_token(code.sdt_l == SET, pos, line);
+    return parse_sdt_immediate(node, code);
+  }
+
+  // Not an immediate instruction, we take the register.
+  cond_move(assert_separator(tokens->list[pos], '[', pos, line), &pos);
+  instr.rn = get_and_move(tokens->list[pos], REG, &pos, line).reg;
 
   // Check post / pre-indexed
-  sdt_instr.is_preindexed =
-      (tokens->list[tokens->size - 1].type == SEPARATOR &&
-       tokens->list[tokens->size - 1].data.separator == ']');
+  instr.is_preindexed = match_separator(tokens->list[tokens->size - 1], ']');
 
   // No offset
   if (tokens->size == 5) {
-    sdt_instr.is_shift_R = !SET;
-    sdt_instr.offset = 0;
-    sdt_instr.up_bit = SET;
-    return construct_sdt_binary(&sdt_instr);
+    instr.is_shift_R = !SET;
+    instr.offset = 0;
+    instr.up_bit = SET;
+    return construct_sdt_binary(&instr);
   }
 
-  uint8_t curr_tok = 4;
+  instr.is_shift_R = cond_move(match_separator(tokens->list[pos], ']'), &pos)
+                         ? !SET
+                         : instr.is_shift_R;
 
-  if (tokens->list[curr_tok].type == SEPARATOR &&
-      tokens->list[curr_tok].data.separator == ']') {
-    sdt_instr.is_shift_R = !SET;
-    curr_tok++;
-  }
-
-  if (tokens->list[curr_tok].type == SEPARATOR) {
-    if (tokens->list[curr_tok].data.separator == '#') {
-      sdt_instr.is_shift_R = !SET;
-      curr_tok++;
-
-      if (tokens->list[curr_tok].type == SEPARATOR &&
-          tokens->list[curr_tok].data.separator == '-') {
-        sdt_instr.up_bit =
-            (tokens->list[curr_tok].data.separator == '-') ? !SET : SET;
-        curr_tok++;
-      } else {
-        sdt_instr.up_bit = SET;
-      }
-    }
+  if (cond_move(match_separator(tokens->list[pos], '#'), &pos)) {
+    instr.up_bit = !cond_move(match_separator(tokens->list[pos], '-'), &pos);
   } else {
-    sdt_instr.is_shift_R = SET;
-    sdt_instr.up_bit = SET;
+    instr.is_shift_R = SET;
+    instr.up_bit = SET;
   }
 
-  sdt_instr.offset = parse_operand2(tokens, &curr_tok, line);
+  instr.offset = parse_operand2(tokens, line, &pos);
 
-  if (sdt_instr.is_preindexed) {
-    assert_token(tokens->list[curr_tok].type == SEPARATOR, curr_tok, line);
-    assert_token(tokens->list[curr_tok].data.separator == ']', curr_tok, line);
+  if (instr.is_preindexed) {
+    assert_separator(tokens->list[pos], ']', pos, line);
   }
 
-  return construct_sdt_binary(&sdt_instr);
+  return construct_sdt_binary(&instr);
 }
 
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   node *node = ll_node;
   token_list *tokens = node->value;
-  assert_token(tokens->list[1].type == LABEL, 1, node->address);
-  branch_t branch_instr = {0};
-  branch_instr.cond = code.branch_cond;
-  uint32_t *label_address =
-      (uint32_t *) st_retrieve(st, tokens->list[1].data.label);
-  branch_instr.offset =
-      ((int32_t) *label_address - (int32_t) node->address - PIPELINE_OFFSET)
-      >> BRANCH_SHIFT;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
+
+  uint32_t *label_address = (uint32_t *)st_retrieve(
+      st, match_and_get(tokens->list[1], LABEL, 1, line).label);
+
+  branch_t branch_instr = {
+    .cond = code.branch_cond,
+    .offset =
+      ((int32_t)*label_address - (int32_t)node->address - PIPELINE_OFFSET)
+      >> BRANCH_SHIFT
+  };
+
   return construct_branch_binary(&branch_instr);
 }
 

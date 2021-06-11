@@ -24,12 +24,19 @@ typedef struct linked_list {
 
 /**
  * @brief Initialises a new linked list with a null head node.
+ * 
+ * @return The initialised linked list.
  */
 linked_list *init_linked_list(void);
 
 /**
  * @brief Initialises a new linked list node with a specified address and val,
  * pointing to a next node of NULL.
+ *
+ * @param address The address of the initialised node.
+ * @param val The value to be stored in the node.
+ *
+ * @return The initialized node.
  */
 node *init_node(uint32_t address, void *val);
 
@@ -62,11 +69,10 @@ uint32_t append_to_linked_list(linked_list *list, void *val);
  * address.
  *
  * @param list The linked list to be traversed.
- * @param address The address of the node that must be returned.
  *
  * @return A pointer to node at specified address.
  */
-node *traverse_linked_list(linked_list *list, uint32_t address);
+node *traverse_linked_list(linked_list *list);
 
 /**
  * @brief Changes the value of the node in the given linked list at a specified
@@ -84,6 +90,6 @@ void change_node(linked_list *list, uint32_t address, void *val);
  *
  * @param list The list to be freed.
  */
-void free_linked_list(linked_list *list);
+void free_linked_list(linked_list *list, void (*value_free)(void *));
 
 #endif

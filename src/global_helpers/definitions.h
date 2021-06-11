@@ -8,6 +8,7 @@
 #define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
 #define TWENTY_FOUR_MSB 23
+#define PIPELINE_OFFSET 8
 
 #define PC 15
 #define CPSR 16
@@ -117,6 +118,15 @@
 #define OCTAL 8
 #define DENARY 10
 #define HEX 16
+
+/* Parser */
+#define ROTATE_COUNT 16
+#define SHIFT_OFFSET 4
+#define BRANCH_SHIFT 2
+
+
+/* File Read */
+#define INSTR_BUFFER 511
 
 /* File Write */
 #define WRITE_SIZE 1

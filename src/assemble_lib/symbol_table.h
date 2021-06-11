@@ -2,7 +2,6 @@
 #define SYMBOL_TABLE_UTILS_H
 
 #include <stdint.h>
-#include "../global_helpers/types.h"
 
 /**
  * @brief Initializes a header node for a symbol table.

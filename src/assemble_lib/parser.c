@@ -1,8 +1,10 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
-#include "tokenizer.h"
+#include "symbol_table.h"
 #include "tokens.h"
+#include "tokenizer.h"
 #include "linked_list.h"
+#include "parser.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -94,32 +96,33 @@ bool match_separator(struct token tok, char separator) {
 }
 
 union token_data get_and_move(struct token tok, enum token_type expected,
-                               uint8_t *pos, uint8_t line) {
-    cond_move(assert_token(tok.type == expected, *pos, line), pos);;
-    return tok.data;
+                              uint8_t *pos, uint8_t line) {
+  cond_move(assert_token(tok.type == expected, *pos, line), pos);
+  return tok.data;
 }
 
 union token_data match_and_get(struct token tok, enum token_type expected,
                                uint8_t pos, uint8_t line) {
-    assert_token(tok.type == expected, pos, line);
-    return tok.data;
+  assert_token(tok.type == expected, pos, line);
+  return tok.data;
 }
 
 uint16_t parse_operand2(token_list *tokens, uint8_t line, uint8_t *pos) {
 
   // If op2 is an immediate value (EXPR identified)
   if (tokens->list[*pos].type == EXPRESSION) {
-    // Set up rotate byte
-    // Rotation example
-    // 1. 00 00 xx 00 -> rotate = 16 - 2
-    // 2. 00 00 0x x0 -> rotate = 16 - 1
-    // 3. 00 00 00 xx -> no rotation
-    uint16_t rotate_count = 16;
-    // Rotate only if it is required - If value is less than 0xFF,
-    // no rotation is needed
+    /* Set up rotate byte
+     * Rotation example
+     * 1. 00 00 xx 00 -> rotate = 16 - 2
+     * 2. 00 00 0X X0 -> ROTATE = 16 - 1
+     * 3. 00 00 00 xx -> no rotation */
+    uint16_t rotate_count = ROTATE_COUNT;
+    /* Rotate only if it is required - If value is less than 0xFF,
+     * no rotation is needed */
     if (tokens->list[*pos].data.exp > 0xFF) {
-      // 0x3 = 11 in binary, this while loop checks to see if the last  any of
-      // the 2 bits are set E.G. 1100 is not valid, 0011 is valid, 0110 is valid
+      /* 0x3 = 11 in binary, this while loop checks to see if the last  any of
+       * the 2 bits are set E.G. 1100 is not valid, 0011 is valid, 0110 is valid
+       */
       while (!(tokens->list[*pos].data.exp & 0x3)) {
         rotate_count--;
         tokens->list[*pos].data.exp >>= SHIFT_MULTIPLIER;
@@ -143,9 +146,9 @@ uint16_t parse_operand2(token_list *tokens, uint8_t line, uint8_t *pos) {
   uint8_t shift =
       get_and_move(tokens->list[*pos], SHIFTNAME, pos, line).shift_name << 1;
 
-  // Structure of shift
-  // 1. <shiftname> <#expression> - 3 tokens
-  // 2. <shiftname> <register> - 2 tokens
+  /* Structure of shift
+   * 1. <shiftname> <#expression> - 3 tokens
+   * 2. <shiftname> <register> - 2 tokens */
   if (tokens->list[*pos].type == SEPARATOR) {
     // Case 1: <shiftname> <register> - 3 tokens
     cond_move(assert_separator(tokens->list[*pos], '#', *pos, line), pos);
@@ -157,7 +160,7 @@ uint16_t parse_operand2(token_list *tokens, uint8_t line, uint8_t *pos) {
   }
 
   uint16_t base = rm;
-  base |= shift << 4;
+  base |= shift << SHIFT_OFFSET;
   return base;
 }
 
@@ -179,8 +182,8 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
   instr.cond = AL;
 
   if (code.dataproc_opcode <= 0xA && code.dataproc_opcode >= 0x8) {
-    // Check for TST, TEQ, CMP
-    // 0 - INSTR, 1 - RD, 2  - <#expression>
+    /* Check for TST, TEQ, CMP
+     * 0 - INSTR, 1 - RD, 2  - <#expression> */
     instr.set_cond = SET;
     instr.rn = get_and_move(tokens->list[pos], REG, &pos, line).reg;
     instr.is_immediate =
@@ -191,8 +194,8 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
   }
 
   if (code.dataproc_opcode == MOV) {
-    // Check for MOV
-    // 0 - INSTR, 1 - RD, 2  - <#expression>
+    /* Check for MOV
+     * 0 - INSTR, 1 - RD, 2  - <#expression> */
     instr.rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
     instr.is_immediate =
         cond_move(match_separator(tokens->list[pos], '#'), &pos);
@@ -201,8 +204,8 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
     return construct_dataproc_binary(&instr);
   }
 
-  // Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
-  // 0 - INSTR, 1 - RD, 2 - RN, 3 - <#expression>
+  /* Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
+   * 0 - INSTR, 1 - RD, 2 - RN, 3 - <#expression> */
   instr.rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
   instr.rn = get_and_move(tokens->list[pos], REG, &pos, line).reg;
   instr.is_immediate = cond_move(match_separator(tokens->list[pos], '#'), &pos);
@@ -214,15 +217,14 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
   node *node = ll_node;
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   multiply_t mult_instr = {
       .cond = AL,
       .rd = match_and_get(tokens->list[1], REG, 1, line).reg,
       .rm = match_and_get(tokens->list[2], REG, 2, line).reg,
       .rs = match_and_get(tokens->list[3], REG, 3, line).reg,
-      .rn =
-          (code.mul_a) ? match_and_get(tokens->list[4], REG, 4, line).reg : 0,
+      .rn = (code.mul_a) ? match_and_get(tokens->list[4], REG, 4, line).reg : 0,
       .accumulate = code.mul_a,
       .set_cond = !SET};
 
@@ -231,7 +233,7 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
 
 uint32_t parse_sdt_immediate(node *node, union instr_code code) {
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   uint8_t pos = 1;
   uint8_t rd = get_and_move(tokens->list[pos], REG, &pos, line).reg;
@@ -245,8 +247,8 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
       match_and_get(tokens->list[pos], EXPRESSION, pos, line).exp;
 
   if (to_load <= 0xff) {
-    // Since the value to load fits inside a mov instruction, we assemble it as
-    // such, and return immediately.
+    /* Since the value to load fits inside a mov instruction, we assemble it as
+     * such, and return immediately. */
     dataproc_t dataproc_instr = {
         .cond = AL,
         .is_immediate = SET,
@@ -258,7 +260,9 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
     return construct_dataproc_binary(&dataproc_instr);
   }
 
-  uint32_t *val = calloc(1, sizeof(uint32_t));
+  token_list *val = calloc(1, sizeof(token_list));
+  val->list[0].type = EXPRESSION;
+  val->list[0].data.exp = to_load;
 
   sdt_t instr = {
       .cond = AL,
@@ -267,10 +271,8 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
       .up_bit = SET,
       .rn = PC,
       .rd = rd,
-      .offset = append_via_node(node, val) - (node->address + 8),
+      .offset = append_via_node(node, val) - (node->address + PIPELINE_OFFSET),
   };
-
-  *val = to_load;
   return construct_sdt_binary(&instr);
 }
 
@@ -279,7 +281,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   node *node = ll_node;
   token_list *tokens = node->value;
 
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
   uint8_t pos = 1;
 
   instr.cond = AL;
@@ -301,8 +303,10 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
   // Check post / pre-indexed
   instr.is_preindexed = match_separator(tokens->list[tokens->size - 1], ']');
 
-  // No offset
-  if (tokens->size == 5) {
+  /* No offset
+   * Instruction is of the form <sdt> [R], so there are no more tokens
+   * to point to. */
+  if (tokens->size == pos + 1) {
     instr.is_shift_R = !SET;
     instr.offset = 0;
     instr.up_bit = SET;
@@ -332,30 +336,27 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
   node *node = ll_node;
   token_list *tokens = node->value;
-  uint32_t line = (node->address / 4) + 1;
+  uint32_t line = (node->address / WORD_SIZE_IN_BYTES) + 1;
 
   uint32_t *label_address = (uint32_t *)st_retrieve(
       st, match_and_get(tokens->list[1], LABEL, 1, line).label);
 
-  branch_t branch_instr = {
-    .cond = code.branch_cond,
-    .offset =
-      ((int32_t)*label_address - (int32_t)node->address - 8) >> 2
-  };
+  branch_t branch_instr = {.cond = code.branch_cond,
+                           .offset =
+                               ((int32_t)*label_address -
+                                (int32_t)node->address - PIPELINE_OFFSET) >>
+                               BRANCH_SHIFT};
 
   return construct_branch_binary(&branch_instr);
 }
 
-
 uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
-  char fake_input[511];
+  char fake_input[INSTR_BUFFER];
   node *old_node = ll_node;
   token_list *tokens = old_node->value;
 
-  sprintf(fake_input, "mov r%d,r%d, lsl #%d"
-    , tokens->list[1].data.reg
-    , tokens->list[1].data.reg
-    , tokens->list[3].data.exp);
+  sprintf(fake_input, "mov r%d,r%d, lsl #%d", tokens->list[1].data.reg,
+          tokens->list[1].data.reg, tokens->list[3].data.exp);
 
   token_list *new_tokens = tokenizer(fake_input);
 
@@ -369,6 +370,8 @@ uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {
   uint32_t result = parse_dataproc(new_node, code, st);
 
   /* With hardcore freeing */
+  free_token_list(new_tokens);
+  free(new_tokens);
   free(new_node);
 
   return result;

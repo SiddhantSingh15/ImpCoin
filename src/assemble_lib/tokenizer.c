@@ -13,7 +13,7 @@
 #include <string.h>
 
 token_list *tokenizer(char *instr_line) {
-  // pre: instr_line is not a label, only an instruction
+  // pre: instr_line is not a label. It is a complete instruction string
 
   token_list *tokens = calloc(1, sizeof(token_list));
   PTR_CHECK(tokens, "Memory allocation failure\n");
@@ -23,17 +23,24 @@ token_list *tokenizer(char *instr_line) {
   char *rest_start = malloc(strlen(instr_line) + 1);
   PTR_CHECK(rest_start, "Memory allocation failure\n");
   strcpy(rest_start, instr_line);
+
+  // A second variable is needed to store the pointer to the beginning of the
+  // string. The pointer 'rest' will be changed by str_brk to point to other
+  // parts of the string later in str_brk
   char *rest = rest_start;
 
+  // Before analyzing the instruction, we can extract the instruction name first
+  // It will always be the leftmost word in the string
   char *instr_name = malloc(strlen(instr_line + 1));
   PTR_CHECK(instr_name, "Memory allocation failure\n");
   token = strbrk_r(rest, BLANK_SPACE, &rest);
   strcpy(instr_name, token);
-  free(token);
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;
+  free(token);
 
+  // Convert the remaining string into an array of tokens
   while ((token = strbrk_r(rest, DELIMITERS, &rest))) {
 
     enum token_type type;
@@ -57,6 +64,7 @@ token_list *tokenizer(char *instr_line) {
       data.shift_name = is_shift(token);
 
     } else {
+      // Malloc a new token since these cases store pointers instead of values
       char *token_dupe = malloc(strlen(token) + 1);
       PTR_CHECK(token_dupe, "Memory allocation failure\n");
       strcpy(token_dupe, token);

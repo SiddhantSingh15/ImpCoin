@@ -110,6 +110,9 @@ int main(int argc, char **argv) {
     write_file(to_write, &binary_instr);
   }
   fclose(to_write);
-
+  // Free linked list
+  free_linked_list(instructions);
+  // Free symbol table
+  free_symbol_table(labels);
   return EXIT_SUCCESS;
 }

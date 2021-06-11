@@ -27,8 +27,9 @@ token_list *tokenizer(char *instr_line) {
 
   char *instr_name = malloc(strlen(instr_line + 1));
   PTR_CHECK(instr_name, "Memory allocation failure\n");
-
-  strcpy(instr_name, strbrk_r(rest, BLANK_SPACE, &rest));
+  token = strbrk_r(rest, BLANK_SPACE, &rest);
+  strcpy(instr_name, token);
+  free(token);
   tokens->list[count].type = INSTRNAME;
   tokens->list[count].data.instr_name = instr_name;
   count++;
@@ -78,7 +79,6 @@ token_list *tokenizer(char *instr_line) {
     free(token);
     count++;
   }
-
   free(rest_start);
   tokens->size = count;
   return tokens;

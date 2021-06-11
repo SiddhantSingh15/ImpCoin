@@ -63,16 +63,17 @@ token_list *tokenizer(char *instr_line) {
       type = SHIFTNAME;
       data.shift_name = is_shift(token);
 
+    } else if (strlen(token) == 1) {
+      type = SEPARATOR;
+      data.separator = *token;
+      
     } else {
       // Malloc a new token since these cases store pointers instead of values
       char *token_dupe = malloc(strlen(token) + 1);
       PTR_CHECK(token_dupe, "Memory allocation failure\n");
       strcpy(token_dupe, token);
-      if (strlen(token) == 1) {
-        type = SEPARATOR;
-        data.separator = *token_dupe;
-
-      } else if (isalpha(*token)) {
+      
+      if (isalpha(*token)) {
         type = LABEL;
         data.label = token_dupe;
 
@@ -92,19 +93,25 @@ token_list *tokenizer(char *instr_line) {
   return tokens;
 }
 
-void free_token_list (token_list *tl) {
-  token_t *token;
+void free_token_list (void *ptr) {
+  token_list *tl = ptr;
   for (int i = 0; i < tl->size; i++) {
-    token = tl->list[i];
-    if (token->type == SEPARATOR ||
-        token->type == LABEL ||
-        token_type == TOKERR) {
-      free(token->data);
+    switch (tl->list[i].type) {
+      case INSTRNAME:
+      free(tl->list[i].data.instr_name);
+      break;
+      case LABEL:
+      free(tl->list[i].data.label);
+      break;
+      case TOKERR:
+      free(tl->list[i].data.error);
+      break;
+      default:
+      break;
     }
-    free(token);
+    // free(&tl->list[i]);
   }
 }
-free(tl);
 
 /*
   s      = "[r1, r2]"

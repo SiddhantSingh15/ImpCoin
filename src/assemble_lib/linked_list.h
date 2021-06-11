@@ -91,6 +91,6 @@ void change_node(linked_list *list, uint32_t address, void *val);
  *
  * @param list The list to be freed.
  */
-void free_linked_list(linked_list *list);
+void free_linked_list(linked_list *list, void (*value_free)(void *));
 
 #endif

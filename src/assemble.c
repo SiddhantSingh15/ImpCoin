@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   }
   fclose(to_write);
   // Free linked list
-  free_linked_list(instructions);
+  free_linked_list(instructions, free_token_list);
   // Free symbol table
   free_symbol_table(labels);
   return EXIT_SUCCESS;

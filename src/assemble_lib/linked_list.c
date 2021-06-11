@@ -70,13 +70,14 @@ void change_node(linked_list *list, uint32_t address, void *val) {
   }
 }
 
-void free_linked_list(linked_list *list) {
+void free_linked_list(linked_list *list, void (*value_free)(void *)) {
   assert(list);
 
   node *curr = list->head;
   while (curr) {
     node *temp = curr;
     curr = curr->next;
+    value_free(temp->value);
     free(temp->value);
     free(temp);
   }

@@ -23,7 +23,7 @@ token_list *tokenizer(char *instr_line);
  *        token_list itself
  * @param tl The pointer to the token that is being freed
  */
-void free_token_list(token_list *tl);
+void free_token_list(void *tl);
 
 /**
  * @brief In-house string breaking function. strtok_r could not be used due to

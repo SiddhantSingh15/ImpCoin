@@ -15,7 +15,7 @@ typedef struct blockchain {
 
 blockchain *init_blockchain(void);
 
-uint32_t append_to_blockchain(blockchain *chain, void *val);
+void append_to_blockchain(blockchain *chain, void *val);
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 

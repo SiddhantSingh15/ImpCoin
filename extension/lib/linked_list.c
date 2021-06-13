@@ -17,29 +17,22 @@ node *init_node(void *val) {
   return new_node;
 }
 
-void append_via_node(node *entry, void *val) {
-  assert(entry != NULL);
+void append_to_linked_list(linked_list *list, void *val) {
+  assert(list);
   assert(val);
 
-  //add 1 to size of list?
+  list->size +=1;
 
-  node *curr = entry;
-  while(curr->next != NULL){
-    curr = curr->next;
-  }
-
-  curr->next = init_node(val);
-}
-
-void append_to_linked_list(linked_list *list, void *val) {
   if (list->head == NULL) {
     list->head = init_node(val);
-    list->size = 1;
     return;
   }
 
-  list->size += 1;
-  append_via_node(list->head, val);
+  node *curr = list->head;
+  while(curr->next != NULL){
+    curr = curr->next;
+  }
+  curr->next = init_node(val);
 }
 
 node *traverse_linked_list(linked_list *list) {
@@ -53,7 +46,22 @@ node *traverse_linked_list(linked_list *list) {
   return curr;
 }
 
-void delete_node(node *to_delete, linked_list *list) {}
+void free_node(node *to_free){
+  free(to_free->value);
+  free(to_free);
+}
+
+void delete_node(node *to_delete, linked_list *list) {
+  assert(list);
+  assert(to_delete);
+
+  node *prev_node = list->head;
+  while (prev_node->next != to_delete){
+    prev_node = prev_node->next;
+  }
+  prev_node->next = to_delete->next;
+  free_node(to_delete);
+}
   
 
 void free_linked_list(linked_list *list, void (*value_free)(void *)) {
@@ -63,7 +71,7 @@ void free_linked_list(linked_list *list, void (*value_free)(void *)) {
   while (curr) {
     node *temp = curr;
     curr = curr->next;
-    //value_free(tem->value);
+    value_free(temp->value);
     free(temp->value);
     free(temp);
   }

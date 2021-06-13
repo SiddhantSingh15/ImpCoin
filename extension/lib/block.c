@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-block *init_block(uint32_t block_num, void *val){
+block *init_block(block *prev, uint32_t block_num, void *val){
   block *new_block = calloc(1, sizeof(block));
   new_block->value = val;
   new_block->index = block_num;
+  new_block->prev_block = prev;
   new_block->this_hash = NULL;
   new_block->prev_hash = NULL;
   return new_block;

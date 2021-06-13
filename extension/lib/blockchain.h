@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <time.h>
 
-//TODO: define GENESIS_BLOCK
+//TODO: define GENESIS_BLOCK. Note : set prev_node to NULL.
 
 typedef struct blockchain {
   block *tail;

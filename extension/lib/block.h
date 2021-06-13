@@ -17,11 +17,12 @@ typedef struct block {
   uint32_t index;
   time_t timestamp;
   long *nons;
+  block *prev_block;
   hash *this_hash;
   hash *prev_hash;
 } block;
 
-block *init_block(uint32_t block_num, void *val);
+block *init_block(block *prev, uint32_t block_num, void *val);
 
 void hash_block(block *b);
 

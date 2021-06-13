@@ -1,7 +1,6 @@
 #ifndef EMULATE_H
 #define EMULATE_H
 #include <stdint.h>
-#include "definitions.h"
 
 /**
  * @brief Data processing instruction type
@@ -107,11 +106,30 @@ typedef struct symbol_table {
 } symbol_table;
 
 /**
- * @brief The key-value pair structure for the symbol table 
+ * @brief The key-value pair structure for the symbol table
  */
 typedef struct symbol_table_kvp {
   char *key;
-  uint32_t value;
+  void *value;
 } symbol_table_kvp;
+
+
+/**
+ * @brief The union type for the code stored in instr_func_map
+ */
+union instr_code {
+  uint8_t dataproc_opcode; // Opcode for data processing instruction
+  uint8_t branch_cond; // Condition for branch
+  uint8_t sdt_l; // L bit for SDT
+  uint8_t mul_a; // A bit for multiply
+};
+
+/**
+ * @brief The function map for instruction names
+ */
+typedef struct instr_func_map {
+  union instr_code code;
+  uint32_t (*function)(void*,union instr_code, symbol_table*);
+} instr_func_map;
 
 #endif

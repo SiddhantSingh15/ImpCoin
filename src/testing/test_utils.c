@@ -52,7 +52,7 @@ bool test_uint32(uint32_t expected, uint32_t got, char *testname) {
 }
 
 bool test_string(char *expected, char *got, char *testname) {
-  bool passed = strcmp(expected, got) == 0;
+  bool passed = expected == NULL ? got == NULL : strcmp(expected, got) == 0;
   printf("TEST - %s : %s%s%s\n", testname, passed ? GREEN : RED,
          passed ? PASSED : FAILED, NOCOLOUR);
 

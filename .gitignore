@@ -24,6 +24,7 @@
 *.o
 *.d
 *.dSYM
+*.bin
 emulate
 assemble
 testrunner

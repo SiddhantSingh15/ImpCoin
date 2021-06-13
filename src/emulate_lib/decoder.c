@@ -5,18 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// TODO: Macros or functions?
-
-/*
-uint32_t extract_bits(uint32_t raw, uint8_t from, uint8_t size) {
-  return ((((1 << size) - 1) << from) & raw) >> from;
-}
-
-uint8_t extract_bit(uint32_t raw, uint8_t position) {
-  return ((1 << position) & raw) >> position;
-}
-*/
-
 instruction_t *decode_dataproc(instruction_t *instr) {
   // the instruction to be decoded must be raw
   assert(instr->tag == RAW);
@@ -98,17 +86,18 @@ instruction_t *decode(instruction_t *instr) {
   }
 
   // Multiply
-  if (EXTRACT_BITS(raw, 22, 6) == 0 && EXTRACT_BITS(raw, 4, 4) == 0x9) {
+  if (EXTRACT_BITS(raw, ZERO_POS, 6) == 0 && 
+      EXTRACT_BITS(raw, NINE_POS, REG_SIZE) == 0x9) {
     return decode_multiply(instr);
   }
 
-  switch (EXTRACT_BITS(raw, 26, 2)) {
-  case 0x0: // Data Process
-    return decode_dataproc(instr);
-  case 0x1: // Single Data Transfer
-    return decode_sdt(instr);
-  case 0x2: // Branch
-    return decode_branch(instr);
+  switch (EXTRACT_BITS(raw, INSTR_FLAG, 2)) {
+    case DP_FLAG: // Data Process
+      return decode_dataproc(instr);
+    case SDT_FLAG: // Single Data Transfer
+      return decode_sdt(instr);
+    case BRANCH_FLAG: // Branch
+      return decode_branch(instr);
   }
 
   // Cannot decode the instruction

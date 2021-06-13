@@ -2,16 +2,20 @@
 #define DEFINITIONS_H
 
 #define MEM_SIZE 65536
+#define READ_SIZE 63356
 #define NUM_REGS 17
 #define NUM_GENERAL 12
 #define INSTR_SIZE 32
 #define WORD_SIZE_IN_BYTES 4
+#define TWENTY_FOUR_MSB 23
+#define PIPELINE_OFFSET 8
 
 #define PC 15
 #define CPSR 16
 
 /* Macro for creating 32-bit set-masks of size n */
 #define MASK(n) (uint32_t) ((1 << n) - 1)
+#define TOP_EIGHT_BITMASK 0xFF000000
 
 /* FLAGS */
 #define SET 1
@@ -20,6 +24,10 @@
 #define C_FLAG 29
 #define Z_FLAG 30
 #define N_FLAG 31
+#define INSTR_FLAG 26
+#define DP_FLAG 0x0
+#define SDT_FLAG 0x1
+#define BRANCH_FLAG 0x2
 
 /* Different byte sizes to use somewhere */
 #define ONE_B 8
@@ -47,6 +55,8 @@
 #define IMM_VALUE_SIZE 8
 
 /* Multiply  */
+#define ZERO_POS 22 
+#define NINE_POS 4
 #define RM_POS 0
 #define RS_POS 8
 #define MULTIPLY_RN_POS 12
@@ -82,6 +92,7 @@
 #define CMP 0xA
 #define ORR 0xC
 #define MOV 0xD
+#define ANDEQ 0xE
 
 /* Shift Operations */
 #define SHIFT_MULTIPLIER 2
@@ -95,6 +106,36 @@
 #define ROR 0x3
 
 /* Symbol Table */
-#define TABLE_CAPACITY 16
+#define TABLE_CAPACITY 64
+
+/* Tokenizer */
+#define DELIMITERS " ,[]#=+-"
+#define BLANK_SPACE " "
+#define COMMA_SPACE ", "
+#define REGISTER_SYMB 'r'
+#define LINE_TERMINATOR '\0'
+#define BINARY 2
+#define OCTAL 8
+#define DENARY 10
+#define HEX 16
+
+/* Parser */
+#define ROTATE_COUNT 16
+#define SHIFT_OFFSET 4
+#define BRANCH_SHIFT 2
+
+
+/* File Read */
+#define INSTR_BUFFER 511
+
+/* File Write */
+#define WRITE_SIZE 1
+
+/* Error Check */
+#define PTR_CHECK(ptr, msg) \
+if (!ptr) {                 \
+  perror(msg);              \
+  exit(EXIT_FAILURE);       \
+}
 
 #endif // DEFINITIONS_H

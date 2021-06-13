@@ -1,8 +1,6 @@
 #ifndef DECODER_H
 #define DECODER_H
 
-#include "../global_helpers/types.h"
-
 /**
  * @brief 
  * Takes an instruction containing raw uint32_t data, and decodes it to

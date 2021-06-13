@@ -2,7 +2,6 @@
 #define SYMBOL_TABLE_UTILS_H
 
 #include <stdint.h>
-#include "../global_helpers/types.h"
 
 /**
  * @brief Initializes a header node for a symbol table.
@@ -16,20 +15,20 @@ symbol_table *init_symbol_table();
  * @brief Insert a label and its associated memory address into the symbol table
  * 
  * @param st The pointer to the symbol table
- * @param label The string of the label
- * @param address The address associated with the label
+ * @param key The key of the key-pair to be inserted
+ * @param value The value of the key-pair to be inserted
  */
-void insert_to_symbol_table (symbol_table *st, char* label, int address);
+void st_insert (symbol_table *st, char* key, void *value, uint32_t vsize);
 
 /**
  * @brief Retrieves the address from a symbol table
  * 
  * @param st The pointer to the symbol table
- * @param label The label string
+ * @param key The key of the key-pair to retrieve
  * 
  * @result The address of the provided label
  */
-uint32_t *retrieve_address (symbol_table *st, char* label);
+void *st_retrieve (symbol_table *st, char* key);
 
 /**
  * @brief Frees all allocated memory for the symbol table

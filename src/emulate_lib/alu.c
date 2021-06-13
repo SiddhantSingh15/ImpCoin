@@ -1,13 +1,79 @@
 #include "../global_helpers/definitions.h"
 #include "../global_helpers/types.h"
-#include "exec_utils.h"
-#include "dataproc_operations.h"
+#include "alu.h"
 #include "emulate_utils.h"
+#include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
+
+/*------------------------------------------------------------
+ * Arithmetic and Logical Data Processing Functions.
+ * */
+
+int32_t and_tst(int32_t op1, int32_t op2, int *carry_out) {
+  return op1 & op2;
+}
+
+int32_t eor_teq(int32_t op1, int32_t op2, int *carry_out) {
+  return op1 ^ op2; 
+}
+
+int32_t sub(int32_t op1, int32_t op2, int *carry_out) {
+  *carry_out = !overflow(op1, twos_comp(op2));
+  return op1 - op2;
+}
+
+int32_t rsb(int32_t op1, int32_t op2, int *carry_out) {
+  *carry_out = !overflow(op2, twos_comp(op1));
+  return op2 - op1;
+}
+
+int32_t add(int32_t op1, int32_t op2, int *carry_out) {
+  *carry_out = overflow(op1, op2);
+  return op1 + op2;
+}
+
+int32_t cmp(int32_t op1, int32_t op2, int *carry_out) {
+  *carry_out = !(op1 < op2);
+  return op1 - op2;
+}
+
+int32_t orr(int32_t op1, int32_t op2, int *carry_out) {
+  return op1 | op2; 
+}
+
+int32_t mov(int32_t op1, int32_t op2, int *carry_out) {
+  return op2; 
+}
+
+/*------------------------------------------------------------
+ * Shift and Rotate Functions
+ * */
+
+uint32_t lsl(uint32_t to_shift, uint8_t shift_amt, int *carry_out) {
+  *carry_out = EXTRACT_BIT(to_shift, (INSTR_SIZE - shift_amt + 1));
+  return to_shift << shift_amt;
+}
+
+uint32_t lsr(uint32_t to_shift, uint8_t shift_amt, int *carry_out) {
+  *carry_out = EXTRACT_BIT(to_shift, (shift_amt - 1));
+  return to_shift >> shift_amt;
+}
+
+uint32_t asr(uint32_t to_shift, uint8_t shift_amt, int *carry_out) {
+  *carry_out = EXTRACT_BIT(to_shift, (shift_amt - 1));
+  uint32_t result = to_shift >> shift_amt;
+  uint8_t mask = (int32_t)result < 0 ? 1 << (shift_amt - 1) : 0;
+  return result |= (mask << (INSTR_SIZE - shift_amt));
+}
+
+uint32_t ror(uint32_t to_rotate, uint8_t rotate_amt, int *carry_out) {
+  *carry_out = EXTRACT_BIT(to_rotate, (rotate_amt - 1));
+  return (to_rotate >> rotate_amt) | (to_rotate << (INSTR_SIZE - rotate_amt));
+}
+
 
 bool satisfies_cpsr(uint8_t cond, uint32_t regs[NUM_REGS]) {
   uint32_t cpsr_register = regs[CPSR];
@@ -49,8 +115,8 @@ int32_t twos_comp(int32_t x) {
 }
 
 int32_t signed_24_to_32(uint32_t num) {
-  if (num >> 23) {
-    return (int32_t) (0xFF000000 | num);
+  if (num >> TWENTY_FOUR_MSB) {
+    return (int32_t) (TOP_EIGHT_BITMASK | num);
   }
   return (int32_t) num;
 }
@@ -99,7 +165,7 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
     to_shift = register_file[EXTRACT_BITS(offset, OP2_POS, REG_SIZE)];
     uint8_t shift = EXTRACT_BITS(offset, REG_SIZE, IMM_VALUE_SIZE);
 
-    if ((shift & 0x1) == 0) {
+    if ((shift & LSR) == 0) {
       shift_amt = EXTRACT_BITS(offset, SHIFT_VAL, SHIFT_VAL_SIZE);
     } else {
       // Shift amount is the bottom byte of the register specified
@@ -117,6 +183,6 @@ uint32_t barrel_shifter(bool is_immediate, uint16_t offset,
   assert(shift_amt > 0);
   const shift_operation shifts[] = {lsl, lsr, asr, ror};
 
-  assert(shift_type >= 0 && shift_type < 4);
+  assert(shift_type >= LSL && shift_type <= ROR);
   return shifts[shift_type](to_shift, shift_amt, carry_out);
 }

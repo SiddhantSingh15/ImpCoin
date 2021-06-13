@@ -46,12 +46,13 @@ node *traverse_linked_list(linked_list *list) {
   return curr;
 }
 
-void free_node(node *to_free){
+void free_node(node *to_free, void (*value_free)(void *)){
+  value_free(to_free->value);
   free(to_free->value);
   free(to_free);
 }
 
-void delete_node(node *to_delete, linked_list *list) {
+void delete_node(node *to_delete, linked_list *list, void (*value_free)(void *)) {
   assert(list);
   assert(to_delete);
 
@@ -60,7 +61,7 @@ void delete_node(node *to_delete, linked_list *list) {
     prev_node = prev_node->next;
   }
   prev_node->next = to_delete->next;
-  free_node(to_delete);
+  free_node(to_delete, value_free);
 }
   
 
@@ -71,9 +72,7 @@ void free_linked_list(linked_list *list, void (*value_free)(void *)) {
   while (curr) {
     node *temp = curr;
     curr = curr->next;
-    value_free(temp->value);
-    free(temp->value);
-    free(temp);
+    free_node(temp, value_free);
   }
   free(list);
 }

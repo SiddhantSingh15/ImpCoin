@@ -6,22 +6,18 @@
 #include <stdint.h>
 #include <time.h>
 
+//TODO: define GENESIS_BLOCK
+
 typedef struct blockchain {
   block *tail;
   linked_list *mem_pool;
 } blockchain;
 
-block_chain *init_blockchain(void);
-
-block *init_block(uint32_t block_index, void *val);
-
-uint32_t append_via_block(block *end_of_chain, void *val);
+blockchain *init_blockchain(void);
 
 uint32_t append_to_blockchain(blockchain *chain, void *val);
 
-block *traverse_blockchain(blockchain *chain);
-
-void change_block(blockchain *list, void *val);
+block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 
 void proof_of_work(void);
 

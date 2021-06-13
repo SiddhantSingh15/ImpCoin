@@ -22,7 +22,7 @@
   \texttt{aa9220@ic.ac.uk}
   \and
   Kavya Chopra\\
-  \texttt{kc2320@ic.ac.uk}
+  \texttt{kc2320@ic.ac.uk}
   \and
   Siddhant Singh\\
   \texttt{ss5120@ic.ac.uk}
@@ -36,21 +36,28 @@
 
 \section{Assembler}
 \subsection{The structure:}
-\subsubsection{Reading from source files}
-Reads the source file and inserts either tokenized instructions into our linked list, or labels into our symbol table. This is the first pass.
-\subsubsection{Linked List}
-Storage for the tokenized instructions. Each linked list node contains an array of tokens representing an instruction. This is our second pass.
-\subsubsection{Symbol Table}
-Hashtable for mapping strings to a pointer. This pointer can either be an address for labels, or a function for instruction names.
-\subsubsection{Tokenizer}
-Function that segments a string into an array of tokens. Each token will have an affiliated enumerator to describe what it is supposed to be.
-\subsubsection{Parsers}
-Functions that examine an array of tokens and produces a special union type with certain properties filled. These functions are called by taking the instruction name and retrieving the function pointer from the symbol table.
-\subsubsection{Encoders}
-Functions that convert a union type data into a 32 bit binary value.
-\subsubsection{Writing to output files}
-Writes a 32 bit binary value to a binary file.
+\subsubsection{First Pass: }
+During the first pass, the assembler initialises the linked list and the symbol table using the \verb|init_linked_list()| and \verb|init_symbol_table()| respectively in \verb|assemble.c|. The linked list is initialised by setting the head to \verb|NULL| and allocating memory based on the size of the linked list. The symbol table is initialised by allocating contiguous memory, setting the capacity to \verb|64| and the key-value pairs to \verb|NULL|. Once the symbol table is initialised, we populate the table with function mappings for all pre-defined instructions mentioned in spec. The instruction function mappings are a combination of a \verb|union| code and a parse functional pointer pointing to the appropriate parse function. 
+Once the structures have been initialised, lines from the \verb|.s| file are read (all being of length \verb|511| as specified by the spec) and trailing whitespace from each line is removed and any erroneous line is ignored. Then, the line is tokenised using the \verb|tokenizer()| function in \verb|tokenizer.c|. The tokenized instruction is then appended to the linked list. Thus, the length of the link list will 1 more than the line length of the \verb|.s| file (as the head is \verb|NULL|). This linked list is passed to the parser which is part of the second pass.
+
+\subsubsection{Second Pass: }
+In the second pass
+
+
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=15cm]{assembler_flowchart.jpg}
+    \caption{Our 2-pass assembly process}
+    \label{fig:assembler}
+\end{figure}
+
 \subsection{The implementation:}
+% Why we chose a 2-pass approach
+% Talk about the functional pointers 
+% Decision choice about using parser and encoder in one function
+% How the tokenizer works
+
 Reading from the source file is required to obtain our instructions in string form. We decided to take the two-pass approach when tackling the assembler.
 
 A notable issue we faced was that we did not know how many lines there were in each source file, so we could not create an array of strings to store these instructions. To tackle this, we used a linked list to store the instructions instead. Since we took such an approach, we could then read through the source file once, converting each instruction in a tokenized form and inserting them into the linked list. Labels are inserted into our symbol table, and are not inserted into the linked list.

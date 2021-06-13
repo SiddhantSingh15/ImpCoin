@@ -21,7 +21,7 @@ typedef struct block {
   hash *prev_hash;
 } block;
 
-block *init_block(void);
+block *init_block(uint32_t block_num, void *val);
 
 void hash_block(block *b);
 

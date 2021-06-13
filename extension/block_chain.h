@@ -2,11 +2,13 @@
 #define BLOCK_CHAIN_H
 
 #include "block.h"
+#include "linked_list.h"
 #include <stdint.h>
 #include <time.h>
 
 typedef struct block_chain {
   block *tail;
+  linked_list *mem_pool;
 } block_chain;
 
 block_chain *init_block_chain(void);

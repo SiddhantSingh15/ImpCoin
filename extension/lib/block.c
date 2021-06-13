@@ -7,12 +7,13 @@ block *init_block(void){
   new_block->value = NULL;
   new_block->this_hash = NULL;
   new_block->prev_hash = NULL;
+  return new_block;
 }
 
 void hash_block(block *b);
 
-void de_serialize_block(block *b);
+void deserialize_block(block *b);
 
-void is_valid(block *b);
+bool is_valid(block *b);
 
 

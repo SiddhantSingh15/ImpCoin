@@ -25,7 +25,7 @@ block *init_block(void);
 
 void hash_block(block *b);
 
-void de_serialize_block(block *b);
+void deserialize_block(block *b);
 
 bool is_valid(block *b);
 

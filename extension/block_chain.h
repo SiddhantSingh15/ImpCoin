@@ -23,6 +23,8 @@ block *traverse_block_chain(block_chain *chain);
 
 void change_block(block_chain *list, void *val);
 
+void proof_of_work(void);
+
 void free_block_chain(block_chain *list, void (*value_free)(void *));
 
 #endif

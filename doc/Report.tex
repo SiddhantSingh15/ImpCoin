@@ -36,23 +36,49 @@
 
 \section{Assembler}
 \subsection{The structure:}
-
+\subsubsection{Reading from source files}
+Reads the source file and inserts either tokenized instructions into our linked list, or labels into our symbol table. This is the first pass.
+\subsubsection{Linked List}
+Storage for the tokenized instructions. Each linked list node contains an array of tokens representing an instruction. This is our second pass.
+\subsubsection{Symbol Table}
+Hashtable for mapping strings to a pointer. This pointer can either be an address for labels, or a function for instruction names.
+\subsubsection{Tokenizer}
+Function that segments a string into an array of tokens. Each token will have an affiliated enumerator to describe what it is supposed to be.
+\subsubsection{Parsers}
+Functions that examine an array of tokens and produces a special union type with certain properties filled. These functions are called by taking the instruction name and retrieving the function pointer from the symbol table.
+\subsubsection{Encoders}
+Functions that convert a union type data into a 32 bit binary value.
+\subsubsection{Writing to output files}
+Writes a 32 bit binary value to a binary file.
 \subsection{The implementation:}
+Reading from the source file is required to obtain our instructions in string form. We decided to take the two-pass approach when tackling the assembler.
 
-\section{Extension: ...}
+A notable issue we faced was that we did not know how many lines there were in each source file, so we could not create an array of strings to store these instructions. To tackle this, we used a linked list to store the instructions instead. Since we took such an approach, we could then read through the source file once, converting each instruction in a tokenized form and inserting them into the linked list. Labels are inserted into our symbol table, and are not inserted into the linked list.
+
+\section{Extension: A Concurrent Application of Blockchain Mining in C}
 \subsection{Real world usage:}
+\lipsum[1-1]
 \subsection{The implementation:}
+\lipsum[1-1]
 \subsection{Testing:}
+\lipsum[1-1]
 \subsubsection{Effectiveness of testing:}
+\lipsum[1-1]
 
 \section{Group Reflection}
 \subsection{Effectiveness of communication and division of work:}
+\lipsum[1-1]
 \subsection{Future improvements:}
+\lipsum[1-1]
 
 \section{Individual Reflections}
-\subsection{Ashvin: }
-\subsection{Kavya: }
-\subsection{Siddhant: }
-\subsection{Ye Lun: }
+\subsection{Ashvin:}
+\lipsum[1-1]
+\subsection{Kavya:}
+\lipsum[1-1]
+\subsection{Siddhant:}
+\lipsum[1-1]
+\subsection{Ye Lun:}
+\lipsum[1-1]
 
 \end{document}

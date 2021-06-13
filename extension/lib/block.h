@@ -2,6 +2,7 @@
 #define BLOCK_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <time.h>
 
 typedef char *hash;
@@ -19,6 +20,8 @@ typedef struct block {
   hash *this_hash;
   hash *prev_hash;
 } block;
+
+block *init_block(void);
 
 void hash_block(block *b);
 

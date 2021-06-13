@@ -1,9 +1,18 @@
+#include "block.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: come up with a better name
-
-int main(int argc, char **argv) { 
-  printf("Hello, blockchain!");
-  return EXIT_SUCCESS; 
+block *init_block(void){
+  block *new_block = calloc(1, sizeof(block));
+  new_block->value = NULL;
+  new_block->this_hash = NULL;
+  new_block->prev_hash = NULL;
 }
+
+void hash_block(block *b);
+
+void de_serialize_block(block *b);
+
+void is_valid(block *b);
+
+

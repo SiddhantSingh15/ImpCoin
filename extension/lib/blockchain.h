@@ -21,6 +21,6 @@ block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 
 void proof_of_work(void);
 
-void free_blockchain(blockchain *list, void (*value_free)(void *));
+void free_blockchain(blockchain *chain, void (*value_free)(void *));
 
 #endif

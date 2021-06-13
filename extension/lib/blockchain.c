@@ -38,4 +38,17 @@ block *traverse_blockchain(blockchain *chain, uint32_t block_num){
 
 void proof_of_work(void);
 
-void free_blockchain(blockchain *list, void (*value_free)(void *));
+void free_blockchain(blockchain *chain, void (*value_free)(void *)){
+  assert(chain);
+  assert(value_free);
+
+  block *curr = chain->tail;
+  while(curr->prev_block != NULL){
+    block *temp = curr;
+    curr = curr->prev_block;
+    //TODO: free all attributes of temp.
+    value_free(temp->value);
+    free(temp);
+  }
+  free(chain);
+}

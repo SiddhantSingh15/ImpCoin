@@ -4,12 +4,13 @@ LDLIBS  = -lnng -lbinn -lsodium
 
 SRC_DIRS ?= .
 
-INC_DIRS := $(shell find . ! -path . -type d)
+INC_DIRS := $(shell find . ! -path . -type d) 
 
 ifeq ($(shell uname), Darwin)
   CC = gcc-9
   LDFLAGS := $(LDFLAGS)-L/usr/local/Cellar/
-  INC_DIRS := $(INC_DIRS) /usr/local/Cellar/nng/ /usr/local/Cellar/libsodium/
+  INC_DIRS := $(INC_DIRS) /usr/local/include/nng/ \
+	/usr/local/include/ /usr/local/include/sodium/
 else
   LDFLAGS := $(LDFLAGS)-L/usr/local/lib/
 endif

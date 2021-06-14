@@ -29,7 +29,7 @@ binn *serialize_block(block *input) {
   binn_object_set_uint32(obj, "index", input->index);
   binn_object_set_uint64(obj, "timestamp", input->timestamp);
   binn_object_set_list(obj, "transactions",
-    serialize_transactions(&input->transactions[0]));
+    serialize_transactions(input->transactions));
   binn_object_set_object(obj, "reward", serialize_transaction(&input->reward));
   binn_object_set_uint64(obj, "nonce", input->nonce);
 

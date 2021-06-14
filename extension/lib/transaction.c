@@ -6,7 +6,7 @@
 
 #include <binn.h>
 
-#include "block.h"
+#include "linked_list.h"
 #include "transaction.h"
 
 binn *serialize_transaction(transaction *single) {
@@ -20,12 +20,14 @@ binn *serialize_transaction(transaction *single) {
   return trans;
 }
 
-binn *serialize_transactions(transaction *transactions) {
+binn *serialize_transactions(linked_list *transactions) {
   binn *list = binn_list();
 
-  for (int i  = 0; i < sizeof(transactions); i++) {
-    binn *obj = serialize_transaction(&transactions[i]);
+  node *curr = transactions->head;
+  while (curr != NULL) {
+    binn *obj = serialize_transaction(curr->value);
     binn_list_add_object(list, obj);
+    curr = curr->next;
   }
 
   return list;
@@ -42,16 +44,15 @@ transaction *deserialize_transaction(binn *trn) {
   return trans;
 }
 
-transaction *deserialize_transactions(binn *transactions) {
+linked_list *deserialize_transactions(binn *transactions) {
 
-  transaction *trns = malloc(sizeof(transaction) * MAX_TRANSACTIONS_PER_BLOCK);
-  transaction *temp;
+  linked_list *new_ll = init_linked_list();
 
-  for (int i = 0; i < MAX_TRANSACTIONS_PER_BLOCK; i++) {
-    temp = deserialize_transaction(binn_list_object(transactions, i));
-    trns[i] = *temp;
-    free(temp);
+  binn_iter iter;
+  binn value;
+  binn_list_foreach(transactions, value) {
+    append_to_linked_list(new_ll, deserialize_transaction(&value));
   }
 
-  return trns;
+  return new_ll;
 }

@@ -13,10 +13,10 @@ typedef struct transaction {
 
 binn *serialize_transaction(transaction *reward);
 
-binn *serialize_transactions(transaction *transactions);
+binn *serialize_transactions(linked_list *transactions);
 
 transaction *deserialize_transaction(binn *trn);
 
-transaction *deserialize_transactions(binn *transactions);
+linked_list *deserialize_transactions(binn *transactions);
 
 #endif

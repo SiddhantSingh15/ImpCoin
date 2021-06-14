@@ -1,7 +1,6 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include "transaction.h"
 #include <binn.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -19,7 +18,7 @@ typedef char hash[32];
 typedef struct block {
   uint32_t index;
   time_t timestamp;
-  transaction transactions[MAX_TRANSACTIONS_PER_BLOCK];
+  linked_list *transactions;
   transaction reward;
   uint64_t nonce;
   hash prev_hash;

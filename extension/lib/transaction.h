@@ -1,7 +1,6 @@
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
 
-#include <binn.h>
 #include <time.h>
 #include <stdint.h>
 

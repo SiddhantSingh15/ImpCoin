@@ -1,11 +1,13 @@
-#include "block.h"
-#include "transaction.h"
-#include <binn.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#include <binn.h>
+
+#include "block.h"
+#include "transaction.h"
 
 binn *serialize_transaction(transaction *single) {
   binn *trans = binn_object();
@@ -26,11 +28,11 @@ binn *serialize_transactions(transaction *transactions) {
     binn_list_add_object(list, obj);
   }
 
-  return list; 
+  return list;
 }
 
 transaction *deserialize_transaction(binn *trn) {
-  transaction *trans;
+  transaction *trans = malloc(sizeof(transaction));
 
   trans->timestamp = binn_object_uint64(trn, "timestamp");
   strcpy(trans->to, binn_object_str(trn, "to"));
@@ -41,11 +43,15 @@ transaction *deserialize_transaction(binn *trn) {
 }
 
 transaction *deserialize_transactions(binn *transactions) {
-  
-  transaction *trns;
+
+  transaction *trns = malloc(sizeof(transaction) * MAX_TRANSACTIONS_PER_BLOCK);
+  transaction *temp;
+
   for (int i = 0; i < MAX_TRANSACTIONS_PER_BLOCK; i++) {
-    trns[i] = *deserialize_transaction(binn_list_object(transactions, i));
+    temp = deserialize_transaction(binn_list_object(transactions, i));
+    trns[i] = *temp;
+    free(temp);
   }
-  
+
   return trns;
 }

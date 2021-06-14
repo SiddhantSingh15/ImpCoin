@@ -1,12 +1,15 @@
-#include "linked_list.h"
-#include "transaction.h"
-#include "block.h"
-#include "blockchain.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <binn.h>
+
+#include "linked_list.h"
+#include "transaction.h"
+#include "block.h"
+#include "blockchain.h"
 
 #define GENESIS_BLOCK genesis_block()
 

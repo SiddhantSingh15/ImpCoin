@@ -65,8 +65,19 @@ A notable issue we faced was that we did not know how many lines there were in e
 
 During our weekly mentor meetings, Professor Knottenbelt suggested that we move away from switch-case statements and delve into the world of functional pointers. We took the advice and incorporated suitable function pointers wherever possible. Figure \ref{fig:functional_pointers} shows how we have used functional pointers in our assembler, this example shows that the function attribute of the instruction function map points to the appropriate function which is \verb|parse_dataproc| in this case. The use of this method allowed for code modularity and also enabling object oriented programming features in our code base.
 
-
-
+\begin{figure}[htp]
+  \centering
+  \begin{BVerbatim}
+  instr_func_map and = {
+  .code.dataproc_opcode = AND,
+  .function = &parse_dataproc /* FUNCTIONAL POINTER USED */
+  };
+  // continues for all operations below...
+  \end{BVerbatim}
+  \caption{Example of functional pointers in the assembler}
+  \label{fig:functional_pointers}
+  \end{figure}
+  
 \section{Extension: A Concurrent Application of Blockchain Mining in C}
 \subsection{Real world usage:}
 \lipsum[1-1]

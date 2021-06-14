@@ -1,5 +1,6 @@
 CC      = gcc
-CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
+CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_DEFAULT_SOURCE -Werror -pedantic
+LDFLAGS := $(LDFLAGS)-L/usr/local/lib/
 LDLIBS  = -lnng -lbinn -lsodium
 
 SRC_DIRS ?= .
@@ -8,11 +9,8 @@ INC_DIRS := $(shell find . ! -path . -type d)
 
 ifeq ($(shell uname), Darwin)
   CC = gcc-9
-  LDFLAGS := $(LDFLAGS)-L/usr/local/Cellar/
   INC_DIRS := $(INC_DIRS) /usr/local/include/nng/ \
 	/usr/local/include/ /usr/local/include/sodium/
-else
-  LDFLAGS := $(LDFLAGS)-L/usr/local/lib/
 endif
 
 INC_FLAGS := $(addprefix -I, $(INC_DIRS:./%=%))

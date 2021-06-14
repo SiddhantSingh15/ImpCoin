@@ -25,11 +25,15 @@ typedef struct block {
   struct block *prev_block; // Ignore for serialise and hash
 } block;
 
+binn *serialize_block(block *input);
+
 block *init_block(block *prev);
 
 void hash_block(block *b);
 
-void deserialize_block(block *b);
+block *deserialize_block(binn *b);
+
+void *serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
 

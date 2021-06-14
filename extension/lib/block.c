@@ -1,21 +1,21 @@
+#include "transaction.h"
 #include "block.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
-block *init_block(block *prev, uint32_t block_num, void *val){
-  assert(prev);
-  assert(val);
+block *init_block(block *prev){
+  block *new = calloc(1, sizeof(block));
+  new->index = (prev) ? prev->index + 1 : 0;
+  new->prev_block = prev;
 
-  block *new_block = calloc(1, sizeof(block));
-  new_block->value = val;
-  new_block->index = block_num;
-  new_block->prev_block = prev;
-  //TODO: initialize timestamp, nons
-  new_block->this_hash = NULL;
-  new_block->prev_hash = NULL;
-  return new_block;
+  if (prev) {
+    memcpy(new->prev_hash, prev->hash, 32);
+  }
+
+  return new;
 }
 
 void hash_block(block *b);
@@ -23,5 +23,3 @@ void hash_block(block *b);
 void deserialize_block(block *b);
 
 bool is_valid(block *b);
-
-

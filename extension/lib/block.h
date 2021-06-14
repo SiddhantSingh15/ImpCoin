@@ -19,13 +19,13 @@ typedef struct block {
   time_t timestamp;
   transaction transactions[MAX_TRANSACTIONS_PER_BLOCK];
   transaction reward;
-  long nonce;
+  uint64_t nonce;
   hash prev_hash;
   hash hash; // Hash of all the fields above this
-  block *prev_block; // Ignore for serialise and hash
+  struct block *prev_block; // Ignore for serialise and hash
 } block;
 
-block *init_block(block *prev, uint32_t block_num, void *val);
+block *init_block(block *prev);
 
 void hash_block(block *b);
 

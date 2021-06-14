@@ -1,6 +1,8 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
+#include "transaction.h"
+#include <binn.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <time.h>
@@ -33,7 +35,7 @@ void hash_block(block *b);
 
 block *deserialize_block(binn *b);
 
-void *serialize_w_hash(binn *b, hash hash);
+void serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
 

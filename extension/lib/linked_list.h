@@ -17,8 +17,6 @@ linked_list *init_linked_list(void);
 
 node *init_node(void *val);
 
-void append_via_node(node *entry, void *val);
-
 void append_to_linked_list(linked_list *list, void *val);
 
 void free_node(node *to_free, void (*value_free)(void *));

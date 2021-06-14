@@ -2,12 +2,17 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 block *init_block(block *prev, uint32_t block_num, void *val){
+  assert(prev);
+  assert(val);
+
   block *new_block = calloc(1, sizeof(block));
   new_block->value = val;
   new_block->index = block_num;
   new_block->prev_block = prev;
+  //TODO: initialize timestamp, nons
   new_block->this_hash = NULL;
   new_block->prev_hash = NULL;
   return new_block;

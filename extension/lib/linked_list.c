@@ -54,6 +54,7 @@ void free_node(node *to_free, void (*value_free)(void *)){
 
 void delete_node(node *to_delete, linked_list *list, void (*value_free)(void *)) {
   assert(list);
+  assert(list->size > 0);
   assert(to_delete);
 
   node *prev_node = list->head;

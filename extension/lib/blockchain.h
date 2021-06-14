@@ -9,7 +9,7 @@
 //TODO: define GENESIS_BLOCK. Note : set prev_node to NULL.
 
 typedef struct blockchain {
-  block *tail;
+  block *latest_block;
   linked_list *mem_pool;
 } blockchain;
 

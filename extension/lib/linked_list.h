@@ -5,7 +5,7 @@
 
 typedef struct node {
   void *value;
-  node *next;
+  struct node *next;
 } node;
 
 typedef struct linked_list {
@@ -21,9 +21,9 @@ void append_to_linked_list(linked_list *list, void *val);
 
 void free_node(node *to_free, void (*value_free)(void *));
 
-void delete_node(node *to_delete, linked_list *list, void (*value_free)(void *));
+void delete_node(node *to_delete, linked_list *list,
+                 void (*value_free)(void *));
 
 void free_linked_list(linked_list *list, void (*value_free)(void *));
 
 #endif
-

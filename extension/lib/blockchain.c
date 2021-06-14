@@ -35,7 +35,7 @@ void append_to_blockchain(blockchain *chain, void *val){
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num){
   assert(chain);
-  assert(0 <= block_num <= chain->latest_block->index);
+  assert(0 <= block_num && block_num <= chain->latest_block->index);
 
   block *curr = chain->latest_block;
 

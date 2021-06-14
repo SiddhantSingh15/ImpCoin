@@ -1,15 +1,22 @@
 CC      = gcc
 CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
-
-ifeq ($(shell uname), Darwin)
-  CC = gcc-9
-endif
+LDLIBS  = -lnng -lbinn -lsodium
 
 SRC_DIRS ?= .
 
 INC_DIRS := $(shell find . ! -path . -type d)
+
+ifeq ($(shell uname), Darwin)
+  CC = gcc-9
+  LDFLAGS := $(LDFLAGS)-L/usr/local/Cellar/
+  INC_DIRS := $(INC_DIRS) /usr/local/Cellar/nng/ /usr/local/Cellar/libsodium/
+else
+  LDFLAGS := $(LDFLAGS)-L/usr/local/lib/
+endif
+
 INC_FLAGS := $(addprefix -I, $(INC_DIRS:./%=%))
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
+
 
 # SRCS := $(shell find $(SRC_DIRS) -name "*.c")
 GET_OBJS = $(addsuffix .o, $(basename $(shell find $(1) -name "*.c")))

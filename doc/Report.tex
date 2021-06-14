@@ -5,6 +5,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
+\usepackage[export]{adjustbox}
 % \renewcommand\Authfont{\fontsize{12}{14.4}\selectfont}
 
 %% Sets page size and margins
@@ -15,6 +16,7 @@
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{fancyvrb}
 
 \title{\textbf{ARM11 Final Report}}
 \author{
@@ -50,21 +52,20 @@ Once the parse operations have been performed, the parsed instruction will be se
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=15cm]{assembler_flowchart.jpg}
+    \includegraphics[width=14.5cm, frame]{assembler_flow.jpg}
     \caption{Our 2-pass assembly process}
     \label{fig:assembler}
 \end{figure}
 
 \subsection{The implementation:}\label{Assembler implementation}
-% Why we chose a 2-pass approach
-% Talk about the functional pointers 
-% Decision choice about using parser and encoder in one function
 % How the tokenizer works
 % Some detail on parse_operand2()
 
-Reading from the source file is required to obtain our instructions in string form. We decided to take the two-pass approach when tackling the assembler.
+A notable issue we faced was that we did not know how many lines there were in each source file, so we could not create an array of strings to store these instructions. To tackle this, we used a linked list to store the instructions instead. Since we took such an approach, we could then read through the source file once, converting each instruction in a tokenized form and inserting them into the linked list. Labels are inserted into our symbol table, and are not inserted into the linked list. This is the reason why we preferred a 2-pass approach over a 1-pass one.
 
-A notable issue we faced was that we did not know how many lines there were in each source file, so we could not create an array of strings to store these instructions. To tackle this, we used a linked list to store the instructions instead. Since we took such an approach, we could then read through the source file once, converting each instruction in a tokenized form and inserting them into the linked list. Labels are inserted into our symbol table, and are not inserted into the linked list.
+During our weekly mentor meetings, Professor Knottenbelt suggested that we move away from switch-case statements and delve into the world of functional pointers. We took the advice and incorporated suitable function pointers wherever possible. Figure \ref{fig:functional_pointers} shows how we have used functional pointers in our assembler, this example shows that the function attribute of the instruction function map points to the appropriate function which is \verb|parse_dataproc| in this case. The use of this method allowed for code modularity and also enabling object oriented programming features in our code base.
+
+
 
 \section{Extension: A Concurrent Application of Blockchain Mining in C}
 \subsection{Real world usage:}

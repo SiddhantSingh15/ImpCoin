@@ -52,32 +52,39 @@ Once the parse operations have been performed, the parsed instruction will be se
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=14.5cm, frame]{assembler_flow.jpg}
+    \includegraphics[width=15cm, frame]{assembler_flow.jpg}
     \caption{Our 2-pass assembly process}
     \label{fig:assembler}
 \end{figure}
 
 \subsection{The implementation:}\label{Assembler implementation}
-% How the tokenizer works
-% Some detail on parse_operand2()
-
+\subsubsection{Problems we overcame: }
 A notable issue we faced was that we did not know how many lines there were in each source file, so we could not create an array of strings to store these instructions. To tackle this, we used a linked list to store the instructions instead. Since we took such an approach, we could then read through the source file once, converting each instruction in a tokenized form and inserting them into the linked list. Labels are inserted into our symbol table, and are not inserted into the linked list. This is the reason why we preferred a 2-pass approach over a 1-pass one.
 
+\subsubsection{Improvements after weekly meetings: }
 During our weekly mentor meetings, Professor Knottenbelt suggested that we move away from switch-case statements and delve into the world of functional pointers. We took the advice and incorporated suitable function pointers wherever possible. Figure \ref{fig:functional_pointers} shows how we have used functional pointers in our assembler, this example shows that the function attribute of the instruction function map points to the appropriate function which is \verb|parse_dataproc| in this case. The use of this method allowed for code modularity and also enabling object oriented programming features in our code base.
 
 \begin{figure}[htp]
-  \centering
-  \begin{BVerbatim}
-  instr_func_map and = {
-  .code.dataproc_opcode = AND,
-  .function = &parse_dataproc /* FUNCTIONAL POINTER USED */
-  };
-  // continues for all operations below...
-  \end{BVerbatim}
-  \caption{Example of functional pointers in the assembler}
-  \label{fig:functional_pointers}
-  \end{figure}
-  
+\centering
+\begin{BVerbatim}
+instr_func_map and = {
+.code.dataproc_opcode = AND,
+.function = &parse_dataproc /* FUNCTIONAL POINTER USED */
+};
+// continues for all operations below...
+\end{BVerbatim}
+\caption{Example of functional pointers in the assembler}
+\label{fig:functional_pointers}
+\end{figure}
+
+\subsubsection{Tokenizer:}
+Another interesting aspect of our assembler is how our tokenizer works. Before passing anything to \verb|tokenizer()|, we check that its not a label, it will always be an instruction line. Then we allocate contiguous memory to a \verb|token_list| which will store our tokenized instruction. Then, instead of using \verb|strtok_r()|, we used our own version - \verb|strbrk_r|. This choice was made due to 2 reasons:
+\begin{enumerate}
+    \item \verb|strtok_r()| isn't portable for pre-POSIX-2001 systems and it caused a lot of compilation issues on macOS.
+    \item Our \verb|strbrk_r| functions returns the delimiters inside the returned tokens, which was important to identify pre-indexed and post-indexed instructions. For example, \verb|strtok_r| wouldn't return the \verb|[]| in \verb|ldr r1, [r0]| and our program required that identification later on in the assembler process.
+\end{enumerate}
+Once we ran a \verb|while| loop inside \verb|tokenizer()|, we freed any memory allocation we may have used and then passed the tokenized list of type \verb|token_list|. This token list is then parsed and encoded as mentioned before.
+
 \section{Extension: A Concurrent Application of Blockchain Mining in C}
 \subsection{Real world usage:}
 \lipsum[1-1]

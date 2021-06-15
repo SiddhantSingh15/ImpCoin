@@ -16,12 +16,13 @@
 block *genesis_block(void) {
   block *genesis = init_block(NULL);
   genesis->timestamp = -22118400; // 4/20/69, Unix Epoch Time
+  genesis->prev_block = NULL;
 
   // add transactions to give us free money
-  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000);
-  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000);
-  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000);
-  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000);
+  transaction *t1 = init_transaction("rick", "ash", 1000);
+  transaction *t2 = init_transaction("rick", "sid", 1000);
+  transaction *t3 = init_transaction("rick", "kavya", 1000);
+  transaction *t4 = init_transaction("rick", "yelun", 1000);
 
   // Create list and add transactions
   genesis->transactions = ll_init();
@@ -41,8 +42,7 @@ linked_list *init_mempool(void) {
 }
 
 void free_mempool(linked_list *mem_pool) {
-  // TODO: do we need a specialised `free_transaction` ?
-  ll_free(mem_pool, free);
+  ll_free(mem_pool, free_transaction);
 }
 
 blockchain *init_blockchain(void) {
@@ -60,7 +60,7 @@ void append_to_blockchain(blockchain *chain, void *val){
   memcpy(to_append->prev_hash, chain->latest_block->hash, 32);
   //TODO: set this_hash and other missing attributes
   chain->latest_block = to_append;
- }
+}
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num){
   assert(chain);

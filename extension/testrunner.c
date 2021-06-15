@@ -4,9 +4,12 @@
 #include <stdbool.h>
 
 #include <binn.h>
+#include <string.h>
 
 #include "lib/linked_list.h"
 #include "lib/transaction.h"
+#include "lib/block.h"
+#include "lib/blockchain.h"
 #include "test/test_utils.h"
 
 void dummy_free(void *unused) {}
@@ -147,6 +150,33 @@ void test_serialize_transaction_list(int *passing, int *total) {
   ll_free(other_end, free_transaction);
 }
 
+void test_serialize_block_no_hash(int *passing, int *total) {
+
+  block *genesis = GENESIS_BLOCK;
+
+  // we want to test serialize without hashing
+  strcpy(genesis->hash, "");
+
+  // we also want to check if prev hash gets serialised
+  strcpy(genesis->prev_hash, "It's previous hash lmao");
+
+  binn *serialized = serialize_block(genesis);
+  block *other_end = deserialize_block(serialized);
+  binn_free(serialized);
+
+  track_test(
+      test_block(genesis, other_end, "Genesis block is equal on both ends"),
+      passing, total);
+
+
+  printf("before serializing  : \n");
+  print_block(genesis);
+  printf("after deserializing : \n");
+  print_block(other_end);
+
+  free_block(genesis);
+}
+
 void test_serialize_deserialize(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
          "\n");
@@ -158,6 +188,7 @@ void test_serialize_deserialize(int *passing, int *total) {
 
   test_serialize_transaction(&internal_passing, &internal_total);
   test_serialize_transaction_list(&internal_passing, &internal_total);
+  test_serialize_block_no_hash(&internal_passing, &internal_total);
 
   printf("-----------------------------------------------------------------"
          "----"

@@ -29,6 +29,7 @@ void print_uint8_array(uint8_t *array, size_t length);
 bool test_transaction(transaction *expected, transaction *got, char *testname);
 bool test_linked_list(linked_list *expected, linked_list *got,
                       void (*value_to_string)(void *, char *), char *testname);
+bool test_block(block *expected, block *got, char *testname);
 void track_test(bool test, int *passing, int *total);
 
 #endif /* TEST_UTILS_H */

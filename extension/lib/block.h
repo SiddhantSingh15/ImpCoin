@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-#define MAX_TRANSACTIONS_PER_BLOCK 3
+#define MAX_TRANSACTIONS_PER_BLOCK 4
 
 typedef char hash[32];
 
@@ -37,6 +37,8 @@ block *deserialize_block(binn *b);
 void serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
+
+char *to_string_block(block *b);
 
 void print_block(block *b);
 

@@ -5,12 +5,14 @@
 #include <stdint.h>
 #include <time.h>
 
-//TODO: define GENESIS_BLOCK. Note : set prev_node to NULL.
+#define GENESIS_BLOCK genesis_block()
 
 typedef struct blockchain {
   block *latest_block;
   linked_list *mem_pool;
 } blockchain;
+
+block *genesis_block(void);
 
 blockchain *init_blockchain(void);
 

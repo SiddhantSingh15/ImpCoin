@@ -9,6 +9,7 @@
 
 #include "../lib/linked_list.h"
 #include "../lib/transaction.h"
+#include "../lib/block.h"
 #include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
@@ -106,6 +107,19 @@ bool test_linked_list(linked_list *expected, linked_list *got,
 
   char *expected_str = ll_to_string(expected, value_to_string);
   char *got_str = ll_to_string(got, value_to_string);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
+
+  return passed;
+}
+
+bool test_block(block *expected, block *got, char *testname) {
+
+  char *expected_str = to_string_block(expected);
+  char *got_str = to_string_block(got);
 
   bool passed = test_string(expected_str, got_str, testname);
 

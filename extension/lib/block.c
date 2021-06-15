@@ -36,6 +36,7 @@ binn *serialize_block(block *input) {
     serialize_transactions(input->transactions));
   binn_object_set_object(obj, "reward", serialize_transaction(&input->reward));
   binn_object_set_uint64(obj, "nonce", input->nonce);
+  binn_object_set_str(obj, "prev_hash", input->prev_hash);
 
   return obj;
 }
@@ -43,16 +44,23 @@ binn *serialize_block(block *input) {
 hash *hash_block(block *b);
 
 block *deserialize_block(binn *b) {
-  block *new_block = calloc(1, sizeof(block));
-  new_block->index = binn_object_uint32(b, "index");
-  new_block->timestamp = binn_object_uint64(b, "timestamp");
-  binn *transactions = binn_object_list(b, "transactions");
-  memcpy(new_block->transactions, deserialize_transactions(transactions),
-    MAX_TRANSACTIONS_PER_BLOCK);
-  new_block->reward = *deserialize_transaction(b);
-  new_block->nonce = binn_object_uint64(b, "nonce");
+  block *new = calloc(1, sizeof(block));
 
-  return new_block;
+  new->index = binn_object_uint32(b, "index");
+  new->timestamp = binn_object_uint64(b, "timestamp");
+
+  binn *transactions = binn_object_list(b, "transactions");
+  new->transactions = deserialize_transactions(transactions);
+
+  transaction *reward = deserialize_transaction(binn_object_object(b, "reward"));
+  memcpy(&new->reward, reward, sizeof(transaction));
+  free_transaction(reward);
+
+  new->nonce = binn_object_uint64(b, "nonce");
+
+  strncpy(new->prev_hash, binn_object_str(b, "prev_hash"), 32);
+
+  return new;
 }
 
 void serialize_w_hash(binn *b, hash hash) {
@@ -102,5 +110,6 @@ void  print_block(block *b) {
 }
 
 void free_block(block *b) {
+  ll_free(b->transactions, free_transaction);
   free(b);
 }

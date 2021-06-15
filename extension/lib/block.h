@@ -1,6 +1,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
+#include <binn.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <time.h>
@@ -17,7 +18,7 @@ typedef char hash[32];
 typedef struct block {
   uint32_t index;
   time_t timestamp;
-  transaction transactions[MAX_TRANSACTIONS_PER_BLOCK];
+  linked_list *transactions;
   transaction reward;
   uint64_t nonce;
   hash prev_hash;
@@ -25,11 +26,15 @@ typedef struct block {
   struct block *prev_block; // Ignore for serialise and hash
 } block;
 
+binn *serialize_block(block *input);
+
 block *init_block(block *prev);
 
 hash *hash_block(block *b);
 
-void deserialize_block(block *b);
+block *deserialize_block(binn *b);
+
+void serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
 

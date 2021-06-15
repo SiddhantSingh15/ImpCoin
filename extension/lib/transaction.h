@@ -11,4 +11,12 @@ typedef struct transaction {
   uint64_t amount;
 } transaction;
 
+binn *serialize_transaction(transaction *reward);
+
+binn *serialize_transactions(linked_list *transactions);
+
+transaction *deserialize_transaction(binn *trn);
+
+linked_list *deserialize_transactions(binn *transactions);
+
 #endif

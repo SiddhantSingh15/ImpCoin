@@ -91,8 +91,11 @@ void test_linked_list_functions(int *passing, int *total) {
 
 void test_serialize_transaction(int *passing, int *total) {
 
+  // Setup transaction
   transaction *t = init_transaction("ash", "ash21", 1200);
-  transaction *other_end = deserialize_transaction(serialize_transaction(t));
+  binn *serialized = serialize_transaction(t);
+  transaction *other_end = deserialize_transaction(serialized);
+  binn_free(serialized);
 
   track_test(
       test_transaction(t, other_end, "Transactions are equal on both ends"),
@@ -102,6 +105,10 @@ void test_serialize_transaction(int *passing, int *total) {
   print_transaction(t);
   printf("after deserializing : ");
   print_transaction(other_end);
+
+  // Free transactions
+  free_transaction(t);
+  free_transaction(other_end);
 
 }
 
@@ -120,8 +127,10 @@ void test_serialize_transaction_list(int *passing, int *total) {
   ll_append(transactions, t3);
   ll_append(transactions, t4);
 
+  binn *serialized = serialize_transactions(transactions);
   linked_list *other_end =
-      deserialize_transactions(serialize_transactions(transactions));
+      deserialize_transactions(serialized);
+  binn_free(serialized);
 
   track_test(
       test_linked_list(transactions, other_end, to_string_transaction,
@@ -132,6 +141,10 @@ void test_serialize_transaction_list(int *passing, int *total) {
   ll_print(transactions, to_string_transaction);
   printf("after deserializing : \n");
   ll_print(other_end, to_string_transaction);
+
+  // Free linked list and transactions
+  ll_free(transactions, free_transaction);
+  ll_free(other_end, free_transaction);
 }
 
 void test_serialize_deserialize(int *passing, int *total) {

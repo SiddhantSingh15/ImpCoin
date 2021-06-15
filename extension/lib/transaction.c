@@ -20,23 +20,24 @@ transaction *init_transaction(char *from, char *to, uint64_t amount) {
 }
 
 binn *serialize_transaction(transaction *single) {
-  binn *trans = binn_object();
+  binn *obj = binn_object();
 
-  binn_object_set_uint64(trans, "timestamp", single->timestamp);
-  binn_object_set_str(trans, "to", &single->to[0]);
-  binn_object_set_str(trans, "from", &single->from[0]);
-  binn_object_set_uint64(trans, "amount", single->amount);
+  binn_object_set_uint64(obj, "timestamp", single->timestamp);
+  binn_object_set_str(obj, "to", &single->to[0]);
+  binn_object_set_str(obj, "from", &single->from[0]);
+  binn_object_set_uint64(obj, "amount", single->amount);
 
-  return trans;
+  return obj;
 }
 
-binn *serialize_transactions(linked_list *transactions) {
+binn *serialize_transactions(linked_list *ts) {
   binn *list = binn_list();
 
-  ll_node *curr = transactions->head;
+  ll_node *curr = ts->head;
   while (curr != NULL) {
     binn *obj = serialize_transaction(curr->value);
     binn_list_add_object(list, obj);
+    binn_free(obj);
     curr = curr->next;
   }
 
@@ -81,6 +82,6 @@ void print_transaction(transaction *t) {
   printf("%s\n", buffer);
 }
 
-void free_transaction(transaction *t) {
+void free_transaction(void *t) {
   free(t);
 }

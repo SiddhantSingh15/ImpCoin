@@ -23,7 +23,7 @@ transaction *deserialize_transaction(binn *trn);
 
 linked_list *deserialize_transactions(binn *transactions);
 
-void to_string_transaction(transaction *t, char *buf);
+void to_string_transaction(void *t, char *buf);
 
 void print_transaction(transaction *t);
 

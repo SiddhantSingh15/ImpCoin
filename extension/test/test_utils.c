@@ -101,6 +101,20 @@ bool test_transaction(transaction *expected, transaction *got, char *testname) {
   return test_string(expected_buf, got_buf, testname);
 }
 
+bool test_linked_list(linked_list *expected, linked_list *got,
+                      void (*value_to_string)(void *, char *), char *testname) {
+
+  char *expected_str = ll_to_string(expected, value_to_string);
+  char *got_str = ll_to_string(got, value_to_string);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
+
+  return passed;
+}
+
 void print_uint8_array(uint8_t *array, size_t length) {
   for (int i = 0; i < length; i++) {
     printf("%02x ", array[i]);

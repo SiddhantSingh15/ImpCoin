@@ -67,10 +67,11 @@ linked_list *deserialize_transactions(binn *transactions) {
   return new_ll;
 }
 
-void to_string_transaction(transaction *t, char *buffer) {
+void to_string_transaction(void *t, char *buffer) {
+  transaction *tr = (transaction *)t;
   char fmttime[100];
-  strftime(fmttime, 100, "%m/%d/%y %X UTC", gmtime(&t->timestamp));
-  sprintf(buffer, "[%lu Coin] %s -> %s @ %s", t->amount, t->from, t->to,
+  strftime(fmttime, 100, "%m/%d/%y %X UTC", gmtime(&tr->timestamp));
+  sprintf(buffer, "[%lu Coin] %s -> %s @ %s", tr->amount, tr->from, tr->to,
           fmttime);
 }
 

@@ -9,6 +9,7 @@
 
 #include <binn.h>
 #include <sodium/crypto_generichash.h>
+#include <sodium/utils.h>
 
 #include "utils.h"
 #include "linked_list.h"
@@ -33,9 +34,15 @@ binn *serialize_block(block *input) {
 
   binn_object_set_uint32(obj, "index", input->index);
   binn_object_set_uint64(obj, "timestamp", input->timestamp);
-  binn_object_set_list(obj, "transactions",
-    serialize_transactions(input->transactions));
-  binn_object_set_object(obj, "reward", serialize_transaction(&input->reward));
+
+  binn *transactions = serialize_transactions(input->transactions);
+  binn_object_set_list(obj, "transactions", transactions);
+  binn_free(transactions);
+
+  binn *reward = serialize_transaction(&input->reward);
+  binn_object_set_object(obj, "reward", reward);
+  binn_free(reward);
+
   binn_object_set_uint64(obj, "nonce", input->nonce);
   binn_object_set_str(obj, "prev_hash", input->prev_hash);
 
@@ -50,6 +57,8 @@ hash *hash_block(block *b) {
   char *out = rand_hash(binn_ptr(serialized), binn_size(serialized));
   memcpy(hashed, out, crypto_generichash_BYTES);
   free(out);
+
+  binn_free(serialized);
 
   return hashed;
 }
@@ -78,17 +87,28 @@ void serialize_w_hash(binn *b, hash hash) {
   binn_object_set_str(b, "hash", &hash[0]);
 }
 
-bool is_valid(block *b);
+bool is_valid(block *b) {
+  // pre: the hash has been calculated
+  for (int i = 0; i < 3; i++) {
+    if (b->hash[i] != '\0') {
+      return false;
+    }
+  }
+  return true;
+}
 
 char *to_string_block(block *b) {
 
   char buf[511];
-  char *out = calloc(10 + b->transactions->size, sizeof(char) * 511);
+  char *out = calloc(10 + ((b->transactions) ? b->transactions->size : 0),
+                     sizeof(char) * 511);
 
   if (b->index == 0) {
     sprintf(out, "GENESIS BLOCK - %s\n", b->hash);
   } else {
-    printf(out, "Block %03d - %s\n", b->index, b->hash);
+    char *hash_string = to_hex_string_hash(&b->hash[0]);
+    sprintf(out, "Block %03d - 0x%s\n", b->index, hash_string);
+    free(hash_string);
   }
 
   char *fmtedtime = formatted_time(&b->timestamp);
@@ -98,16 +118,21 @@ char *to_string_block(block *b) {
   sprintf(out + strlen(out), " |} reward: %s\n", buf);
   sprintf(out + strlen(out), " |} transactions:\n");
 
-  ll_node *curr = b->transactions->head;
-  while (curr != NULL) {
-    assert(curr->value);
-    to_string_transaction(curr->value, buf);
-    sprintf(out + strlen(out), " |}  %s\n", buf);
-    curr = curr->next;
+  if (b->transactions != NULL) {
+    ll_node *curr = b->transactions->head;
+    while (curr != NULL) {
+      assert(curr->value);
+      to_string_transaction(curr->value, buf);
+      sprintf(out + strlen(out), " |}  %s\n", buf);
+      curr = curr->next;
+    }
   }
 
   sprintf(out + strlen(out), " |} nonce: %"PRIu64"\n", b->nonce);
-  sprintf(out + strlen(out), " |} previous hash: %s\n", b->prev_hash);
+
+  char *prev_hash_string = to_hex_string_hash(&b->hash[0]);
+  sprintf(out + strlen(out), " |} previous hash: 0x%s\n", b->prev_hash);
+  free(prev_hash_string);
 
   out = realloc(out, strlen(out) + 1);
   free(fmtedtime);
@@ -121,6 +146,8 @@ void  print_block(block *b) {
 }
 
 void free_block(block *b) {
-  ll_free(b->transactions, free_transaction);
+  if (b->transactions != NULL) {
+    ll_free(b->transactions, free_transaction);
+  }
   free(b);
 }

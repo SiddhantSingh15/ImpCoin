@@ -20,7 +20,7 @@ void append_to_blockchain(blockchain *chain, void *val);
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 
-void proof_of_work(void);
+block *proof_of_work(blockchain *bc, char *username);
 
 void print_blockchain(blockchain *chain);
 

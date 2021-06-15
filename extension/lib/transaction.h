@@ -13,8 +13,10 @@ typedef struct transaction {
   uint64_t amount;
 } transaction;
 
-transaction *init_transaction(char *from, char *to, uint64_t amount, 
+transaction *init_transaction(char *from, char *to, uint64_t amount,
   time_t time);
+
+transaction *dup_transaction(transaction *t);
 
 binn *serialize_transaction(transaction *t);
 

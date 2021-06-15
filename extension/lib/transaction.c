@@ -13,7 +13,7 @@
 #include "linked_list.h"
 #include "transaction.h"
 
-transaction *init_transaction(char *from, char *to, uint64_t amount, 
+transaction *init_transaction(char *from, char *to, uint64_t amount,
   time_t time) {
   transaction *new = calloc(1, sizeof(transaction));
   new->timestamp = time;
@@ -21,6 +21,11 @@ transaction *init_transaction(char *from, char *to, uint64_t amount,
   strncpy(new->from, from, UID_LENGTH);
   strncpy(new->to, to, UID_LENGTH);
   return new;
+}
+
+transaction *dup_transaction(transaction *t) {
+  transaction *dup = init_transaction(t->from, t->to, t->amount, t->timestamp);
+  return dup;
 }
 
 binn *serialize_transaction(transaction *single) {
@@ -36,6 +41,10 @@ binn *serialize_transaction(transaction *single) {
 
 binn *serialize_transactions(linked_list *ts) {
   binn *list = binn_list();
+
+  if (ts == NULL) {
+    return list;
+  }
 
   ll_node *curr = ts->head;
   while (curr != NULL) {

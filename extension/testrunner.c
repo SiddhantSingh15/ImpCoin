@@ -104,10 +104,12 @@ void test_serialize_transaction(int *passing, int *total) {
       test_transaction(t, other_end, "Transactions are equal on both ends"),
       passing, total);
 
+  /*
   printf("before serializing  : ");
   print_transaction(t);
   printf("after deserializing : ");
   print_transaction(other_end);
+  */
 
   // Free transactions
   free_transaction(t);
@@ -118,13 +120,13 @@ void test_serialize_transaction(int *passing, int *total) {
 void test_serialize_transaction_list(int *passing, int *total) {
 
   // Create transactions
-  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000, 
+  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000,
 		-22118400);
-  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000, 
+  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000,
 		-22118400);
-  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000, 
+  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000,
 		-22118400);
-  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000, 
+  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000,
 		-22118400);
 
   // Create list and add transactions
@@ -144,10 +146,12 @@ void test_serialize_transaction_list(int *passing, int *total) {
                        "Linked list of transactions is equal on both ends"),
       passing, total);
 
+  /*
   printf("before serializing  : \n");
   ll_print(transactions, to_string_transaction);
   printf("after deserializing : \n");
   ll_print(other_end, to_string_transaction);
+  */
 
   // Free linked list and transactions
   ll_free(transactions, free_transaction);
@@ -173,12 +177,15 @@ void test_serialize_block_no_hash(int *passing, int *total) {
       passing, total);
 
 
+  /*
   printf("before serializing  : \n");
   print_block(genesis);
   printf("after deserializing : \n");
   print_block(other_end);
+  */
 
   free_block(genesis);
+  free_block(other_end);
 }
 
 void test_serialize_deserialize(int *passing, int *total) {
@@ -209,19 +216,39 @@ void test_serialize_deserialize(int *passing, int *total) {
 }
 
 void test_hash_equality(int *passing, int *total) {
-	block *genesis = GENESIS_BLOCK;
-	
-	hash *first_hash = hash_block(genesis);
-	hash *second_hash = hash_block(genesis);
+  block *genesis = GENESIS_BLOCK;
 
-	track_test(test_hash(first_hash, second_hash, 
-										     "Both hashes are equal"), 
-						 passing, total);
-	free_block(genesis);
+  hash *first_hash = hash_block(genesis);
+  hash *second_hash = hash_block(genesis);
+
+  track_test(test_hash(first_hash, second_hash, "Both hashes are equal"),
+             passing, total);
+
+  free_block(genesis);
+  free(first_hash);
+  free(second_hash);
+}
+
+void test_proof_of_work_function(int *passing, int *total) {
+  blockchain *bc = init_blockchain();
+  char *username = "rick";
+  block *just_mined = proof_of_work(bc, username);
+  track_test(test_bool(is_valid(just_mined), "Latest block is valid"),
+             passing, total);
+  track_test(
+      test_bool(just_mined != bc->latest_block, "Latest block is actually new"),
+      passing, total);
+
+  // Print new block
+  printf("Just mined: ");
+  print_block(just_mined);
+
+  free_block(just_mined);
+  free_blockchain(bc);
 }
 
 void test_proof_of_work(int *passing, int *total) {
-	printf("---------------------------------------------------------------------"
+  printf("---------------------------------------------------------------------"
 				"\n");
   printf("-----%s HASH/PROOF OF WORK"
          "TESTS%s-------------------------------------\n",
@@ -230,6 +257,7 @@ void test_proof_of_work(int *passing, int *total) {
 	int internal_total = 0;
 
 	test_hash_equality(&internal_passing, &internal_total);
+    test_proof_of_work_function(&internal_passing, &internal_total);
 
 	printf("-----------------------------------------------------------------"
 				"----"

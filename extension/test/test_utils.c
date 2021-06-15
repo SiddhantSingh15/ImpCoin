@@ -11,6 +11,7 @@
 #include "../lib/linked_list.h"
 #include "../lib/transaction.h"
 #include "../lib/block.h"
+#include "../lib/utils.h"
 #include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
@@ -132,11 +133,13 @@ bool test_block(block *expected, block *got, char *testname) {
 
 bool test_hash(hash *expected, hash *got, char *testname) {
 
-  char fst_hex[64+1];
-  char snd_hex[64+1];
-  bool passed = test_string(sodium_bin2hex(fst_hex, 64+1, (unsigned char *) *expected, 32), 
-                            sodium_bin2hex(snd_hex, 64+1, (unsigned char *) *got, 32), 
-                            testname);
+  char *expected_str = to_hex_string_hash(expected[0]);
+  char *got_str = to_hex_string_hash(got[0]);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
 
   return passed;
 }

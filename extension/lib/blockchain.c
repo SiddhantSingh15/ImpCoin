@@ -9,9 +9,8 @@
 #include "linked_list.h"
 #include "transaction.h"
 #include "block.h"
+#include "utils.h"
 #include "blockchain.h"
-
-#define GENESIS_BLOCK genesis_block()
 
 block *genesis_block(void) {
   block *genesis = init_block(NULL);
@@ -74,7 +73,44 @@ block *traverse_blockchain(blockchain *chain, uint32_t block_num){
   return curr;
 }
 
-void proof_of_work(void);
+block *new_block(blockchain *bc, char *username) {
+  block *new = init_block(bc->latest_block);
+
+  int i = 0;
+  ll_node *curr = bc->mem_pool->head;
+  while (curr != NULL && i < MAX_TRANSACTIONS_PER_BLOCK) {
+    assert(curr->value);
+    ll_append(new->transactions, dup_transaction((transaction *)curr->value));
+  }
+
+  new->timestamp = time(NULL);
+
+  transaction *reward = init_transaction("rick", username, 69, time(NULL));
+  memcpy(&new->reward, reward, sizeof(transaction));
+  free_transaction(reward);
+
+  new->nonce = random_long();
+  return new;
+}
+
+block *proof_of_work(blockchain *bc, char *username) {
+  block *new = new_block(bc, username);
+
+  hash *new_hash = hash_block(new);
+  strncpy(new->hash, *new_hash, 32);
+  free(new_hash);
+
+  while (!is_valid(new)) {
+    free_block(new);
+    new = new_block(bc, username);
+
+    hash *new_hash = hash_block(new);
+    memcpy(new->hash, *new_hash, 32);
+    free(new_hash);
+  }
+
+  return new;
+}
 
 void free_blockchain(blockchain *chain){
   assert(chain);
@@ -84,7 +120,7 @@ void free_blockchain(blockchain *chain){
 
   // Free the blocks one-by-one
   block *curr = chain->latest_block;
-  while(curr->prev_block != NULL){
+  while(curr != NULL){
     block *temp = curr;
     curr = curr->prev_block;
     free_block(temp);

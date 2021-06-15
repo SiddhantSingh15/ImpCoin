@@ -10,6 +10,7 @@ typedef struct ll_node {
 
 typedef struct linked_list {
   ll_node *head;
+  ll_node *last;
   uint32_t size;
 } linked_list;
 

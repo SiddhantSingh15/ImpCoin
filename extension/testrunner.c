@@ -95,7 +95,7 @@ void test_linked_list_functions(int *passing, int *total) {
 void test_serialize_transaction(int *passing, int *total) {
 
   // Setup transaction
-  transaction *t = init_transaction("ash", "ash21", 1200);
+  transaction *t = init_transaction("ash", "ash21", 1200, -22118400);
   binn *serialized = serialize_transaction(t);
   transaction *other_end = deserialize_transaction(serialized);
   binn_free(serialized);
@@ -118,10 +118,14 @@ void test_serialize_transaction(int *passing, int *total) {
 void test_serialize_transaction_list(int *passing, int *total) {
 
   // Create transactions
-  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000);
-  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000);
-  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000);
-  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000);
+  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000, 
+		-22118400);
+  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000, 
+		-22118400);
+  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000, 
+		-22118400);
+  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000, 
+		-22118400);
 
   // Create list and add transactions
   linked_list *transactions = ll_init();
@@ -204,6 +208,41 @@ void test_serialize_deserialize(int *passing, int *total) {
 
 }
 
+void test_hash_equality(int *passing, int *total) {
+	block *genesis = GENESIS_BLOCK;
+	
+	hash *first_hash = hash_block(genesis);
+	hash *second_hash = hash_block(genesis);
+
+	track_test(test_hash(first_hash, second_hash, 
+										     "Both hashes are equal"), 
+						 passing, total);
+	free_block(genesis);
+}
+
+void test_proof_of_work(int *passing, int *total) {
+	printf("---------------------------------------------------------------------"
+				"\n");
+  printf("-----%s HASH/PROOF OF WORK"
+         "TESTS%s-------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+	int internal_passing = 0;
+	int internal_total = 0;
+
+	test_hash_equality(&internal_passing, &internal_total);
+
+	printf("-----------------------------------------------------------------"
+				"----"
+				"\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
+
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+}
 
 int main(void) {
   int passing = 0;
@@ -211,6 +250,7 @@ int main(void) {
 
   test_linked_list_functions(&passing, &total);
   test_serialize_deserialize(&passing, &total);
+	test_proof_of_work(&passing, &total);
 
   printf(
       "%s---------------------------------------------------------------------%"

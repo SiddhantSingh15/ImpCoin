@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <binn.h>
+#include <sodium/utils.h>
 
 #include "../lib/linked_list.h"
 #include "../lib/transaction.h"
@@ -125,6 +126,17 @@ bool test_block(block *expected, block *got, char *testname) {
 
   free(expected_str);
   free(got_str);
+
+  return passed;
+}
+
+bool test_hash(hash *expected, hash *got, char *testname) {
+
+  char fst_hex[64+1];
+  char snd_hex[64+1];
+  bool passed = test_string(sodium_bin2hex(fst_hex, 64+1, (unsigned char *) *expected, 32), 
+                            sodium_bin2hex(snd_hex, 64+1, (unsigned char *) *got, 32), 
+                            testname);
 
   return passed;
 }

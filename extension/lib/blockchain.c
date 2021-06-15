@@ -19,10 +19,10 @@ block *genesis_block(void) {
   genesis->prev_block = NULL;
 
   // add transactions to give us free money
-  transaction *t1 = init_transaction("rick", "ash", 1000);
-  transaction *t2 = init_transaction("rick", "sid", 1000);
-  transaction *t3 = init_transaction("rick", "kavya", 1000);
-  transaction *t4 = init_transaction("rick", "yelun", 1000);
+  transaction *t1 = init_transaction("rick", "ash", 1000, -22118400);
+  transaction *t2 = init_transaction("rick", "sid", 1000, -22118400);
+  transaction *t3 = init_transaction("rick", "kavya", 1000, -22118400);
+  transaction *t4 = init_transaction("rick", "yelun", 1000, -22118400);
 
   // Create list and add transactions
   genesis->transactions = ll_init();

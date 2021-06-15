@@ -13,9 +13,10 @@
 #include "linked_list.h"
 #include "transaction.h"
 
-transaction *init_transaction(char *from, char *to, uint64_t amount) {
+transaction *init_transaction(char *from, char *to, uint64_t amount, 
+  time_t time) {
   transaction *new = calloc(1, sizeof(transaction));
-  new->timestamp = time(NULL);
+  new->timestamp = time;
   new->amount = amount;
   strncpy(new->from, from, UID_LENGTH);
   strncpy(new->to, to, UID_LENGTH);

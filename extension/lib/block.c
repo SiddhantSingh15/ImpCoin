@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include <binn.h>
+#include <sodium/crypto_generichash.h>
 
 #include "utils.h"
 #include "linked_list.h"
@@ -41,7 +42,17 @@ binn *serialize_block(block *input) {
   return obj;
 }
 
-hash *hash_block(block *b);
+hash *hash_block(block *b) {
+
+  binn *serialized = serialize_block(b);
+
+  hash *hashed = malloc(sizeof(hash));
+  char *out = rand_hash(binn_ptr(serialized), binn_size(serialized));
+  memcpy(hashed, out, crypto_generichash_BYTES);
+  free(out);
+
+  return hashed;
+}
 
 block *deserialize_block(binn *b) {
   block *new = calloc(1, sizeof(block));

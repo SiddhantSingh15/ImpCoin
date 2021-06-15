@@ -1,10 +1,15 @@
-#include "test_utils.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <binn.h>
+
+#include "../lib/linked_list.h"
+#include "../lib/transaction.h"
+#include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
   printf("TEST - %s : %s%s%s\n", testname, cond ? GREEN : RED,
@@ -84,6 +89,16 @@ bool test_uint8_array(uint8_t *expected, uint8_t *got, size_t length,
   }
 
   return passed;
+}
+
+bool test_transaction(transaction *expected, transaction *got, char *testname) {
+  char expected_buf[511];
+  char got_buf[511];
+
+  to_string_transaction(expected, expected_buf);
+  to_string_transaction(got, got_buf);
+
+  return test_string(expected_buf, got_buf, testname);
 }
 
 void print_uint8_array(uint8_t *array, size_t length) {

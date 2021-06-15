@@ -1,6 +1,10 @@
-#include <sodium/crypto_generichash.h>
 #include <stdint.h>
 #include <sodium.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <sodium/crypto_generichash.h>
 
 uint64_t random_num(void) {
   uint64_t rand = ((uint64_t) (randombytes_random() | 0x0000000000000000) << 32) + randombytes_random();
@@ -9,4 +13,11 @@ uint64_t random_num(void) {
 
 void rand_hash(const unsigned char *in, unsigned char *out) {
    crypto_generichash(out, crypto_generichash_BYTES, in, sizeof(in), NULL, 0);
+}
+
+char *formatted_time(time_t *t) {
+  char *fmttime = calloc(1, 100);
+  strftime(fmttime, 100, "%m/%d/%y %X %Z", gmtime(t));
+  fmttime = realloc(fmttime, strlen(fmttime) + 1);
+  return fmttime;
 }

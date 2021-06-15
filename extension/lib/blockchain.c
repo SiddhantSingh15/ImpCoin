@@ -16,7 +16,20 @@
 block *genesis_block(void) {
   block *genesis = init_block(NULL);
   genesis->timestamp = -22118400; // 4/20/69, Unix Epoch Time
+
   // add transactions to give us free money
+  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000);
+  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000);
+  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000);
+  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000);
+
+  // Create list and add transactions
+  genesis->transactions = ll_init();
+  ll_append(genesis->transactions, t1);
+  ll_append(genesis->transactions, t2);
+  ll_append(genesis->transactions, t3);
+  ll_append(genesis->transactions, t4);
+
   // hash *genesis_hash = hash_block(genesis);
   memcpy(genesis->hash, "its a hash hahaha lmao", 32);
   // free(genesis_hash);

@@ -7,6 +7,7 @@
 
 #include <binn.h>
 
+#include "utils.h"
 #include "linked_list.h"
 #include "transaction.h"
 #include "block.h"
@@ -58,18 +59,44 @@ void serialize_w_hash(binn *b, hash hash) {
 
 bool is_valid(block *b);
 
-void  print_block(block *b) {
+char *to_string_block(block *b) {
+
+  char buf[511];
+  char *out = calloc(10 + b->transactions->size, sizeof(char) * 511);
+
   if (b->index == 0) {
-    printf("GENESIS BLOCK - %s\n", b->hash);
+    sprintf(out, "GENESIS BLOCK - %s\n", b->hash);
   } else {
-    printf("Block %03d - %s\n", b->index, b->hash);
+    printf(out, "Block %03d - %s\n", b->index, b->hash);
   }
 
-  char fmttime[100];
-  strftime(fmttime, 100, "%m/%d/%y %I:%M%p", localtime(&b->timestamp));
-  printf(" |} mined at: %s\n", fmttime);
-  printf(" |} nonce: %lu\n", b->nonce);
-  printf(" |} previous hash: %s\n", b->prev_hash);
+  char *fmtedtime = formatted_time(&b->timestamp);
+  sprintf(out + strlen(out), " |} mined at: %s\n", fmtedtime);
+
+  to_string_transaction(&b->reward, buf);
+  sprintf(out + strlen(out), " |} reward: %s\n", buf);
+  sprintf(out + strlen(out), " |} transactions:\n");
+
+  ll_node *curr = b->transactions->head;
+  while (curr != NULL) {
+    assert(curr->value);
+    to_string_transaction(curr->value, buf);
+    sprintf(out + strlen(out), " |}  %s\n", buf);
+    curr = curr->next;
+  }
+
+  sprintf(out + strlen(out), " |} nonce: %lu\n", b->nonce);
+  sprintf(out + strlen(out), " |} previous hash: %s\n", b->prev_hash);
+
+  out = realloc(out, strlen(out) + 1);
+  free(fmtedtime);
+  return out;
+}
+
+void  print_block(block *b) {
+  char *string = to_string_block(b);
+  printf("%s", string);
+  free(string);
 }
 
 void free_block(block *b) {

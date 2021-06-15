@@ -7,6 +7,7 @@
 #include <binn.h>
 #include <time.h>
 
+#include "utils.h"
 #include "linked_list.h"
 #include "transaction.h"
 
@@ -70,10 +71,10 @@ linked_list *deserialize_transactions(binn *transactions) {
 
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
-  char fmttime[100];
-  strftime(fmttime, 100, "%m/%d/%y %X UTC", gmtime(&tr->timestamp));
-  sprintf(buffer, "[%lu Coin] %s -> %s @ %s", tr->amount, tr->from, tr->to,
-          fmttime);
+  char *fmtedtime = formatted_time(&tr->timestamp);
+  sprintf(buffer, "[%lu ASTLY%s] %s -> %s @ %s", tr->amount,
+          (tr->amount > 1) ? "s" : "", tr->from, tr->to, fmtedtime);
+  free(fmtedtime);
 }
 
 void print_transaction(transaction *t) {

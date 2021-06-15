@@ -144,6 +144,7 @@ char *ll_to_string(linked_list *list,
     i++;
   }
 
+  out = realloc(out, strlen(out) + 1);
   return out;
 }
 

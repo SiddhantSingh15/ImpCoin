@@ -11,47 +11,6 @@
 
 void dummy_free(void *unused) {}
 
-void test_serialize_transaction(int *passing, int *total) {
-
-  transaction *t = init_transaction("ash", "ash21", 1200);
-  transaction *other_end = deserialize_transaction(serialize_transaction(t));
-
-  track_test(
-      test_transaction(t, other_end, "Transactions are equal on both ends"),
-      passing, total);
-
-  printf("before serializing  : ");
-  print_transaction(t);
-  printf("after deserializing : ");
-  print_transaction(other_end);
-
-}
-
-void test_serialize_deserialize(int *passing, int *total) {
-  printf("---------------------------------------------------------------------"
-         "\n");
-  printf("-----%sSERIALIZE/DESERIALIZE "
-         "TESTS%s-----------------------------------------------\n",
-         BOLDBLUE, NOCOLOUR);
-  int internal_passing = 0;
-  int internal_total = 0;
-
-  test_serialize_transaction(&internal_passing, &internal_total);
-
-  printf("-----------------------------------------------------------------"
-         "----"
-         "\n");
-  printf("%sPASSING: (%d/%d) tests%s\n",
-         internal_passing == internal_total        ? GREEN
-         : (internal_passing > internal_total / 2) ? YELLOW
-                                                   : RED,
-         internal_passing, internal_total, NOCOLOUR);
-
-  *passing = *passing + internal_passing;
-  *total = *total + internal_total;
-
-}
-
 void test_ll_add_delete(int *passing, int *total) {
   linked_list *ll = ll_init();
 
@@ -106,7 +65,7 @@ void test_linked_list(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
          "\n");
   printf("-----%sLINKED LIST "
-         "TESTS%s----------------------------------------------\n",
+         "TESTS%s-----------------------------------------------\n",
          BOLDBLUE, NOCOLOUR);
   int internal_passing = 0;
   int internal_total = 0;
@@ -124,6 +83,48 @@ void test_linked_list(int *passing, int *total) {
   *passing = *passing + internal_passing;
   *total = *total + internal_total;
 }
+
+void test_serialize_transaction(int *passing, int *total) {
+
+  transaction *t = init_transaction("ash", "ash21", 1200);
+  transaction *other_end = deserialize_transaction(serialize_transaction(t));
+
+  track_test(
+      test_transaction(t, other_end, "Transactions are equal on both ends"),
+      passing, total);
+
+  printf("before serializing  : ");
+  print_transaction(t);
+  printf("after deserializing : ");
+  print_transaction(other_end);
+
+}
+
+void test_serialize_deserialize(int *passing, int *total) {
+  printf("---------------------------------------------------------------------"
+         "\n");
+  printf("-----%sSERIALIZE/DESERIALIZE "
+         "TESTS%s-------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+  int internal_passing = 0;
+  int internal_total = 0;
+
+  test_serialize_transaction(&internal_passing, &internal_total);
+
+  printf("-----------------------------------------------------------------"
+         "----"
+         "\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
+
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+
+}
+
 
 int main(void) {
   int passing = 0;

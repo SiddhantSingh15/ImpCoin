@@ -14,16 +14,29 @@
 #define GENESIS_BLOCK genesis_block()
 
 block *genesis_block(void) {
-  // TODO: Not implemented
-  return NULL;
+  block *genesis = init_block(NULL);
+  genesis->timestamp = -22118400; // 4/20/69, Unix Epoch Time
+  // add transactions to give us free money
+  // hash *genesis_hash = hash_block(genesis);
+  memcpy(genesis->hash, "its a hash hahaha lmao", 32);
+  // free(genesis_hash);
+  return genesis;
 }
 
-blockchain *init_block_chain(void) {
-  blockchain *new_chain = malloc(sizeof(blockchain));
-  new_chain->latest_block = GENESIS_BLOCK;
-  new_chain->latest_block->index = 0;
-  new_chain->mem_pool = NULL;
-  return new_chain;
+linked_list *init_mempool(void) {
+  return init_linked_list();
+}
+
+void free_mempool(linked_list *mem_pool) {
+  // TODO: do we need a specialised `free_transaction` ?
+  free_linked_list(mem_pool, free);
+}
+
+blockchain *init_blockchain(void) {
+  blockchain *new = malloc(sizeof(blockchain));
+  new->latest_block = GENESIS_BLOCK;
+  new->mem_pool = init_mempool();
+  return new;
 }
 
 void append_to_blockchain(blockchain *chain, void *val){
@@ -53,12 +66,15 @@ void proof_of_work(void);
 void free_blockchain(blockchain *chain){
   assert(chain);
 
+  // Free the mempool
+  free_mempool(chain->mem_pool);
+
+  // Free the blocks one-by-one
   block *curr = chain->latest_block;
   while(curr->prev_block != NULL){
     block *temp = curr;
     curr = curr->prev_block;
-    //TODO: free all attributes of temp.
-    free(temp);
+    free_block(temp);
   }
   free(chain);
 }

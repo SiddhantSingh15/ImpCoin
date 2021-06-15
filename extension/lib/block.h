@@ -30,12 +30,16 @@ binn *serialize_block(block *input);
 
 block *init_block(block *prev);
 
-void hash_block(block *b);
+hash *hash_block(block *b);
 
 block *deserialize_block(binn *b);
 
 void serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
+
+void print_block(block *b);
+
+void free_block(block *b);
 
 #endif

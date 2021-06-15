@@ -34,7 +34,10 @@ void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *));
 void ll_delete_node(linked_list *list, ll_node *to_delete,
                     void (*value_free)(void *));
 
-void ll_print(linked_list *list, void (*value_print)(void *));
+char *ll_to_string(linked_list *list,
+                  void (*value_to_string)(void *, char *buf));
+
+void ll_print(linked_list *list, void (*value_to_string)(void *, char *buf));
 
 void ll_free(linked_list *list, void (*value_free)(void *));
 

@@ -11,6 +11,11 @@
 
 void dummy_free(void *unused) {}
 
+void int_to_string(void *value, char *buf) {
+  int *int_value = (int *)value;
+  sprintf(buf, "%i", *int_value);
+}
+
 void test_ll_add_delete(int *passing, int *total) {
   linked_list *ll = ll_init();
 

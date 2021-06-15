@@ -1,7 +1,9 @@
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "linked_list.h"
 
@@ -116,6 +118,32 @@ void ll_delete_node(linked_list *list, ll_node *to_delete,
 void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *)) {
   ll_node *node = ll_get_node(list, index);
   ll_delete_node(list, node, value_free);
+}
+
+void ll_print(linked_list *list, void (*value_to_string)(void *, char *buf)) {
+  char *string = ll_to_string(list, value_to_string);
+  printf("%s", string);
+}
+
+char *ll_to_string(linked_list *list,
+                  void (*value_to_string)(void *, char *buf)) {
+  assert(list);
+
+  int i = 0;
+  char buf[511];
+  char *out = calloc(list->size, sizeof(buf));
+
+  ll_node *curr = list->head;
+  while (curr != NULL) {
+    assert(curr->value);
+    value_to_string(curr->value, buf);
+    sprintf(out + strlen(out), "[%i] --> {%s}\n", i, buf);
+
+    curr = curr->next;
+    i++;
+  }
+
+  return out;
 }
 
 void ll_free(linked_list *list, void (*value_free)(void *)) {

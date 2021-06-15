@@ -5,7 +5,7 @@ LDLIBS  = -lnng -lbinn -lsodium
 
 SRC_DIRS ?= .
 
-INC_DIRS := $(shell find . ! -path . -type d) 
+INC_DIRS := $(shell find . ! -path . -type d)
 
 ifeq ($(shell uname), Darwin)
   CC = gcc-9
@@ -24,6 +24,9 @@ DEPS := $($(call GET_OBJS,$(SRC_DIRS)):.o=.d)
 NODE_SRC_DIRS := lib
 NODE_OBJS := $(call GET_OBJS, $(NODE_SRC_DIRS))
 
+TEST_SRC_DIRS := test
+TEST_OBJS := $(call GET_OBJS, $(TEST_SRC_DIRS))
+
 .SUFFIXES: .c .o
 .PHONY: all clean
 
@@ -34,6 +37,8 @@ tests: testrunner
 	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
 
 node: $(NODE_OBJS)
+
+testrunner: $(NODE_OBJS) $(TEST_OBJS)
 
 clean:
 	$(RM) $(shell find $(SRC_DIRS) -name "*.o")

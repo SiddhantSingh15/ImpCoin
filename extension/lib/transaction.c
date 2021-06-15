@@ -23,7 +23,7 @@ binn *serialize_transaction(transaction *single) {
 binn *serialize_transactions(linked_list *transactions) {
   binn *list = binn_list();
 
-  node *curr = transactions->head;
+  ll_node *curr = transactions->head;
   while (curr != NULL) {
     binn *obj = serialize_transaction(curr->value);
     binn_list_add_object(list, obj);
@@ -46,12 +46,12 @@ transaction *deserialize_transaction(binn *trn) {
 
 linked_list *deserialize_transactions(binn *transactions) {
 
-  linked_list *new_ll = init_linked_list();
+  linked_list *new_ll = ll_init();
 
   binn_iter iter;
   binn value;
   binn_list_foreach(transactions, value) {
-    append_to_linked_list(new_ll, deserialize_transaction(&value));
+    ll_append(new_ll, deserialize_transaction(&value));
   }
 
   return new_ll;

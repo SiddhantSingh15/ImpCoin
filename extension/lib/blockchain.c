@@ -24,12 +24,12 @@ block *genesis_block(void) {
 }
 
 linked_list *init_mempool(void) {
-  return init_linked_list();
+  return ll_init();
 }
 
 void free_mempool(linked_list *mem_pool) {
   // TODO: do we need a specialised `free_transaction` ?
-  free_linked_list(mem_pool, free);
+  ll_free(mem_pool, free);
 }
 
 blockchain *init_blockchain(void) {

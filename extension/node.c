@@ -5,6 +5,7 @@
 #include <binn.h>
 #include <sodium.h>
 
+#include "lib/linked_list.h"
 #include "lib/transaction.h"
 #include "lib/block.h"
 #include "lib/blockchain.h"

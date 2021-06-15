@@ -37,7 +37,7 @@ binn *serialize_block(block *input) {
   return obj;
 }
 
-void hash_block(block *b);
+hash *hash_block(block *b);
 
 block *deserialize_block(binn *b) {
   block *new_block = calloc(1, sizeof(block));

@@ -30,9 +30,9 @@ block *genesis_block(void) {
   ll_append(genesis->transactions, t3);
   ll_append(genesis->transactions, t4);
 
-  // hash *genesis_hash = hash_block(genesis);
-  memcpy(genesis->hash, "its a hash hahaha lmao", 32);
-  // free(genesis_hash);
+  hash *genesis_hash = hash_block(genesis);
+  memcpy(genesis->hash, genesis_hash, 32);
+  free(genesis_hash);
   return genesis;
 }
 

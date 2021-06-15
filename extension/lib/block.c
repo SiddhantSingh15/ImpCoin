@@ -28,7 +28,7 @@ block *init_block(block *prev){
   return new;
 }
 
-binn *serialize_block(block *input) {
+binn *serialize_block_no_hash(block *input) {
   binn *obj;
   obj = binn_object();
 
@@ -51,7 +51,7 @@ binn *serialize_block(block *input) {
 
 hash *hash_block(block *b) {
 
-  binn *serialized = serialize_block(b);
+  binn *serialized = serialize_block_no_hash(b);
 
   hash *hashed = malloc(sizeof(hash));
   char *out = rand_hash(binn_ptr(serialized), binn_size(serialized));
@@ -131,7 +131,7 @@ char *to_string_block(block *b) {
   sprintf(out + strlen(out), " |} nonce: %"PRIu64"\n", b->nonce);
 
   char *prev_hash_string = to_hex_string_hash(&b->hash[0]);
-  sprintf(out + strlen(out), " |} previous hash: 0x%s\n", b->prev_hash);
+  sprintf(out + strlen(out), " |} previous hash: 0x%s\n", prev_hash_string);
   free(prev_hash_string);
 
   out = realloc(out, strlen(out) + 1);

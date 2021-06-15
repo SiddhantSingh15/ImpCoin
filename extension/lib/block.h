@@ -26,7 +26,7 @@ typedef struct block {
   struct block *prev_block; // Ignore for serialise and hash
 } block;
 
-binn *serialize_block(block *input);
+binn *serialize_block_no_hash(block *input);
 
 block *init_block(block *prev);
 

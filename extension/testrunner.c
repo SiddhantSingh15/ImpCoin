@@ -168,7 +168,7 @@ void test_serialize_block_no_hash(int *passing, int *total) {
   // we also want to check if prev hash gets serialised
   strcpy(genesis->prev_hash, "It's previous hash lmao");
 
-  binn *serialized = serialize_block(genesis);
+  binn *serialized = serialize_block_no_hash(genesis);
   block *other_end = deserialize_block(serialized);
   binn_free(serialized);
 
@@ -257,7 +257,7 @@ void test_proof_of_work(int *passing, int *total) {
 	int internal_total = 0;
 
 	test_hash_equality(&internal_passing, &internal_total);
-    test_proof_of_work_function(&internal_passing, &internal_total);
+  test_proof_of_work_function(&internal_passing, &internal_total);
 
 	printf("-----------------------------------------------------------------"
 				"----"

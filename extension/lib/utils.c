@@ -20,7 +20,7 @@ char *rand_hash(const unsigned char *in, size_t len) {
 }
 
 char *to_hex_string_hash(char *in) {
-  char *hex = malloc(crypto_generichash_BYTES * 2);
+  char *hex = malloc(crypto_generichash_BYTES * 2 + 1);
   return sodium_bin2hex(hex, crypto_generichash_BYTES * 2 + 1, (unsigned char *)in,
                         crypto_generichash_BYTES);
 }

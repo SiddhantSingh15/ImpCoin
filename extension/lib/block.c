@@ -103,13 +103,13 @@ char *to_string_block(block *b) {
   char *out = calloc(10 + ((b->transactions) ? b->transactions->size : 0),
                      sizeof(char) * 511);
 
+  char *hash_string = to_hex_string_hash(&b->hash[0]);
   if (b->index == 0) {
-    sprintf(out, "GENESIS BLOCK - %s\n", b->hash);
+    sprintf(out, "GENESIS BLOCK - 0x%s\n", hash_string);
   } else {
-    char *hash_string = to_hex_string_hash(&b->hash[0]);
     sprintf(out, "Block %03d - 0x%s\n", b->index, hash_string);
-    free(hash_string);
   }
+  free(hash_string);
 
   char *fmtedtime = formatted_time(&b->timestamp);
   sprintf(out + strlen(out), " |} mined at: %s\n", fmtedtime);
@@ -130,7 +130,7 @@ char *to_string_block(block *b) {
 
   sprintf(out + strlen(out), " |} nonce: %"PRIu64"\n", b->nonce);
 
-  char *prev_hash_string = to_hex_string_hash(&b->hash[0]);
+  char *prev_hash_string = to_hex_string_hash(&b->prev_hash[0]);
   sprintf(out + strlen(out), " |} previous hash: 0x%s\n", prev_hash_string);
   free(prev_hash_string);
 

@@ -163,7 +163,7 @@ void test_serialize_block_no_hash(int *passing, int *total) {
   block *genesis = GENESIS_BLOCK;
 
   // we want to test serialize without hashing
-  strcpy(genesis->hash, "");
+  memset(genesis->hash, 0, sizeof(genesis->hash));
 
   // we also want to check if prev hash gets serialised
   strcpy(genesis->prev_hash, "It's previous hash lmao");

@@ -1,10 +1,18 @@
-#include "test_utils.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <binn.h>
+#include <sodium/utils.h>
+
+#include "../lib/linked_list.h"
+#include "../lib/transaction.h"
+#include "../lib/block.h"
+#include "../lib/utils.h"
+#include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
   printf("TEST - %s : %s%s%s\n", testname, cond ? GREEN : RED,
@@ -82,6 +90,56 @@ bool test_uint8_array(uint8_t *expected, uint8_t *got, size_t length,
     print_uint8_array(got, length);
     printf("\n");
   }
+
+  return passed;
+}
+
+bool test_transaction(transaction *expected, transaction *got, char *testname) {
+  char expected_buf[511];
+  char got_buf[511];
+
+  to_string_transaction(expected, expected_buf);
+  to_string_transaction(got, got_buf);
+
+  return test_string(expected_buf, got_buf, testname);
+}
+
+bool test_linked_list(linked_list *expected, linked_list *got,
+                      void (*value_to_string)(void *, char *), char *testname) {
+
+  char *expected_str = ll_to_string(expected, value_to_string);
+  char *got_str = ll_to_string(got, value_to_string);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
+
+  return passed;
+}
+
+bool test_block(block *expected, block *got, char *testname) {
+
+  char *expected_str = to_string_block(expected);
+  char *got_str = to_string_block(got);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
+
+  return passed;
+}
+
+bool test_hash(hash *expected, hash *got, char *testname) {
+
+  char *expected_str = to_hex_string_hash(expected[0]);
+  char *got_str = to_hex_string_hash(got[0]);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
 
   return passed;
 }

@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +87,7 @@ char *to_string_block(block *b) {
     curr = curr->next;
   }
 
-  sprintf(out + strlen(out), " |} nonce: %lu\n", b->nonce);
+  sprintf(out + strlen(out), " |} nonce: %"PRIu64"\n", b->nonce);
   sprintf(out + strlen(out), " |} previous hash: %s\n", b->prev_hash);
 
   out = realloc(out, strlen(out) + 1);

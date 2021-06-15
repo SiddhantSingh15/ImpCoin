@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,7 +70,7 @@ void  print_block(block *b) {
   char fmttime[100];
   strftime(fmttime, 100, "%m/%d/%y %I:%M%p", localtime(&b->timestamp));
   printf(" |} mined at: %s\n", fmttime);
-  printf(" |} nonce: %lu\n", b->nonce);
+  printf(" |} nonce: %"PRIu64"\n", b->nonce);
   printf(" |} previous hash: %s\n", b->prev_hash);
 }
 

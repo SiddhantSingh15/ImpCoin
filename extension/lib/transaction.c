@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,7 +72,7 @@ linked_list *deserialize_transactions(binn *transactions) {
 void to_string_transaction(transaction *t, char *buffer) {
   char fmttime[100];
   strftime(fmttime, 100, "%m/%d/%y %X UTC", gmtime(&t->timestamp));
-  sprintf(buffer, "[%lu Coin] %s -> %s @ %s", t->amount, t->from, t->to,
+  sprintf(buffer, "[%"PRIu64" Coin] %s -> %s @ %s", t->amount, t->from, t->to,
           fmttime);
 }
 

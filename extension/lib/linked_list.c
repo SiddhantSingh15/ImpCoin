@@ -123,6 +123,7 @@ void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *)) {
 void ll_print(linked_list *list, void (*value_to_string)(void *, char *buf)) {
   char *string = ll_to_string(list, value_to_string);
   printf("%s", string);
+  free(string);
 }
 
 char *ll_to_string(linked_list *list,

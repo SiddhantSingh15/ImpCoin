@@ -66,7 +66,7 @@ void test_ll_add_delete(int *passing, int *total) {
   ll_free(ll, dummy_free);
 }
 
-void test_linked_list(int *passing, int *total) {
+void test_linked_list_functions(int *passing, int *total) {
   printf("---------------------------------------------------------------------"
          "\n");
   printf("-----%sLINKED LIST "
@@ -91,8 +91,11 @@ void test_linked_list(int *passing, int *total) {
 
 void test_serialize_transaction(int *passing, int *total) {
 
+  // Setup transaction
   transaction *t = init_transaction("ash", "ash21", 1200);
-  transaction *other_end = deserialize_transaction(serialize_transaction(t));
+  binn *serialized = serialize_transaction(t);
+  transaction *other_end = deserialize_transaction(serialized);
+  binn_free(serialized);
 
   track_test(
       test_transaction(t, other_end, "Transactions are equal on both ends"),
@@ -103,6 +106,45 @@ void test_serialize_transaction(int *passing, int *total) {
   printf("after deserializing : ");
   print_transaction(other_end);
 
+  // Free transactions
+  free_transaction(t);
+  free_transaction(other_end);
+
+}
+
+void test_serialize_transaction_list(int *passing, int *total) {
+
+  // Create transactions
+  transaction *t1 = init_transaction("blockchain_overlord", "ash", 1000);
+  transaction *t2 = init_transaction("blockchain_overlord", "sid", 1000);
+  transaction *t3 = init_transaction("blockchain_overlord", "kavya", 1000);
+  transaction *t4 = init_transaction("blockchain_overlord", "yelun", 1000);
+
+  // Create list and add transactions
+  linked_list *transactions = ll_init();
+  ll_append(transactions, t1);
+  ll_append(transactions, t2);
+  ll_append(transactions, t3);
+  ll_append(transactions, t4);
+
+  binn *serialized = serialize_transactions(transactions);
+  linked_list *other_end =
+      deserialize_transactions(serialized);
+  binn_free(serialized);
+
+  track_test(
+      test_linked_list(transactions, other_end, to_string_transaction,
+                       "Linked list of transactions is equal on both ends"),
+      passing, total);
+
+  printf("before serializing  : \n");
+  ll_print(transactions, to_string_transaction);
+  printf("after deserializing : \n");
+  ll_print(other_end, to_string_transaction);
+
+  // Free linked list and transactions
+  ll_free(transactions, free_transaction);
+  ll_free(other_end, free_transaction);
 }
 
 void test_serialize_deserialize(int *passing, int *total) {
@@ -115,6 +157,7 @@ void test_serialize_deserialize(int *passing, int *total) {
   int internal_total = 0;
 
   test_serialize_transaction(&internal_passing, &internal_total);
+  test_serialize_transaction_list(&internal_passing, &internal_total);
 
   printf("-----------------------------------------------------------------"
          "----"
@@ -135,7 +178,7 @@ int main(void) {
   int passing = 0;
   int total = 0;
 
-  test_linked_list(&passing, &total);
+  test_linked_list_functions(&passing, &total);
   test_serialize_deserialize(&passing, &total);
 
   printf(

@@ -39,6 +39,12 @@ void ll_append(linked_list *list, void *val) {
   list->last = list->last->next;
 }
 
+void ll_clear(linked_list *list) {
+  list->head = NULL;
+  list->last = NULL;
+  list->size = 0;
+}
+
 ll_node *ll_get_node(linked_list *list, uint32_t index) {
   assert(list);
 
@@ -118,6 +124,22 @@ void ll_delete_node(linked_list *list, ll_node *to_delete,
 void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *)) {
   ll_node *node = ll_get_node(list, index);
   ll_delete_node(list, node, value_free);
+}
+
+void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
+
+  if (number >= list->size) {
+    ll_clear(list);
+  }
+
+  int i = 0;
+  ll_node *curr = list->head;
+  while (i < number) {
+    ll_node *temp = curr;
+    curr = curr->next;
+    ll_free_node(temp, value_free);
+  }
+  list->head = curr;
 }
 
 void ll_print(linked_list *list, void (*value_to_string)(void *, char *buf)) {

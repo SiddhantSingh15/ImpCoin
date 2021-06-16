@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include <nng/nng.h>
@@ -38,26 +39,25 @@ void address_callback(void *arg) {
 
   switch (w->state) {
   case INIT:
-    fprintf(stdout, "%s", "INIT");
     w->state = RECV;
     nng_recv_aio(w->sock, w->aio);
     break;
   case RECV:
-    printf("???");
+    if ((rv = nng_aio_result(w->aio)) != 0) {
+			fatal("nng_recv_aio", rv);
+		}
+    printf("???\n");
     msg = nng_aio_get_msg(w->aio);
 
     if ((rv = nng_aio_result(w->aio)) != 0) {
       fatal("nng_recv_aio", rv);
     } else {
-      printf("result received");
+      printf("result received\n");
     }
 
     w->msg = msg;
     buffer = (char *)nng_msg_body(w->msg);
-    printf("%s", buffer);
-    w->state = WAIT;
-    break;
-  case WAIT:
+    printf("%s\n", buffer);
     nng_aio_set_msg(w->aio, w->msg);
     w->msg = NULL;
     w->state = SEND;
@@ -128,15 +128,12 @@ int run_address_node(const char *our_url, struct addr_worker *workers[]) {
 int main(int argc, char **argv) {
 
   struct addr_worker *workers[PARALLEL];
-  const char *host_url = "tcp://127.0.0.1:8000\0";
+  const char *host_url = "tcp://127.0.0.1:8000";
   int rc = run_address_node(host_url, workers);
-
-  for (;;) {
-    nng_msleep(360000);
-  }
 
   // blockchain *bc = init_blockchain();
   // print_block(bc->latest_block);
   printf("Hello, blockchain!\n");
+  while (true);
   exit(rc == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }

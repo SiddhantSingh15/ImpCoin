@@ -62,7 +62,7 @@ void incoming_callback(void *arg) {
     }
     w->msg = nng_aio_get_msg(w->aio);
     buffer = (char *)nng_msg_body(w->msg);
-    fprintf(stdout, "%s", buffer);
+    fprintf(stdout, "\n%s\n", buffer);
     nng_recv_aio(w->sock, w->aio);
     w->state = RECV;
     break;
@@ -78,7 +78,6 @@ void outgoing_callback(void *arg) {
   case IDLE:
     break;
   case SEND:
-    printf("\nText message sent\n");
     w->state = IDLE;
     break;
   default:
@@ -153,10 +152,20 @@ int main(int argc, char **argv) {
 
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
-
-  nng_socket sock = start_node("tcp://127.0.0.1:8005", incoming, outgoing);
-
   char buffer[511];
+  printf("Please enter your local ip port thing: \n");
+  for (int i = 0; i < 511; i++) {
+      char c = getchar();
+      if (c == '\n') {
+        buffer[i] = '\0';
+        break;
+      };
+      buffer[i] = c;
+    }
+  
+  nng_socket sock = start_node(buffer, incoming, outgoing);
+  dial_address_server(sock, "tcp://127.0.0.1:8000");
+
   while (true) {
     fprintf(stdout, "ASLTY> ");
     for (int i = 0; i < 511; i++) {
@@ -167,17 +176,10 @@ int main(int argc, char **argv) {
       };
       buffer[i] = c;
     }
-
-    if (buffer[0] == 'd' && buffer[1] == ' ') {
-      const char* peer_url = &buffer[2];
-      dial_address_server(sock, peer_url);
-      continue;
-    } else {
-      for (int i = 0; i < PARALLEL; ++i) {
-        if (outgoing[i]->state == IDLE) {
-          send_input_message(buffer, outgoing[i]);
-          break;
-        }
+    for (int i = 0; i < PARALLEL; ++i) {
+      if (outgoing[i]->state == IDLE) {
+        send_input_message(buffer, outgoing[i]);
+        break;
       }
     }
   }

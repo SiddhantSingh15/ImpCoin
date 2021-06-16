@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <nng/nng.h>
 #include <nng/protocol/bus0/bus.h>
@@ -13,6 +14,7 @@
 #include "lib/transaction.h"
 #include "lib/block.h"
 #include "lib/blockchain.h"
+#include "lib/messages.h"
 
 #define PARALLEL 32
 
@@ -35,7 +37,8 @@ void address_callback(void *arg) {
   struct addr_worker *w = arg;
   int rv;
   nng_msg *msg;
-  char *buffer;
+  binn *buffer;
+  char type[10];
 
   switch (w->state) {
   case INIT:
@@ -46,18 +49,24 @@ void address_callback(void *arg) {
     if ((rv = nng_aio_result(w->aio)) != 0) {
 			fatal("nng_recv_aio", rv);
 		}
-    printf("???\n");
     msg = nng_aio_get_msg(w->aio);
 
     if ((rv = nng_aio_result(w->aio)) != 0) {
       fatal("nng_recv_aio", rv);
     } else {
-      printf("result received\n");
+      printf("Result received\n");
     }
 
     w->msg = msg;
-    buffer = (char *)nng_msg_body(w->msg);
-    printf("%s\n", buffer);
+    buffer = (binn *)nng_msg_body(w->msg);
+    printf("%s", binn_object_str(buffer, "type"));
+    strcpy(type, binn_object_str(buffer, "type"));
+    if (strcmp(type, "mine") == 0) {
+      blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
+      printf("%s", blockchain_to_string(bc_msg->bc));
+    } else {
+      printf("This is supposed to be for transactions\n");
+    }
     nng_aio_set_msg(w->aio, w->msg);
     w->msg = NULL;
     w->state = SEND;

@@ -210,3 +210,23 @@ void print_blockchain(blockchain *chain) {
   printf("%s", string);
   free(string);
 }
+
+bool blockchain_valid (blockchain *curr, blockchain *new) {
+  block *latest_curr = curr->latest_block;
+  if (new->latest_block->index > curr->latest_block->index) {
+    block *new_b = new->latest_block;
+    while (new_b->index > 0) {
+      if (new_b->prev_hash != new_b->prev_block->hash) {
+        return false;
+      }
+      // If curr exists within new
+      if (new_b->index == latest_curr->index &&
+        memcmp(new_b->hash, latest_curr->hash, 32) == 0) {
+        return true;
+      }
+      new_b = new_b->prev_block;
+    }
+    return true;
+  }
+  return false;
+}

@@ -17,4 +17,12 @@ typedef struct {
   uint16_t amount;
 } transaction_msg;
 
+binn *serialize_bc_msg(blockchain_msg *bc_msg);
+
+blockchain_msg *deserialize_bc_msg(binn *input);
+
+binn *serialize_t_msg(transaction_msg *t_msg);
+
+transaction_msg *deserialize_t_msg(binn *input);
+
 #endif // MESSAGES_H

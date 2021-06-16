@@ -34,4 +34,6 @@ void free_blockchain(blockchain *chain);
 
 char *blockchain_to_string(blockchain *chain);
 
+bool blockchain_valid (blockchain *curr, blockchain *new);
+
 #endif

@@ -30,7 +30,7 @@ blockchain_msg *deserialize_bc_msg(binn *input) {
   bc_msg->bc = deserialize_blockchain(binn_object_object(input, "blockchain"));
   strncpy(bc_msg->username, binn_object_str(input, "username"), 40);
   strncpy(bc_msg->type, binn_object_str(input, "type"), 10);
-
+  printf("I finished deserialization\n");
   return bc_msg;
 }
 

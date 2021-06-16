@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <nng/nng.h>
 #include <nng/protocol/bus0/bus.h>
@@ -13,8 +14,11 @@
 #include "lib/block.h"
 #include "lib/blockchain.h"
 #include "lib/utils.h"
+#include "lib/messages.h"
 
 #define PARALLEL 32
+
+pthread_mutex_t lock;
 
 typedef enum { IDLE, INIT, RECV, WAIT, SEND } state;
 
@@ -31,7 +35,27 @@ void fatal(const char *func, int rv) {
   exit(1);
 }
 
-void send_input_message(char *msg, struct worker *w) {
+void send_mine_message(blockchain *bc, char *username, struct worker *w) {
+  int rv;
+  nng_msg *nng_msg;
+  blockchain_msg *bc_msg = malloc(sizeof(blockchain_msg));
+  binn *obj;
+
+  w->state = SEND;
+  if ((rv = nng_msg_alloc(&nng_msg, 0)) != 0) {
+    fatal("nng_msg_alloc", rv);
+  }
+  bc_msg->bc = bc;
+  strcpy(bc_msg->username, username);
+  strcpy(bc_msg->type, "mine");
+  obj = serialize_bc_msg(bc_msg);
+  free(bc_msg);
+  nng_msg_insert(nng_msg, binn_ptr(obj), binn_size(obj));
+  nng_aio_set_msg(w->aio, nng_msg);
+  nng_send_aio(w->sock, w->aio);
+}
+
+void send_transaction_message(char *msg, struct worker *w) {
   int rv;
   int msg_size;
   nng_msg *nng_msg;
@@ -50,7 +74,8 @@ void send_input_message(char *msg, struct worker *w) {
 void incoming_callback(void *arg) {
   struct worker *w = arg;
   int rv;
-  char *buffer;
+  binn *buffer;
+  char type[10];
 
   switch (w->state) {
   case INIT:
@@ -62,8 +87,20 @@ void incoming_callback(void *arg) {
       fatal("nng_recv_aio", rv);
     }
     w->msg = nng_aio_get_msg(w->aio);
-    buffer = (char *)nng_msg_body(w->msg);
-    fprintf(stdout, "\n%s\n", buffer);
+    buffer = (binn *)nng_msg_body(w->msg);
+    strcpy(type, binn_object_str(buffer, "type"));
+    if (strcmp(type, "mine") == 0) {
+      blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
+      printf("%s", blockchain_to_string(bc_msg->bc));
+    } else {
+      printf("This is supposed to be for transactions\n");
+    }
+    // pthread_mutex_lock(&lock);
+    // if (blockchain_valid (w->bc, bc_msg->bc)) {
+    //   // DO SOMETHING
+    // }
+    // // EDIT OUR BLOCKCHAIN
+    // pthread_mutex_unlock(&lock);
     nng_recv_aio(w->sock, w->aio);
     w->state = RECV;
     break;
@@ -173,12 +210,14 @@ void mine(blockchain *bc, char *username, uint32_t limit,
 
   while (limit == 0 || i <= limit) {
     block *valid = proof_of_work(bc, username);
+    // lock
     if (append_to_blockchain(bc, valid)) {
-      char *string = to_string_block(valid);
       struct worker *out = find_idle_outgoing(outgoing);
-      send_input_message(string, out);
-      free(string);
+      printf("HASH LOOK HERE%s\n", bc->latest_block->hash);
+      send_mine_message(bc, username, out);
     }
+    // unlock
+    i++;
   }
 }
 
@@ -205,7 +244,7 @@ int main(int argc, char **argv) {
     fprintf(stdout, "ASLTY> ");
     read_line(input_buf, 511);
 
-    mine(bc, "rick", 5, outgoing);
+    mine(bc, username, 5, outgoing);
     /*
     struct worker *out = find_idle_outgoing(outgoing);
     send_input_message(input_buf, out);

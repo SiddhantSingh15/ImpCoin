@@ -158,6 +158,7 @@ void test_serialize_transaction_list(int *passing, int *total) {
   ll_free(other_end, free_transaction);
 }
 
+// Remove this test?
 void test_serialize_block_no_hash(int *passing, int *total) {
 
   block *genesis = GENESIS_BLOCK;
@@ -260,7 +261,7 @@ void test_serialize_deserialize(int *passing, int *total) {
 
   test_serialize_transaction(&internal_passing, &internal_total);
   test_serialize_transaction_list(&internal_passing, &internal_total);
-  test_serialize_block_no_hash(&internal_passing, &internal_total);
+  // test_serialize_block_no_hash(&internal_passing, &internal_total);
   test_serialize_block_w_hash(&internal_passing, &internal_total);
   test_serialize_blockchain(&internal_passing, &internal_total);
 

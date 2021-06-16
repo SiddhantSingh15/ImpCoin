@@ -212,22 +212,27 @@ void print_blockchain(blockchain *chain) {
   free(string);
 }
 
-bool blockchain_valid (blockchain *curr, blockchain *new) {
+bool blockchain_valid (blockchain *curr, blockchain *incoming) {
   block *latest_curr = curr->latest_block;
-  if (new->latest_block->index > curr->latest_block->index) {
-    block *new_b = new->latest_block;
-    while (new_b->index > 0) {
-      if (new_b->prev_hash != new_b->prev_block->hash) {
-        return false;
-      }
-      // If curr exists within new
-      if (new_b->index == latest_curr->index &&
-        memcmp(new_b->hash, latest_curr->hash, 32) == 0) {
-        return true;
-      }
-      new_b = new_b->prev_block;
-    }
-    return true;
+
+  if (curr->latest_block->index > incoming->latest_block->index) {
+    return false;
   }
-  return false;
+
+  block *new_b = incoming->latest_block;
+  while (new_b->index > 0) {
+
+    if (memcmp(new_b->prev_hash, new_b->prev_block->hash, 32) != 0) {
+      return false;
+    }
+
+    // If curr exists within new
+    if (new_b->index == latest_curr->index &&
+        memcmp(new_b->hash, latest_curr->hash, 32) == 0) {
+      return true;
+    }
+
+    new_b = new_b->prev_block;
+  }
+  return true;
 }

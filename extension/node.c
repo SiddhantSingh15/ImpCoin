@@ -48,24 +48,24 @@ void send_input_message(char *msg, struct worker *w) {
 
 void incoming_callback(void *arg) {
   struct worker *w = arg;
-	int rv;
+  int rv;
   char *buffer;
 
-	switch (w->state) {
-	case INIT:
-		w->state = RECV;
-		nng_recv_aio(w->sock, w->aio);
-		break;
-	case RECV:
-		if ((rv = nng_aio_result(w->aio)) != 0) {
-			fatal("nng_recv_aio", rv);
-		}
-		w->msg = nng_aio_get_msg(w->aio);
-    buffer = (char *) nng_msg_body(w->msg);
+  switch (w->state) {
+  case INIT:
+    w->state = RECV;
+    nng_recv_aio(w->sock, w->aio);
+    break;
+  case RECV:
+    if ((rv = nng_aio_result(w->aio)) != 0) {
+      fatal("nng_recv_aio", rv);
+    }
+    w->msg = nng_aio_get_msg(w->aio);
+    buffer = (char *)nng_msg_body(w->msg);
     fprintf(stdout, "%s", buffer);
     nng_recv_aio(w->sock, w->aio);
-		w->state = RECV;
-		break;
+    w->state = RECV;
+    break;
   default:
     break;
   }
@@ -74,13 +74,13 @@ void incoming_callback(void *arg) {
 void outgoing_callback(void *arg) {
   struct worker *w = arg;
 
-	switch (w->state) {
-	case IDLE:
-		break;
-	case SEND:
-    printf("Text message sent");
-		w->state = IDLE;
-		break;
+  switch (w->state) {
+  case IDLE:
+    break;
+  case SEND:
+    printf("\nText message sent\n");
+    w->state = IDLE;
+    break;
   default:
     break;
   }
@@ -102,7 +102,7 @@ struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
   return w;
 }
 
-nng_socket start_node(struct worker *incoming[], struct worker *outgoing[]) {
+nng_socket start_node(const char *our_url, struct worker *incoming[], struct worker *outgoing[]) {
   nng_socket sock;
   int rv;
   int i;
@@ -115,13 +115,11 @@ nng_socket start_node(struct worker *incoming[], struct worker *outgoing[]) {
     printf("Created bus socket\n");
   }
 
-  /*
   if ((rv = nng_listen(sock, our_url, NULL, 0)) != 0) {
     fatal("nng_listen", rv);
   } else {
     printf("Listening at %s\n", our_url);
   }
-  */
 
   for (i = 0; i < PARALLEL; i++) {
     incoming[i] = alloc_worker(sock, incoming_callback);
@@ -156,7 +154,7 @@ int main(int argc, char **argv) {
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
 
-  nng_socket sock = start_node(incoming, outgoing);
+  nng_socket sock = start_node("tcp://127.0.0.1:8005", incoming, outgoing);
 
   char buffer[511];
   while (true) {

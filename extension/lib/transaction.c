@@ -71,13 +71,11 @@ transaction *deserialize_transaction(binn *trn) {
 linked_list *deserialize_transactions(binn *transactions) {
 
   linked_list *new_ll = ll_init();
-
   binn_iter iter;
   binn value;
   binn_list_foreach(transactions, value) {
     ll_append(new_ll, deserialize_transaction(&value));
   }
-
   return new_ll;
 }
 

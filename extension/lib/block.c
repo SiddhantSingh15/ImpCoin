@@ -20,6 +20,7 @@ block *init_block(block *prev){
   block *new = calloc(1, sizeof(block));
   new->index = (prev) ? prev->index + 1 : 0;
   new->prev_block = prev;
+  new->transactions = ll_init();
 
   if (prev) {
     memcpy(new->prev_hash, prev->hash, 32);
@@ -129,8 +130,7 @@ bool is_valid(block *b) {
 
 char *to_string_block(block *b) {
 
-  char *out = calloc(10 + ((b->transactions) ? b->transactions->size - 2 : 0),
-                     sizeof(char) * 511);
+  char *out = calloc(1, b->transactions->size * sizeof(transaction) + 1000);
   PTR_CHECK(out, "out buffer is null");
 
   char *hash_string = to_hex_string_hash(&b->hash[0]);

@@ -114,10 +114,10 @@ blockchain *deserialize_blockchain(binn *input) {
   bc->mempool = deserialize_transactions(mempool);
 
   binn *blockchain = binn_object_list(input, "blockchain");
-  binn_iter iter;
-  binn value;
-  binn_list_foreach(blockchain, value) {
-    block *b = deserialize_block(&value);
+  int count = binn_count(blockchain);
+  bc->latest_block = NULL;
+  for(int i = count; i > 0; i--) {
+    block *b = deserialize_block(binn_list_object(blockchain, i));
     b->prev_block = bc->latest_block;
     bc->latest_block = b;
   }

@@ -62,7 +62,8 @@ bool append_to_blockchain(blockchain *chain, block *b){
     // Remove the transactions in the block from the mempool.
     // The transactions in the block are always taken from the head of the
     // mempool, so we can just drop that number of nodes from it.
-    ll_drop(chain->mem_pool, b->transactions->size, free_transaction);
+    ll_drop(chain->mem_pool, (b->transactions) ? b->transactions->size : 0,
+            free_transaction);
     return true;
   }
   return false;

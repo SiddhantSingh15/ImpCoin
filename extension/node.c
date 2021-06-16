@@ -20,8 +20,8 @@ struct worker {
   state state;
   nng_aio *aio;
   nng_msg *msg;
-  nng_ctx ctx;
-  blockchain bc;
+  nng_socket sock;
+  blockchain *bc;
 };
 
 void fatal(const char *func, int rv) {
@@ -30,13 +30,13 @@ void fatal(const char *func, int rv) {
 }
 
 void incoming_callback(void *arg) {
-  struct worker *w = arg;
+  // struct worker *w = arg;
 
   // switch case
 }
 
 void outgoing_callback(void *arg) {
-  struct worker *w = arg;
+  // struct worker *w = arg;
 
   // switch case
 }
@@ -53,15 +53,11 @@ struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
     fatal("nng_aio_alloc", rv);
   }
 
-  if ((rv = nng_ctx_open(&w->ctx, sock)) != 0) {
-    fatal("nng_ctx_open", rv);
-  }
-
+  w->sock = sock;
   return w;
 }
 
-void start_node(const char *our_url, struct worker *incoming[],
-                struct worker *outgoing[]) {
+nng_socket start_node(struct worker *incoming[], struct worker *outgoing[]) {
   nng_socket sock;
   int rv;
   int i;
@@ -74,11 +70,13 @@ void start_node(const char *our_url, struct worker *incoming[],
     printf("Created bus socket\n");
   }
 
+  /*
   if ((rv = nng_listen(sock, our_url, NULL, 0)) != 0) {
     fatal("nng_listen", rv);
   } else {
     printf("Listening at %s\n", our_url);
   }
+  */
 
   for (i = 0; i < PARALLEL; i++) {
     incoming[i] = alloc_worker(sock, incoming_callback);
@@ -93,12 +91,44 @@ void start_node(const char *our_url, struct worker *incoming[],
     incoming_callback(incoming[i]);
     outgoing_callback(outgoing[i]);
   }
+
+  return sock;
+}
+
+void dial_address_server(nng_socket sock, const char *peer_url) {
+  int rv;
+  if ((rv = (nng_dial(sock, peer_url, NULL, 0)) != 0)) {
+    fatal("nng_dial", rv);
+  } else {
+    printf("Dialed %s\n", peer_url);
+  }
 }
 
 int main(int argc, char **argv) {
 
-  struct worker incoming[PARALLEL];
-  struct worker outgoing[PARALLEL];
+  struct worker *incoming[PARALLEL];
+  struct worker *outgoing[PARALLEL];
+
+  nng_socket sock = start_node(incoming, outgoing);
+
+  char buffer[511];
+  while (true) {
+    fprintf(stdout, "ASLTY> ");
+    for (int i = 0; i < 511; i++) {
+      char c = getchar();
+      if (c == '\n') {
+        buffer[i] = '\0';
+        break;
+      };
+      buffer[i] = c;
+    }
+
+    if (buffer[0] == 'd' && buffer[1] == ' ') {
+      const char* peer_url = &buffer[2];
+      dial_address_server(sock, peer_url);
+      continue;
+    }
+  }
 
 
   // blockchain *bc = init_blockchain();

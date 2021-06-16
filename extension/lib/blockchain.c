@@ -128,7 +128,7 @@ blockchain *deserialize_blockchain(binn *input) {
 // ---------------------------------------------------------------------------
 // Proof of work and mining
 //
-block *new_block(blockchain *bc, char *username) {
+block *new_block(blockchain *bc, const char *username) {
   block *new = init_block(bc->latest_block);
 
   int i = 0;
@@ -142,7 +142,7 @@ block *new_block(blockchain *bc, char *username) {
 
   new->timestamp = time(NULL);
 
-  transaction *reward = init_transaction("rick", username, 69, time(NULL));
+  transaction *reward = init_transaction("rick", (char *)username, 69, time(NULL));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
@@ -150,7 +150,7 @@ block *new_block(blockchain *bc, char *username) {
   return new;
 }
 
-block *proof_of_work(blockchain *bc, char *username) {
+block *proof_of_work(blockchain *bc, const char *username) {
   block *new = new_block(bc, username);
 
   hash *new_hash = hash_block(new);

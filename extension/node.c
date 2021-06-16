@@ -18,6 +18,7 @@
 
 #define PARALLEL 32
 
+// We only dereference a bc_ptr when the lock is acquired
 pthread_mutex_t lock;
 
 typedef enum { IDLE, INIT, RECV, WAIT, SEND } state;
@@ -28,6 +29,7 @@ struct worker {
   nng_msg *msg;
   nng_socket sock;
   blockchain **bc_ptr;
+  const char *username;
 };
 
 void fatal(const char *func, int rv) {
@@ -35,7 +37,7 @@ void fatal(const char *func, int rv) {
   exit(1);
 }
 
-void send_mine_message(blockchain *bc, char *username, struct worker *w) {
+void send_mine_message(blockchain *bc, struct worker *w) {
   int rv;
   nng_msg *nng_msg;
   blockchain_msg *bc_msg = malloc(sizeof(blockchain_msg));
@@ -49,7 +51,7 @@ void send_mine_message(blockchain *bc, char *username, struct worker *w) {
     fatal("nng_msg_alloc", rv);
   }
   bc_msg->bc = bc;
-  strcpy(bc_msg->username, username);
+  strcpy(bc_msg->username, w->username);
   strcpy(bc_msg->type, "mine");
   obj = serialize_bc_msg(bc_msg);
   free(bc_msg);
@@ -94,21 +96,26 @@ void incoming_callback(void *arg) {
     buffer = (binn *)nng_msg_body(w->msg);
     strcpy(type, binn_object_str(buffer, "type"));
 
+    if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
+      // This was sent by us, ignore
+      break;
+    }
+
     if (strcmp(type, "mine") == 0) {
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
 
       // lock
       pthread_mutex_lock(&lock);
+
       if (blockchain_valid(*w->bc_ptr, bc_msg->bc)) {
         free_blockchain(*w->bc_ptr);
         *w->bc_ptr = bc_msg->bc;
-        // memcpy(w->bc, bc_msg->bc, sizeof(blockchain));
-        // free(bc_msg->bc);
         // printf("%s\n", blockchain_to_string(*w->bc));
         print_block((*(w->bc_ptr))->latest_block);
       } else {
         free_blockchain(bc_msg->bc);
       }
+
       // unlock
       pthread_mutex_unlock(&lock);
 
@@ -155,7 +162,8 @@ struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
 }
 
 nng_socket start_node(const char *our_url, struct worker *incoming[],
-                      struct worker *outgoing[], blockchain **bc_ptr) {
+                      struct worker *outgoing[], blockchain **bc_ptr,
+                      const char *username) {
   nng_socket sock;
   int rv;
   int i;
@@ -179,10 +187,12 @@ nng_socket start_node(const char *our_url, struct worker *incoming[],
     incoming[i] = alloc_worker(sock, incoming_callback);
     incoming[i]->state = INIT;
     incoming[i]->bc_ptr = bc_ptr;
+    incoming[i]->username = username;
 
     outgoing[i] = alloc_worker(sock, outgoing_callback);
     outgoing[i]->state = IDLE;
     outgoing[i]->bc_ptr = NULL;
+    outgoing[i]->username = username;
   }
 
   sleep(1);
@@ -216,7 +226,7 @@ struct worker *find_idle_outgoing(struct worker *outgoing[]) {
   return NULL;
 }
 
-void mine(blockchain **bc_ptr, char *username, uint32_t limit,
+void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
           struct worker *outgoing[]) {
 
   // This function will mine `limit` number of blocks.
@@ -231,7 +241,7 @@ void mine(blockchain **bc_ptr, char *username, uint32_t limit,
 
     if (append_to_blockchain(*bc_ptr, valid)) {
       struct worker *out = find_idle_outgoing(outgoing);
-      send_mine_message(*bc_ptr, username, out);
+      send_mine_message(*bc_ptr, out);
     }
 
     // unlock
@@ -246,7 +256,6 @@ int main(int argc, char **argv) {
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
   char input_buf[511];
-  char username[511];
 
   if (pthread_mutex_init(&lock, NULL) != 0) {
     printf("\n mutex init has failed\n");
@@ -276,18 +285,18 @@ int main(int argc, char **argv) {
   printf("Please enter your local ip port thing: \n");
   read_line(input_buf, 511);
 
-  nng_socket sock = start_node(input_buf, incoming, outgoing, bc_ptr);
-  dial_address_server(sock, "tcp://127.0.0.1:8000");
-
+  const char *username = malloc(511);
   printf("Please enter your username: \n");
-  read_line(input_buf, 511);
-  strcpy(username, input_buf);
+  read_line((char *)username, 511);
+
+  nng_socket sock = start_node(input_buf, incoming, outgoing, bc_ptr, username);
+  dial_address_server(sock, "tcp://127.0.0.1:8000");
 
   while (true) {
     fprintf(stdout, "ASLTY> ");
     read_line(input_buf, 511);
 
-    mine(bc_ptr, username, 0, outgoing);
+    mine(bc_ptr, username, 5, outgoing);
     /*
     struct worker *out = find_idle_outgoing(outgoing);
     send_input_message(input_buf, out);
@@ -296,6 +305,7 @@ int main(int argc, char **argv) {
 
   free_blockchain(*bc_ptr);
   free(bc_ptr);
+  free((char *)username);
 
   // blockchain *bc = init_blockchain();
   // print_block(bc->latest_block);

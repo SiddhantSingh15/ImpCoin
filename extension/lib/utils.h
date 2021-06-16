@@ -11,4 +11,6 @@ char *to_hex_string_hash(char *in);
 
 char *formatted_time(time_t *t);
 
+void read_line(char *buffer, size_t len);
+
 #endif /* UTILS_H */

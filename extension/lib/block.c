@@ -120,7 +120,7 @@ block *deserialize_block(binn *b) {
 
 bool is_valid(block *b) {
   // pre: the hash has been calculated
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < 3; i++) {
     if (b->hash[i] != '\0') {
       return false;
     }

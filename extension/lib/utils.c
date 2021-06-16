@@ -31,3 +31,14 @@ char *formatted_time(time_t *t) {
   fmttime = realloc(fmttime, strlen(fmttime) + 1);
   return fmttime;
 }
+
+void read_line(char *buffer, size_t len) {
+  for (int i = 0; i < len; i++) {
+    char c = getchar();
+    if (c == '\n') {
+      buffer[i] = '\0';
+      break;
+    };
+    buffer[i] = c;
+  }
+}

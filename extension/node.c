@@ -12,6 +12,7 @@
 #include "lib/transaction.h"
 #include "lib/block.h"
 #include "lib/blockchain.h"
+#include "lib/utils.h"
 
 #define PARALLEL 32
 
@@ -101,7 +102,8 @@ struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
   return w;
 }
 
-nng_socket start_node(const char *our_url, struct worker *incoming[], struct worker *outgoing[]) {
+nng_socket start_node(const char *our_url, struct worker *incoming[],
+                      struct worker *outgoing[], blockchain *bc) {
   nng_socket sock;
   int rv;
   int i;
@@ -121,10 +123,14 @@ nng_socket start_node(const char *our_url, struct worker *incoming[], struct wor
   }
 
   for (i = 0; i < PARALLEL; i++) {
+
     incoming[i] = alloc_worker(sock, incoming_callback);
     incoming[i]->state = INIT;
+    incoming[i]->bc = bc;
+
     outgoing[i] = alloc_worker(sock, outgoing_callback);
     outgoing[i]->state = IDLE;
+    outgoing[i]->bc = NULL;
   }
 
   sleep(1);
@@ -148,40 +154,62 @@ void dial_address_server(nng_socket sock, const char *peer_url) {
   }
 }
 
+struct worker *find_idle_outgoing(struct worker *outgoing[]) {
+  for (int i = 0; i < PARALLEL; ++i) {
+    if (outgoing[i]->state == IDLE) {
+      return outgoing[i];
+    }
+  }
+  // shouldn't be reached, theoretically
+  return NULL;
+}
+
+void mine(blockchain *bc, char *username, uint32_t limit,
+          struct worker *outgoing[]) {
+
+  // This function will mine `limit` number of blocks.
+  // If the limit given is 0, it will mine indefinitely.
+  int i = 1;
+
+  while (limit == 0 || i <= limit) {
+    block *valid = proof_of_work(bc, username);
+    if (append_to_blockchain(bc, valid)) {
+      char *string = to_string_block(valid);
+      struct worker *out = find_idle_outgoing(outgoing);
+      send_input_message(string, out);
+      free(string);
+    }
+  }
+}
+
 int main(int argc, char **argv) {
 
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
-  char buffer[511];
+  char input_buf[511];
+  char username[511];
+
+  blockchain *bc = init_blockchain();
+
   printf("Please enter your local ip port thing: \n");
-  for (int i = 0; i < 511; i++) {
-      char c = getchar();
-      if (c == '\n') {
-        buffer[i] = '\0';
-        break;
-      };
-      buffer[i] = c;
-    }
-  
-  nng_socket sock = start_node(buffer, incoming, outgoing);
+  read_line(input_buf, 511);
+
+  nng_socket sock = start_node(input_buf, incoming, outgoing, bc);
   dial_address_server(sock, "tcp://127.0.0.1:8000");
+
+  printf("Please enter your username: \n");
+  read_line(input_buf, 511);
+  strcpy(username, input_buf);
 
   while (true) {
     fprintf(stdout, "ASLTY> ");
-    for (int i = 0; i < 511; i++) {
-      char c = getchar();
-      if (c == '\n') {
-        buffer[i] = '\0';
-        break;
-      };
-      buffer[i] = c;
-    }
-    for (int i = 0; i < PARALLEL; ++i) {
-      if (outgoing[i]->state == IDLE) {
-        send_input_message(buffer, outgoing[i]);
-        break;
-      }
-    }
+    read_line(input_buf, 511);
+
+    mine(bc, "rick", 5, outgoing);
+    /*
+    struct worker *out = find_idle_outgoing(outgoing);
+    send_input_message(input_buf, out);
+    */
   }
 
 

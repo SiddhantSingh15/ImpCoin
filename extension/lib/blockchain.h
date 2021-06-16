@@ -16,7 +16,7 @@ block *genesis_block(void);
 
 blockchain *init_blockchain(void);
 
-void append_to_blockchain(blockchain *chain, void *val);
+void append_to_blockchain(blockchain *chain, block *val);
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 
@@ -25,5 +25,7 @@ block *proof_of_work(blockchain *bc, char *username);
 void print_blockchain(blockchain *chain);
 
 void free_blockchain(blockchain *chain);
+
+char *blockchain_to_string(blockchain *chain);
 
 #endif

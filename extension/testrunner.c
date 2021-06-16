@@ -272,13 +272,103 @@ void test_proof_of_work(int *passing, int *total) {
   *total = *total + internal_total;
 }
 
+void test_append_blocks(int *passing, int *total) {
+  blockchain *first_bc = init_blockchain();
+  blockchain *second_bc = init_blockchain();
+  track_test(
+    test_blockchain(
+      first_bc,
+      second_bc,
+      "Blockchain initialization produces identical results."
+    ),
+    passing, total);
+  // Print new block
+  printf("Blockchain 1: \n");
+  print_blockchain(first_bc);
+  printf("Blockchain 2: \n");
+  print_blockchain(second_bc);
+
+  // Add 1 new node to both blockchains
+
+  char *username = "rick";
+  block *just_mined = proof_of_work(first_bc, username);
+  block *just_mined_dup = calloc(1, sizeof(block));
+  memcpy(just_mined_dup, just_mined, sizeof(block));
+  just_mined_dup->reward = *dup_transaction(&just_mined->reward);
+  append_to_blockchain(first_bc, just_mined);
+  append_to_blockchain(second_bc, just_mined_dup);
+  track_test(
+    test_blockchain(
+      first_bc,
+      second_bc,
+      "Adding the same block to both chains produces identical results."
+    ),
+    passing, total);
+  printf("Blockchain 1: \n");
+  print_blockchain(first_bc);
+  printf("Blockchain 2: \n");
+  print_blockchain(second_bc);
+  // Only free just_mined because we can reuse just_mined_dup
+  free(just_mined);
+  free(just_mined_dup);
+
+  block *next_mined = proof_of_work(first_bc, username);
+  block *next_mined_dup = calloc(1, sizeof(block));
+  memcpy(next_mined_dup, next_mined, sizeof(block));
+  just_mined_dup->reward = *dup_transaction(&just_mined->reward);
+  append_to_blockchain(first_bc, just_mined);
+  append_to_blockchain(second_bc, just_mined_dup);
+  track_test(
+    test_blockchain(
+      first_bc,
+      second_bc,
+      "Adding the same block to both chains produces identical results."
+    ),
+    passing, total);
+  printf("Blockchain 1: \n");
+  print_blockchain(first_bc);
+  printf("Blockchain 2: \n");
+  print_blockchain(second_bc);
+
+  free_blockchain(first_bc);
+  free_blockchain(second_bc);
+  free(next_mined);
+  free(next_mined_dup);
+}
+
+void test_blockchain_append(int *passing, int *total) {
+  printf("---------------------------------------------------------------------"
+				"\n");
+  printf("-----%s BLOCKCHAIN APPENDING "
+         "TESTS%s-------------------------------------\n",
+         BOLDBLUE, NOCOLOUR);
+
+	int internal_passing = 0;
+	int internal_total = 0;
+
+  test_append_blocks(&internal_passing, &internal_total);
+
+	printf("-----------------------------------------------------------------"
+				"----"
+				"\n");
+  printf("%sPASSING: (%d/%d) tests%s\n",
+         internal_passing == internal_total        ? GREEN
+         : (internal_passing > internal_total / 2) ? YELLOW
+                                                   : RED,
+         internal_passing, internal_total, NOCOLOUR);
+
+  *passing = *passing + internal_passing;
+  *total = *total + internal_total;
+}
+
 int main(void) {
   int passing = 0;
   int total = 0;
 
   test_linked_list_functions(&passing, &total);
   test_serialize_deserialize(&passing, &total);
-	test_proof_of_work(&passing, &total);
+	// test_proof_of_work(&passing, &total);
+  test_blockchain_append(&passing, &total);
 
   printf(
       "%s---------------------------------------------------------------------%"

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include <binn.h>
 
@@ -51,14 +52,15 @@ blockchain *init_blockchain(void) {
   return new;
 }
 
-void append_to_blockchain(blockchain *chain, void *val){
+void append_to_blockchain(blockchain *chain, block *val){
   assert(chain);
   assert(val);
-
-  block *to_append = init_block(chain->latest_block);
-  memcpy(to_append->prev_hash, chain->latest_block->hash, 32);
-  //TODO: set this_hash and other missing attributes
-  chain->latest_block = to_append;
+  block *temp = init_block(chain->latest_block);
+  val->index = temp->index;
+  val->prev_block = temp->prev_block;
+  memcpy(val->prev_hash, temp->prev_hash, 32);
+  chain->latest_block = val;
+  free(temp);
 }
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num){
@@ -126,4 +128,29 @@ void free_blockchain(blockchain *chain){
     free_block(temp);
   }
   free(chain);
+}
+
+char *blockchain_to_string(blockchain *chain) {
+  assert(chain);
+  assert(chain->latest_block);
+  char buf[600];
+  block *curr = chain->latest_block;
+  char *out = calloc(curr->index + 1, sizeof(buf));
+  while (curr != NULL) {
+    assert(curr);
+    strcpy(buf, to_string_block(curr));
+    sprintf(out + strlen(out), "%s", buf);
+    if (curr->prev_block != NULL) {
+      sprintf(out + strlen(out), "%s\n", "----- NEXT BLOCK -----");
+    }
+    curr = curr->prev_block;
+  }
+  out = realloc(out, strlen(out) + 1);
+  return out;
+}
+
+void print_blockchain(blockchain *chain) {
+  char *string = blockchain_to_string(chain);
+  printf("%s", string);
+  free(string);
 }

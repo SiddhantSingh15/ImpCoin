@@ -12,6 +12,7 @@
 #include "../lib/transaction.h"
 #include "../lib/block.h"
 #include "../lib/utils.h"
+#include "../lib/blockchain.h"
 #include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {
@@ -122,6 +123,19 @@ bool test_block(block *expected, block *got, char *testname) {
 
   char *expected_str = to_string_block(expected);
   char *got_str = to_string_block(got);
+
+  bool passed = test_string(expected_str, got_str, testname);
+
+  free(expected_str);
+  free(got_str);
+
+  return passed;
+}
+
+bool test_blockchain(blockchain *expected, blockchain *got, char *testname) {
+
+  char *expected_str = blockchain_to_string(expected);
+  char *got_str = blockchain_to_string(got);
 
   bool passed = test_string(expected_str, got_str, testname);
 

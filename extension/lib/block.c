@@ -139,7 +139,7 @@ char *to_string_block(block *b) {
   return out;
 }
 
-void  print_block(block *b) {
+void print_block(block *b) {
   char *string = to_string_block(b);
   printf("%s", string);
   free(string);

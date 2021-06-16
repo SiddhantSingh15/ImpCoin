@@ -33,8 +33,9 @@ TEST_OBJS := $(call GET_OBJS, $(TEST_SRC_DIRS))
 all: node testrunner
 	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
 
-tests: testrunner
+test: testrunner
 	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
+	./testrunner
 
 node: $(NODE_OBJS)
 

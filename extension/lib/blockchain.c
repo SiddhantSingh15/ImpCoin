@@ -52,11 +52,21 @@ blockchain *init_blockchain(void) {
   return new;
 }
 
-void append_to_blockchain(blockchain *chain, block *val){
-  assert(chain);
-  assert(val);
-  assert(is_valid(val));
-  chain->latest_block = val;
+bool append_to_blockchain(blockchain *chain, block *b){
+  assert(chain && b);
+
+  // Append the new block to the blockchain
+  if (is_valid(b) && chain->latest_block == b->prev_block) {
+    chain->latest_block = b;
+
+    // Remove the transactions in the block from the mempool.
+    // The transactions in the block are always taken from the head of the
+    // mempool, so we can just drop that number of nodes from it.
+    ll_drop(chain->mem_pool, (b->transactions) ? b->transactions->size : 0,
+            free_transaction);
+    return true;
+  }
+  return false;
 }
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num){

@@ -21,6 +21,8 @@ ll_node *ll_init_node(void *val);
 
 void ll_append(linked_list *list, void *val);
 
+void ll_clear(linked_list *list);
+
 ll_node *ll_get_node(linked_list *list, uint32_t index);
 
 void *ll_get(linked_list *list, uint32_t index);
@@ -33,6 +35,8 @@ void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *));
 
 void ll_delete_node(linked_list *list, ll_node *to_delete,
                     void (*value_free)(void *));
+
+void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *));
 
 char *ll_to_string(linked_list *list,
                   void (*value_to_string)(void *, char *buf));

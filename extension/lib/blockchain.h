@@ -16,7 +16,7 @@ block *genesis_block(void);
 
 blockchain *init_blockchain(void);
 
-void append_to_blockchain(blockchain *chain, block *val);
+bool append_to_blockchain(blockchain *chain, block *b);
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num);
 

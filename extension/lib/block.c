@@ -120,7 +120,7 @@ block *deserialize_block(binn *b) {
 
 bool is_valid(block *b) {
   // pre: the hash has been calculated
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 2; i++) {
     if (b->hash[i] != '\0') {
       return false;
     }
@@ -177,8 +177,6 @@ void print_block(block *b) {
 }
 
 void free_block(block *b) {
-  if (b->transactions != NULL) {
-    ll_free(b->transactions, free_transaction);
-  }
+  ll_free(b->transactions, free_transaction);
   free(b);
 }

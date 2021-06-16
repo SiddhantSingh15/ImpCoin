@@ -191,6 +191,22 @@ int main(int argc, char **argv) {
 
   blockchain *bc = init_blockchain();
 
+  transaction *t1 = init_transaction("rick", "george", 420, 0);
+  transaction *t2 = init_transaction("rick", "george", 4200, 0);
+  transaction *t3 = init_transaction("rick", "george", 4220, 0);
+  transaction *t4 = init_transaction("rick", "george", 4240, 0);
+
+  transaction *t5 = init_transaction("rick", "george", 5220, 0);
+  transaction *t6 = init_transaction("rick", "george", 6240, 0);
+
+  ll_append(bc->mempool, t1);
+  ll_append(bc->mempool, t2);
+  ll_append(bc->mempool, t3);
+  ll_append(bc->mempool, t4);
+
+  ll_append(bc->mempool, t5);
+  ll_append(bc->mempool, t6);
+
   printf("Please enter your local ip port thing: \n");
   read_line(input_buf, 511);
 
@@ -205,13 +221,14 @@ int main(int argc, char **argv) {
     fprintf(stdout, "ASLTY> ");
     read_line(input_buf, 511);
 
-    mine(bc, "rick", 5, outgoing);
+    mine(bc, username, 5, outgoing);
     /*
     struct worker *out = find_idle_outgoing(outgoing);
     send_input_message(input_buf, out);
     */
   }
 
+  free_blockchain(bc);
 
   // blockchain *bc = init_blockchain();
   // print_block(bc->latest_block);

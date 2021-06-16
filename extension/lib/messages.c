@@ -7,6 +7,9 @@
 #include <binn.h>
 #include <time.h>
 
+#include "linked_list.h"
+#include "transaction.h"
+#include "block.h"
 #include "blockchain.h"
 #include "messages.h"
 #include "utils.h"
@@ -41,7 +44,7 @@ binn *serialize_t_msg(transaction_msg *t_msg) {
   return obj;
 }
 
-blockchain_msg *deserialize_t_msg(binn *input) {
+transaction_msg *deserialize_t_msg(binn *input) {
   transaction_msg *t_msg = calloc(1, sizeof(transaction_msg));
   strncpy(t_msg->username, binn_object_str(input, "username"), 40);
   strncpy(t_msg->type, binn_object_str(input, "type"), 10);

@@ -129,7 +129,7 @@ void free_blockchain(blockchain *chain){
 char *blockchain_to_string(blockchain *chain) {
   assert(chain);
   assert(chain->latest_block);
-  char buf[600];
+  char buf[800];
   block *curr = chain->latest_block;
   char *out = calloc(curr->index + 1, sizeof(buf));
   while (curr != NULL) {
@@ -137,7 +137,7 @@ char *blockchain_to_string(blockchain *chain) {
     strcpy(buf, to_string_block(curr));
     sprintf(out + strlen(out), "%s", buf);
     if (curr->prev_block != NULL) {
-      sprintf(out + strlen(out), "%s\n", "----- NEXT BLOCK -----");
+      sprintf(out + strlen(out), "%s\n", "----- PREVIOUS BLOCK -----");
     }
     curr = curr->prev_block;
   }

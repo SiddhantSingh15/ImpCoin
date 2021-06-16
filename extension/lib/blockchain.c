@@ -55,12 +55,8 @@ blockchain *init_blockchain(void) {
 void append_to_blockchain(blockchain *chain, block *val){
   assert(chain);
   assert(val);
-  block *temp = init_block(chain->latest_block);
-  val->index = temp->index;
-  val->prev_block = temp->prev_block;
-  memcpy(val->prev_hash, temp->prev_hash, 32);
+  assert(is_valid(val));
   chain->latest_block = val;
-  free(temp);
 }
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num){

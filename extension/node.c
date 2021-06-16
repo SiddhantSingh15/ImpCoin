@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <nng/nng.h>
 #include <nng/protocol/bus0/bus.h>
@@ -29,16 +30,60 @@ void fatal(const char *func, int rv) {
   exit(1);
 }
 
-void incoming_callback(void *arg) {
-  // struct worker *w = arg;
+void send_input_message(char *msg, struct worker *w) {
+  int rv;
+  int msg_size;
+  nng_msg *nng_msg;
 
-  // switch case
+  w->state = SEND;
+  if ((rv = nng_msg_alloc(&nng_msg, 0)) != 0) {
+    fatal("nng_msg_alloc", rv);
+  }
+
+  msg_size = strlen(msg) + 1;
+  nng_msg_insert(nng_msg, msg, msg_size);
+  nng_aio_set_msg(w->aio, nng_msg);
+  nng_send_aio(w->sock, w->aio);
+}
+
+void incoming_callback(void *arg) {
+  struct worker *w = arg;
+	int rv;
+  char *buffer;
+
+	switch (w->state) {
+	case INIT:
+		w->state = RECV;
+		nng_recv_aio(w->sock, w->aio);
+		break;
+	case RECV:
+		if ((rv = nng_aio_result(w->aio)) != 0) {
+			fatal("nng_recv_aio", rv);
+		}
+		w->msg = nng_aio_get_msg(w->aio);
+    buffer = (char *) nng_msg_body(w->msg);
+    fprintf(stdout, "%s", buffer);
+    nng_recv_aio(w->sock, w->aio);
+		w->state = RECV;
+		break;
+  default:
+    break;
+  }
 }
 
 void outgoing_callback(void *arg) {
-  // struct worker *w = arg;
+  struct worker *w = arg;
 
-  // switch case
+	switch (w->state) {
+	case IDLE:
+		break;
+	case SEND:
+    printf("Text message sent");
+		w->state = IDLE;
+		break;
+  default:
+    break;
+  }
 }
 
 struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
@@ -80,7 +125,9 @@ nng_socket start_node(struct worker *incoming[], struct worker *outgoing[]) {
 
   for (i = 0; i < PARALLEL; i++) {
     incoming[i] = alloc_worker(sock, incoming_callback);
+    incoming[i]->state = INIT;
     outgoing[i] = alloc_worker(sock, outgoing_callback);
+    outgoing[i]->state = IDLE;
   }
 
   sleep(1);
@@ -127,6 +174,13 @@ int main(int argc, char **argv) {
       const char* peer_url = &buffer[2];
       dial_address_server(sock, peer_url);
       continue;
+    } else {
+      for (int i = 0; i < PARALLEL; ++i) {
+        if (outgoing[i]->state == IDLE) {
+          send_input_message(buffer, outgoing[i]);
+          break;
+        }
+      }
     }
   }
 

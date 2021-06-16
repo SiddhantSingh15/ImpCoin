@@ -4,6 +4,7 @@
 
 #include <nng/nng.h>
 #include <nng/protocol/bus0/bus.h>
+#include <nng/supplemental/util/platform.h>
 #include <binn.h>
 #include <sodium.h>
 
@@ -16,12 +17,11 @@
 
 typedef enum { IDLE, INIT, RECV, WAIT, SEND } state;
 
-struct worker {
+struct addr_worker {
   state state;
   nng_aio *aio;
   nng_msg *msg;
   nng_socket sock;
-  blockchain bc;
 };
 
 void fatal(const char *func, int rv) {
@@ -30,16 +30,18 @@ void fatal(const char *func, int rv) {
 }
 
 void address_callback(void *arg) {
-  struct worker *w = arg;
+  struct addr_worker *w = arg;
 	int rv;
   char *buffer;
 
 	switch (w->state) {
 	case INIT:
+    fprintf(stdout,"%s","INIT");
 		w->state = RECV;
 		nng_recv_aio(w->sock, w->aio);
 		break;
 	case RECV:
+    printf("???");
 		if ((rv = nng_aio_result(w->aio)) != 0) {
 			fatal("nng_recv_aio", rv);
 		}
@@ -49,7 +51,6 @@ void address_callback(void *arg) {
 		w->state = WAIT;
 		break;
 	case WAIT:
-		// We could add more data to the message here.
 		nng_aio_set_msg(w->aio, w->msg);
 		w->msg   = NULL;
 		w->state = SEND;
@@ -70,10 +71,10 @@ void address_callback(void *arg) {
 	}
 }
 
-struct worker *alloc_worker(nng_socket sock) {
-  struct worker *w;
+struct addr_worker *alloc_worker(nng_socket sock) {
+  struct addr_worker *w;
   int rv;
-
+  fprintf(stdout,"?");
   if ((w = nng_alloc(sizeof(*w))) == NULL) {
     fatal("nng_alloc", NNG_ENOMEM);
   }
@@ -86,7 +87,7 @@ struct worker *alloc_worker(nng_socket sock) {
   return w;
 }
 
-void start_address_node(const char *our_url, struct worker *workers[]) {
+void start_address_node(const char *our_url, struct addr_worker *workers[]) {
   nng_socket sock;
   int rv;
   int i;
@@ -99,33 +100,36 @@ void start_address_node(const char *our_url, struct worker *workers[]) {
     printf("Created bus socket\n");
   }
 
+  printf("1");
   if ((rv = nng_listen(sock, our_url, NULL, 0)) != 0) {
     fatal("nng_listen", rv);
   } else {
     printf("Listening at %s\n", our_url);
+    printf("2");
   }
-
   for (i = 0; i < PARALLEL; i++) {
+    printf("%d", i);
     workers[i] = alloc_worker(sock);
   }
-
   sleep(1);
 
   for (i = 0; i < PARALLEL; i++) {
     address_callback(workers[i]);
   }
+  for (;;) {
+    nng_msleep(3600000);
+  }
 }
 
 int main(int argc, char **argv) {
 
-  struct worker *workers[PARALLEL];
-
+  struct addr_worker *workers[PARALLEL];
+  const char *host_url = "tcp://127.0.0.1:8000\0";
 
   // blockchain *bc = init_blockchain();
   // print_block(bc->latest_block);
   printf("Hello, blockchain!\n");
 
-  start_address_node("tcp://127.0.0.1:8000", workers);
-  while (1);
+  start_address_node(host_url, workers);
   return EXIT_SUCCESS;
 }

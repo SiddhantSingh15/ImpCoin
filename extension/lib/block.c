@@ -177,8 +177,6 @@ void print_block(block *b) {
 }
 
 void free_block(block *b) {
-  if (b->transactions != NULL) {
-    ll_free(b->transactions, free_transaction);
-  }
+  ll_free(b->transactions, free_transaction);
   free(b);
 }

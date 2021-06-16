@@ -130,6 +130,7 @@ void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
 
   if (number >= list->size) {
     ll_clear(list);
+    return;
   }
 
   int i = 0;
@@ -138,6 +139,7 @@ void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
     ll_node *temp = curr;
     curr = curr->next;
     ll_free_node(temp, value_free);
+    i++;
   }
   list->head = curr;
 }

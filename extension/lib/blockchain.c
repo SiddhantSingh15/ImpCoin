@@ -133,9 +133,11 @@ block *new_block(blockchain *bc, char *username) {
 
   int i = 0;
   ll_node *curr = bc->mempool->head;
-  while (curr != NULL && i < MAX_TRANSACTIONS_PER_BLOCK) {
+  while (i < MAX_TRANSACTIONS_PER_BLOCK && curr != NULL) {
     assert(curr->value);
     ll_append(new->transactions, dup_transaction((transaction *)curr->value));
+    curr = curr->next;
+    i++;
   }
 
   new->timestamp = time(NULL);

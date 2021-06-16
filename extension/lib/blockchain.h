@@ -9,7 +9,7 @@
 
 typedef struct blockchain {
   block *latest_block;
-  linked_list *mem_pool;
+  linked_list *mempool;
 } blockchain;
 
 block *genesis_block(void);
@@ -19,6 +19,12 @@ blockchain *init_blockchain(void);
 bool append_to_blockchain(blockchain *chain, block *b);
 
 block *traverse_blockchain(blockchain *chain, uint32_t block_num);
+
+binn *serialize_blockchain(blockchain *bc);
+
+blockchain *deserialize_blockchain(binn *input);
+
+block *new_block(blockchain *bc, char *username);
 
 block *proof_of_work(blockchain *bc, char *username);
 

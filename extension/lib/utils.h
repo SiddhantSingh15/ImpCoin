@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define PTR_CHECK(ptr, msg) if (!ptr) { perror(msg); exit(EXIT_FAILURE); }
+
 uint64_t random_long(void);
 
 char *rand_hash(const unsigned char *in, size_t len);

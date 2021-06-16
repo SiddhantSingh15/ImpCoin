@@ -49,6 +49,17 @@ binn *serialize_block_no_hash(block *input) {
   return obj;
 }
 
+binn *serialize_block_w_hash(block *input) {
+  // pre: the hash must have been generated already
+  assert(input->hash);
+
+  binn *obj;
+  obj = serialize_block_no_hash(input);
+  binn_object_set_str(obj, "hash", input->hash);
+
+  return obj;
+}
+
 hash *hash_block(block *b) {
 
   binn *serialized = serialize_block_no_hash(b);
@@ -101,12 +112,9 @@ block *deserialize_block(binn *b) {
   new->nonce = binn_object_uint64(b, "nonce");
 
   strncpy(new->prev_hash, binn_object_str(b, "prev_hash"), 32);
+  strncpy(new->hash, binn_object_str(b, "hash"), 32);
 
   return new;
-}
-
-void serialize_w_hash(binn *b, hash hash) {
-  binn_object_set_str(b, "hash", &hash[0]);
 }
 
 bool is_valid(block *b) {
@@ -121,9 +129,9 @@ bool is_valid(block *b) {
 
 char *to_string_block(block *b) {
 
-  char buf[511];
-  char *out = calloc(10 + ((b->transactions) ? b->transactions->size : 0),
+  char *out = calloc(10 + ((b->transactions) ? b->transactions->size - 2 : 0),
                      sizeof(char) * 511);
+  PTR_CHECK(out, "out buffer is null");
 
   char *hash_string = to_hex_string_hash(&b->hash[0]);
   if (b->index == 0) {
@@ -136,6 +144,7 @@ char *to_string_block(block *b) {
   char *fmtedtime = formatted_time(&b->timestamp);
   sprintf(out + strlen(out), " |} mined at: %s\n", fmtedtime);
 
+  char buf[300];
   to_string_transaction(&b->reward, buf);
   sprintf(out + strlen(out), " |} reward: %s\n", buf);
   sprintf(out + strlen(out), " |} transactions:\n");

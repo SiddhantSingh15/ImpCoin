@@ -41,14 +41,14 @@ linked_list *init_mempool(void) {
   return ll_init();
 }
 
-void free_mempool(linked_list *mem_pool) {
-  ll_free(mem_pool, free_transaction);
+void free_mempool(linked_list *mempool) {
+  ll_free(mempool, free_transaction);
 }
 
 blockchain *init_blockchain(void) {
   blockchain *new = malloc(sizeof(blockchain));
   new->latest_block = GENESIS_BLOCK;
-  new->mem_pool = init_mempool();
+  new->mempool = init_mempool();
   return new;
 }
 
@@ -62,7 +62,7 @@ bool append_to_blockchain(blockchain *chain, block *b){
     // Remove the transactions in the block from the mempool.
     // The transactions in the block are always taken from the head of the
     // mempool, so we can just drop that number of nodes from it.
-    ll_drop(chain->mem_pool, (b->transactions) ? b->transactions->size : 0,
+    ll_drop(chain->mempool, (b->transactions) ? b->transactions->size : 0,
             free_transaction);
     return true;
   }
@@ -81,11 +81,58 @@ block *traverse_blockchain(blockchain *chain, uint32_t block_num){
   return curr;
 }
 
+// ---------------------------------------------------------------------------
+// Serialize and deserialize functions
+//
+
+binn *serialize_blockchain(blockchain *bc) {
+  binn *obj;
+  obj = binn_object();
+
+  binn *mempool = serialize_transactions(bc->mempool);
+  binn_object_set_list(obj, "mempool", mempool);
+  binn_free(mempool);
+
+  binn *blockchain = binn_list();
+  block *curr = bc->latest_block;
+  while (curr != NULL) {
+    binn *block = serialize_block_w_hash(curr);
+    binn_list_add_object(blockchain, block);
+    binn_free(block);
+    curr = curr->prev_block;
+  }
+  binn_object_set_list(obj, "blockchain", blockchain);
+  binn_free(blockchain);
+
+  return obj;
+}
+
+blockchain *deserialize_blockchain(binn *input) {
+  blockchain *bc = malloc(sizeof(blockchain));
+
+  binn *mempool = binn_object_list(input, "mempool");
+  bc->mempool = deserialize_transactions(mempool);
+
+  binn *blockchain = binn_object_list(input, "blockchain");
+  binn_iter iter;
+  binn value;
+  binn_list_foreach(blockchain, value) {
+    block *b = deserialize_block(&value);
+    b->prev_block = bc->latest_block;
+    bc->latest_block = b;
+  }
+
+  return bc;
+}
+
+// ---------------------------------------------------------------------------
+// Proof of work and mining
+//
 block *new_block(blockchain *bc, char *username) {
   block *new = init_block(bc->latest_block);
 
   int i = 0;
-  ll_node *curr = bc->mem_pool->head;
+  ll_node *curr = bc->mempool->head;
   while (curr != NULL && i < MAX_TRANSACTIONS_PER_BLOCK) {
     assert(curr->value);
     ll_append(new->transactions, dup_transaction((transaction *)curr->value));
@@ -124,7 +171,7 @@ void free_blockchain(blockchain *chain){
   assert(chain);
 
   // Free the mempool
-  free_mempool(chain->mem_pool);
+  free_mempool(chain->mempool);
 
   // Free the blocks one-by-one
   block *curr = chain->latest_block;
@@ -147,7 +194,7 @@ char *blockchain_to_string(blockchain *chain) {
     sprintf(out + strlen(out), "%s", block_string);
 
     if (curr->prev_block != NULL) {
-      sprintf(out + strlen(out), "%s\n", "|}");
+      sprintf(out + strlen(out), "%s\n", " |}");
     }
 
     free(block_string);

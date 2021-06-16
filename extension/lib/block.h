@@ -28,6 +28,8 @@ typedef struct block {
 
 binn *serialize_block_no_hash(block *input);
 
+binn *serialize_block_w_hash(block *input);
+
 block *init_block(block *prev);
 
 hash *hash_block(block *b);
@@ -35,8 +37,6 @@ hash *hash_block(block *b);
 block *dup_block(block *b);
 
 block *deserialize_block(binn *b);
-
-void serialize_w_hash(binn *b, hash hash);
 
 bool is_valid(block *b);
 

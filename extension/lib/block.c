@@ -45,7 +45,7 @@ binn *serialize_block_no_hash(block *input) {
   binn_free(reward);
 
   binn_object_set_uint64(obj, "nonce", input->nonce);
-  binn_object_set_str(obj, "prev_hash", input->prev_hash);
+  binn_object_set_blob(obj, "prev_hash", input->prev_hash, 32);
 
   return obj;
 }
@@ -56,7 +56,8 @@ binn *serialize_block_w_hash(block *input) {
 
   binn *obj;
   obj = serialize_block_no_hash(input);
-  binn_object_set_str(obj, "hash", input->hash);
+  // binn_object_set_str(obj, "hash", input->hash);
+  binn_object_set_blob(obj, "hash", input->hash, 32);
 
   return obj;
 }
@@ -98,6 +99,7 @@ block *dup_block(block *b) {
 }
 
 block *deserialize_block(binn *b) {
+  int blobsize = 32;
   block *new = calloc(1, sizeof(block));
 
   new->index = binn_object_uint32(b, "index");
@@ -112,8 +114,8 @@ block *deserialize_block(binn *b) {
 
   new->nonce = binn_object_uint64(b, "nonce");
 
-  strncpy(new->prev_hash, binn_object_str(b, "prev_hash"), 32);
-  strncpy(new->hash, binn_object_str(b, "hash"), 32);
+  memcpy(new->prev_hash, binn_object_blob(b, "prev_hash", &blobsize), 32);
+  memcpy(new->hash, binn_object_blob(b, "hash", &blobsize), 32);
 
   return new;
 }

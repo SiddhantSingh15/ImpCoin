@@ -154,7 +154,7 @@ block *proof_of_work(blockchain *bc, char *username) {
   block *new = new_block(bc, username);
 
   hash *new_hash = hash_block(new);
-  strncpy(new->hash, *new_hash, 32);
+  memcpy(new->hash, *new_hash, 32);
   free(new_hash);
 
   while (!is_valid(new)) {
@@ -165,7 +165,6 @@ block *proof_of_work(blockchain *bc, char *username) {
     memcpy(new->hash, *new_hash, 32);
     free(new_hash);
   }
-
   return new;
 }
 

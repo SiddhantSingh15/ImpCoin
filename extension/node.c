@@ -41,6 +41,10 @@ void send_mine_message(blockchain *bc, char *username, struct worker *w) {
   blockchain_msg *bc_msg = malloc(sizeof(blockchain_msg));
   binn *obj;
 
+  char *temp = to_hex_string_hash(bc->latest_block->hash);
+  printf("HASH LOOK HERE %s\n", temp);
+  free(temp);
+
   w->state = SEND;
   if ((rv = nng_msg_alloc(&nng_msg, 0)) != 0) {
     fatal("nng_msg_alloc", rv);
@@ -213,7 +217,6 @@ void mine(blockchain *bc, char *username, uint32_t limit,
     // lock
     if (append_to_blockchain(bc, valid)) {
       struct worker *out = find_idle_outgoing(outgoing);
-      printf("HASH LOOK HERE%s\n", bc->latest_block->hash);
       send_mine_message(bc, username, out);
     }
     // unlock

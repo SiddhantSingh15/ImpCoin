@@ -329,12 +329,8 @@ void test_append_blocks(int *passing, int *total) {
   printf("Blockchain 2: \n");
   print_blockchain(second_bc);
 
-  free(just_mined);
-  free(just_mined_dup);
   free_blockchain(first_bc);
   free_blockchain(second_bc);
-  free(next_mined);
-  free(next_mined_dup);
 }
 
 void test_blockchain_append(int *passing, int *total) {

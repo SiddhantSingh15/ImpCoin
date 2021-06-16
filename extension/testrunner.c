@@ -289,15 +289,14 @@ void test_append_blocks(int *passing, int *total) {
   print_blockchain(second_bc);
 
   // Add 1 new node to both blockchains
-
   char *username = "rick";
   block *just_mined = proof_of_work(first_bc, username);
-  block *just_mined_dup = calloc(1, sizeof(block));
-  memcpy(just_mined_dup, just_mined, sizeof(block));
+  block *just_mined_dup = dup_block(just_mined);
   just_mined_dup->prev_block = second_bc->latest_block;
-  just_mined_dup->reward = *dup_transaction(&just_mined->reward);
+
   append_to_blockchain(first_bc, just_mined);
   append_to_blockchain(second_bc, just_mined_dup);
+
   track_test(
     test_blockchain(
       first_bc,
@@ -305,16 +304,17 @@ void test_append_blocks(int *passing, int *total) {
       "Adding the same block to both chains produces identical results."
     ),
     passing, total);
+
   printf("Blockchain 1: \n");
   print_blockchain(first_bc);
   printf("Blockchain 2: \n");
   print_blockchain(second_bc);
 
+  // Add 1 more node to both blockchains
   block *next_mined = proof_of_work(first_bc, username);
-  block *next_mined_dup = calloc(1, sizeof(block));
-  memcpy(next_mined_dup, next_mined, sizeof(block));
+  block *next_mined_dup = dup_block(next_mined);
   next_mined_dup->prev_block = second_bc->latest_block;
-  next_mined_dup->reward = *dup_transaction(&next_mined->reward);
+
   append_to_blockchain(first_bc, next_mined);
   append_to_blockchain(second_bc, next_mined_dup);
   track_test(
@@ -324,6 +324,7 @@ void test_append_blocks(int *passing, int *total) {
       "Adding the same block to both chains produces identical results."
     ),
     passing, total);
+
   printf("Blockchain 1: \n");
   print_blockchain(first_bc);
   printf("Blockchain 2: \n");

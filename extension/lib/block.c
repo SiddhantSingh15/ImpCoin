@@ -63,6 +63,28 @@ hash *hash_block(block *b) {
   return hashed;
 }
 
+block *dup_block(block *b) {
+  block *dup = init_block(b->prev_block);
+  dup->timestamp = b->timestamp;
+
+  if (b->transactions) {
+    dup->transactions = ll_init();
+    ll_node *curr = b->transactions->head;
+    while (curr != NULL) {
+      ll_append(dup->transactions, dup_transaction(curr->value));
+    }
+  }
+
+  transaction *reward = dup_transaction(&b->reward);
+  memcpy(&dup->reward, reward, sizeof(transaction));
+  free_transaction(reward);
+
+  dup->nonce = b->nonce;
+  memcpy(dup->hash, b->hash, sizeof(hash));
+
+  return dup;
+}
+
 block *deserialize_block(binn *b) {
   block *new = calloc(1, sizeof(block));
 

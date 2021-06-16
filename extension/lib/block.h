@@ -32,6 +32,8 @@ block *init_block(block *prev);
 
 hash *hash_block(block *b);
 
+block *dup_block(block *b);
+
 block *deserialize_block(binn *b);
 
 void serialize_w_hash(binn *b, hash hash);

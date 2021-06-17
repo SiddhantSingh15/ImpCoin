@@ -17,6 +17,13 @@ typedef struct {
   uint64_t amount;
 } transaction_msg;
 
+typedef struct {
+  char type[10];
+  char username[40];
+  char to[10];
+  uint64_t amount;
+} confirmation_msg;
+
 binn *serialize_bc_msg(blockchain_msg *bc_msg);
 
 blockchain_msg *deserialize_bc_msg(binn *input);

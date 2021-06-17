@@ -61,18 +61,23 @@ void send_mine_message(blockchain *bc, struct worker *w) {
   nng_send_aio(w->sock, w->aio);
 }
 
-void send_transaction_message(char *msg, struct worker *w) {
+void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
   int rv;
-  int msg_size;
   nng_msg *nng_msg;
+  transaction_msg *t_msg = malloc(sizeof(transaction_msg));
+  binn *obj;
 
   w->state = SEND;
   if ((rv = nng_msg_alloc(&nng_msg, 0)) != 0) {
     fatal("nng_msg_alloc", rv);
   }
-
-  msg_size = strlen(msg) + 1;
-  nng_msg_insert(nng_msg, msg, msg_size);
+  t_msg->amount = amount;
+  strcpy(t_msg->to, to);
+  strcpy(t_msg->username, w->username);
+  strcpy(t_msg->type, "trans");
+  obj = serialize_t_msg(t_msg);
+  free(t_msg);
+  nng_msg_insert(nng_msg, binn_ptr(obj), binn_size(obj));
   nng_aio_set_msg(w->aio, nng_msg);
   nng_send_aio(w->sock, w->aio);
 }
@@ -92,13 +97,14 @@ void incoming_callback(void *arg) {
     if ((rv = nng_aio_result(w->aio)) != 0) {
       fatal("nng_recv_aio", rv);
     }
-
+    w->state = RECV;
     w->msg = nng_aio_get_msg(w->aio);
     buffer = (binn *)nng_msg_body(w->msg);
     strcpy(type, binn_object_str(buffer, "type"));
 
     if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
       // This was sent by us, ignore
+      nng_recv_aio(w->sock, w->aio);
       break;
     }
 
@@ -122,12 +128,20 @@ void incoming_callback(void *arg) {
       // unlock
       pthread_mutex_unlock(&lock);
 
-    } else {
-      printf("This is supposed to be for transactions\n");
+    } else if (strcmp(type, "trans") == 0) {
+      printf("Transaction! Is it for me?\n");
+      if (strcmp(w->username, binn_object_str(buffer, "to")) == 0) {
+        transaction_msg *t_msg = deserialize_t_msg(buffer);
+        printf(
+          "Its for me! Specifically from %s, transferring %ld ASTLYCOINS to %s.\n",
+          t_msg->username,t_msg->amount, t_msg->to
+        );
+      } else {
+        printf("Aw its not for us...\n");
+      }
     }
 
     nng_recv_aio(w->sock, w->aio);
-    w->state = RECV;
     break;
   default:
     break;
@@ -253,6 +267,19 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
     // pthread_mutex_unlock(&lock);
     i++;
   }
+  printf("Mining complete.\n");
+}
+
+void perform_transaction(struct worker *outgoing[]) {
+  char buffer[10];
+  uint64_t amount = 0;
+  printf("Please enter the amount you wish to transfer\n");
+  read_line(buffer, 10);
+  amount = (uint64_t) atoi(buffer);
+  printf("Please input the username of the person you are transferring to:\n");
+  read_line(buffer, 10);
+  struct worker *out = find_idle_outgoing(outgoing);
+  send_transaction_message(buffer, amount, out);
 }
 
 int main(int argc, char **argv) {
@@ -298,8 +325,15 @@ int main(int argc, char **argv) {
   while (true) {
     fprintf(stdout, "ASLTY> ");
     read_line(input_buf, 511);
-
-    mine(bc_ptr, username, 10, outgoing);
+    if (*input_buf == 'm' && strlen(input_buf) == 1){
+      printf("Proceeding to mine...\n");
+      mine(bc_ptr, username, 10, outgoing);
+    } else if (*input_buf == 't') {
+      printf("Do transaction\n");
+      perform_transaction(outgoing);
+    } else {
+      printf("Input 'm' to mine, 't' to perform a transaction");
+    }
     /*
     struct worker *out = find_idle_outgoing(outgoing);
     send_input_message(input_buf, out);

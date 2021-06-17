@@ -63,8 +63,13 @@ void address_callback(void *arg) {
     if (strcmp(type, "mine") == 0) {
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
       printf("%s", blockchain_to_string(bc_msg->bc));
-    } else {
-      printf("This is supposed to be for transactions\n");
+    } else if (strcmp(type, "trans") == 0) {
+      printf("I've received a transaction\n");
+      transaction_msg *t_msg = deserialize_t_msg(buffer);
+      printf(
+        "It is from %s, transferring %ld ASTLYCOINS to %s.\n",
+        t_msg->username,t_msg->amount, t_msg->to
+      );
     }
     nng_aio_set_msg(w->aio, w->msg);
     w->msg = NULL;

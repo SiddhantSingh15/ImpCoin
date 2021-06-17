@@ -74,6 +74,7 @@ void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
     fatal("nng_msg_alloc", rv);
   }
   t_msg->amount = amount;
+  t_msg->timestamp = time(NULL);
   strcpy(t_msg->to, to);
   strcpy(t_msg->username, w->username);
   strcpy(t_msg->type, "trans");

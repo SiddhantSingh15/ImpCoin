@@ -15,7 +15,7 @@ typedef struct {
   char username[40];
   char to[10];
   uint64_t amount;
-  uint64_t timestamp;
+  time_t timestamp;
 } transaction_msg;
 
 typedef struct {

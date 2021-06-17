@@ -15,7 +15,7 @@
 // All parsing functions should look like this
 // void parse_function (void* ll_node, union instr_code code, symbol_table* st);
 
-uint32_t construct_dataproc_binary(dataproc_t *instr) {
+uint32_t encode_dataproc_binary(dataproc_t *instr) {
   // Base - 0000 0000 0000 0000 0000 0000 0000 0000
   uint32_t dataproc_base = 0x00000000;
   dataproc_base |= instr->op2 << OP2_POS;
@@ -28,7 +28,7 @@ uint32_t construct_dataproc_binary(dataproc_t *instr) {
   return dataproc_base;
 }
 
-uint32_t construct_mult_binary(multiply_t *instr) {
+uint32_t encode_mult_binary(multiply_t *instr) {
   // Base - 0000 0000 0000 0000 0000 0000 1001 0000
   uint32_t mult_base = 0x00000090;
   mult_base |= instr->rm << RM_POS;
@@ -41,7 +41,7 @@ uint32_t construct_mult_binary(multiply_t *instr) {
   return mult_base;
 }
 
-uint32_t construct_sdt_binary(sdt_t *instr) {
+uint32_t encode_sdt_binary(sdt_t *instr) {
   // Base - 0000 0100 0000 0000 0000 0000 0000 0000
   uint32_t sdt_base = 0x04000000;
   sdt_base |= instr->offset << OFFSET_POS;
@@ -55,7 +55,7 @@ uint32_t construct_sdt_binary(sdt_t *instr) {
   return sdt_base;
 }
 
-uint32_t construct_branch_binary(branch_t *instr) {
+uint32_t encode_branch_binary(branch_t *instr) {
   // Base - 0000 1010 0000 0000 0000 0000 0000 0000
   uint32_t branch_base = 0x0A000000;
   branch_base |= instr->offset << OFFSET_POS;
@@ -190,7 +190,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
         cond_move(match_separator(tokens->list[pos], '#'), &pos);
 
     instr.op2 = parse_operand2(tokens, line, &pos);
-    return construct_dataproc_binary(&instr);
+    return encode_dataproc_binary(&instr);
   }
 
   if (code.dataproc_opcode == MOV) {
@@ -201,7 +201,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
         cond_move(match_separator(tokens->list[pos], '#'), &pos);
 
     instr.op2 = parse_operand2(tokens, line, &pos);
-    return construct_dataproc_binary(&instr);
+    return encode_dataproc_binary(&instr);
   }
 
   /* Remaining can only be AND, EOR, SUB, RSB, ADD, ORR
@@ -211,7 +211,7 @@ uint32_t parse_dataproc(void *ll_node, union instr_code code,
   instr.is_immediate = cond_move(match_separator(tokens->list[pos], '#'), &pos);
 
   instr.op2 = parse_operand2(tokens, line, &pos);
-  return construct_dataproc_binary(&instr);
+  return encode_dataproc_binary(&instr);
 }
 
 uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
@@ -228,7 +228,7 @@ uint32_t parse_mult(void *ll_node, union instr_code code, symbol_table *st) {
       .accumulate = code.mul_a,
       .set_cond = !SET};
 
-  return construct_mult_binary(&mult_instr);
+  return encode_mult_binary(&mult_instr);
 }
 
 uint32_t parse_sdt_immediate(node *node, union instr_code code) {
@@ -257,7 +257,7 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
     };
 
     dataproc_instr.op2 = parse_operand2(tokens, line, &pos);
-    return construct_dataproc_binary(&dataproc_instr);
+    return encode_dataproc_binary(&dataproc_instr);
   }
 
   token_list *val = calloc(1, sizeof(token_list));
@@ -273,7 +273,7 @@ uint32_t parse_sdt_immediate(node *node, union instr_code code) {
       .rd = rd,
       .offset = append_via_node(node, val) - (node->address + PIPELINE_OFFSET),
   };
-  return construct_sdt_binary(&instr);
+  return encode_sdt_binary(&instr);
 }
 
 uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
@@ -310,7 +310,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
     instr.is_shift_R = !SET;
     instr.offset = 0;
     instr.up_bit = SET;
-    return construct_sdt_binary(&instr);
+    return encode_sdt_binary(&instr);
   }
 
   instr.is_shift_R = cond_move(match_separator(tokens->list[pos], ']'), &pos)
@@ -330,7 +330,7 @@ uint32_t parse_sdt(void *ll_node, union instr_code code, symbol_table *st) {
     assert_separator(tokens->list[pos], ']', pos, line);
   }
 
-  return construct_sdt_binary(&instr);
+  return encode_sdt_binary(&instr);
 }
 
 uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
@@ -347,7 +347,7 @@ uint32_t parse_branch(void *ll_node, union instr_code code, symbol_table *st) {
                                 (int32_t)node->address - PIPELINE_OFFSET) >>
                                BRANCH_SHIFT};
 
-  return construct_branch_binary(&branch_instr);
+  return encode_branch_binary(&branch_instr);
 }
 
 uint32_t parse_lsl(void *ll_node, union instr_code code, symbol_table *st) {

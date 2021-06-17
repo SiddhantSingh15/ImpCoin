@@ -6,13 +6,13 @@
 #include "../definitions.h"
 
 typedef struct {
-  char type[10];
+  char type[MESSAGE_TYPE_SIZE];
   char username[UID_LENGTH];
   blockchain *bc;
 } blockchain_msg;
 
 typedef struct transaction_msg {
-  char type[10];
+  char type[MESSAGE_TYPE_SIZE];
   char username[UID_LENGTH];
   char to[UID_LENGTH];
   uint64_t amount;

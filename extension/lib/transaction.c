@@ -12,6 +12,9 @@
 #include "utils.h"
 #include "linked_list.h"
 #include "transaction.h"
+#include "block.h"
+#include "blockchain.h"
+#include "../definitions.h"
 
 transaction *init_transaction(char *from, char *to, uint64_t amount,
   time_t time) {
@@ -71,21 +74,56 @@ transaction *deserialize_transaction(binn *trn) {
 linked_list *deserialize_transactions(binn *transactions) {
 
   linked_list *new_ll = ll_init();
-
   binn_iter iter;
   binn value;
   binn_list_foreach(transactions, value) {
     ll_append(new_ll, deserialize_transaction(&value));
   }
-
   return new_ll;
+}
+
+bool is_valid_transaction(transaction *tc, void *bc_ptr) {
+  blockchain *bc = bc_ptr;
+  uint64_t amount = 0;
+  block *curr_b = bc->latest_block;
+  linked_list *mempool = bc->mempool;
+  ll_node *curr_lln;
+  // Check blockchain
+  while (curr_b != NULL) {
+    curr_lln = (curr_b->transactions) ? curr_b->transactions->head : NULL;
+    while (curr_lln != NULL) {
+      transaction *trans = (transaction *) curr_lln->value;
+      if (strcmp(trans->to, tc->from) == 0) {
+        amount += trans->amount;
+      } else if (strcmp(trans->from, tc->from) == 0) {
+        amount -= trans->amount;
+      }
+      curr_lln = curr_lln->next;
+    }
+    amount += strcmp(curr_b->reward.to, tc->from) == 0 ?
+      curr_b->reward.amount : 0;
+    curr_b = curr_b->prev_block;
+  }
+  // Check current mempool
+  curr_lln = mempool->head;
+  while (curr_lln != NULL) {
+    transaction *trans = (transaction *) curr_lln->value;
+    if (strcmp(trans->to, tc->from) == 0) {
+        amount += trans->amount;
+      } else if (strcmp(trans->from, tc->from) == 0) {
+        amount -= trans->amount;
+      }
+    curr_lln = curr_lln->next;
+  }
+
+  return tc->amount <= amount;
 }
 
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);
-  sprintf(buffer, "[%"PRIu64" ASTLY%s] %s -> %s @ %s", tr->amount,
-          (tr->amount > 1) ? "s" : "", tr->from, tr->to, fmtedtime);
+  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", YELLOW, tr->amount,
+          (tr->amount > 1) ? "s" : "", NOCOLOUR, tr->from, tr->to, fmtedtime);
   free(fmtedtime);
 }
 

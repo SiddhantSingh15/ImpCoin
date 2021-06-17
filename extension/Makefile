@@ -30,7 +30,7 @@ TEST_OBJS := $(call GET_OBJS, $(TEST_SRC_DIRS))
 .SUFFIXES: .c .o
 .PHONY: all clean
 
-all: node testrunner
+all: node address_node testrunner
 	$(RM) $(shell find $(SRC_DIRS) -name "*.d")
 
 test: testrunner
@@ -38,6 +38,8 @@ test: testrunner
 	./testrunner
 
 node: $(NODE_OBJS)
+
+address_node: $(NODE_OBJS)
 
 testrunner: $(NODE_OBJS) $(TEST_OBJS)
 
@@ -48,6 +50,7 @@ clean:
 	rm -rf $(shell find $(SRC_DIRS) -name "*.dSYM")
 	$(RM) node
 	$(RM) testrunner
+	$(RM) address_node
 
 
 -include $(DEPS)

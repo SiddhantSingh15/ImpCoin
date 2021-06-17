@@ -6,9 +6,10 @@
 #include <string.h>
 
 #include "linked_list.h"
+#include "../definitions.h"
 
 linked_list *ll_init(void) {
-  linked_list *new_list = malloc(sizeof(linked_list));
+  linked_list *new_list = calloc(1, sizeof(linked_list));
   new_list->head = NULL;
   new_list->last = NULL;
   new_list->size = 0;
@@ -130,6 +131,7 @@ void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
 
   if (number >= list->size) {
     ll_clear(list);
+    return;
   }
 
   int i = 0;
@@ -138,6 +140,7 @@ void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
     ll_node *temp = curr;
     curr = curr->next;
     ll_free_node(temp, value_free);
+    i++;
   }
   list->head = curr;
 }
@@ -160,7 +163,7 @@ char *ll_to_string(linked_list *list,
   while (curr != NULL) {
     assert(curr->value);
     value_to_string(curr->value, buf);
-    sprintf(out + strlen(out), "[%i] --> {%s}\n", i, buf);
+    sprintf(out + strlen(out), "%s[%i]%s --> %s\n", BOLDBLUE, i, NOCOLOUR, buf);
 
     curr = curr->next;
     i++;

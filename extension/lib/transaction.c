@@ -123,7 +123,7 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);
-  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", BOLDYELLOW, tr->amount,
+  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", YELLOW, tr->amount,
           (tr->amount > 1) ? "s" : "", NOCOLOUR, tr->from, tr->to, fmtedtime);
   free(fmtedtime);
 }

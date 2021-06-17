@@ -310,7 +310,7 @@ void print_state(char *input, blockchain **bc_ptr, const char *username) {
     printf("Username: %s\n", username);
   } else if (strcmp("balance", input) == 0){
     uint64_t balance = get_balance(*bc_ptr, username);
-    printf("Your balance is: %s%ld%s\n",
+    printf("Your balance is: %s%"PRIu64"%s\n",
     (balance == 0) ? BOLDRED : YELLOW, balance, NOCOLOUR);
   } else {
     printf("Invalid command :/\n");

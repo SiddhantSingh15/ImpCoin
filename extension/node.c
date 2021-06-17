@@ -288,11 +288,31 @@ void perform_transaction(struct worker *outgoing[]) {
   send_transaction_message(buffer, amount, out);
 }
 
+void print_state(char *input, blockchain **bc_ptr, const char *username) {
+  if (strcmp("bc", input) == 0) {
+    pthread_mutex_lock(&lock);
+    print_blockchain(*bc_ptr);
+    pthread_mutex_unlock(&lock);
+  } else if (strcmp("mempool", input) == 0) {
+    pthread_mutex_lock(&lock);
+    ll_print((*bc_ptr)->mempool, to_string_transaction);
+    pthread_mutex_unlock(&lock);
+  } else if (strcmp("latest_block", input) == 0) {
+    pthread_mutex_lock(&lock);
+    print_block((*bc_ptr)->latest_block);
+    pthread_mutex_unlock(&lock);
+  } else if (strcmp("name", input) == 0) {
+    printf("Username: %s\n", username);
+  } else {
+    printf("Invalid command :/\n");
+  }
+}
+
 int main(int argc, char **argv) {
 
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
-  char input_buf[511];
+  char input[511];
 
   if (pthread_mutex_init(&lock, NULL) != 0) {
     printf("\n mutex init has failed\n");
@@ -308,26 +328,33 @@ int main(int argc, char **argv) {
 
 
   printf("Please enter a local port to listen on: \n");
-  read_line(input_buf, 511);
+  read_line(input, 511);
 
   const char *username = malloc(511);
   printf("Please enter your username: \n");
   read_line((char *)username, 511);
 
-  nng_socket sock = start_node(input_buf, incoming, outgoing, bc_ptr, username);
+  nng_socket sock = start_node(input, incoming, outgoing, bc_ptr, username);
   dial_address_server(sock, "tcp://127.0.0.1:8000");
   while (true) {
     fprintf(stdout, "Imp> ");
-    read_line(input_buf, 511);
-    if (*input_buf == 'm' && strlen(input_buf) == 1){
+    read_line(input, 511);
+
+    if (is_command('m', input)){
       printf("Proceeding to mine...\n");
       mine(bc_ptr, username, 10, outgoing);
-    } else if (*input_buf == 't') {
+
+    } else if (is_command('t', input)) {
       printf("Do transaction\n");
       perform_transaction(outgoing);
-    } else {
+
+    } else if (is_command('h', input)){
       printf("Input 'm' to mine, 't' to perform a transaction.\n");
+
+    } else if (is_command('p', input)) {
+      print_state(&input[2], bc_ptr, username);
     }
+
   }
 
   free_blockchain(*bc_ptr);

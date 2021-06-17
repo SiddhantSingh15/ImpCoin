@@ -1,12 +1,11 @@
 \documentclass[a4paper]{article}
 
-%% Language and font encodings
+%% Preamble of the document
 \usepackage[english]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lipsum}
 \usepackage[export]{adjustbox}
-% \renewcommand\Authfont{\fontsize{12}{14.4}\selectfont}
 
 %% Sets page size and margins
 \usepackage[a4paper,top=1.5cm,bottom=1.75cm,left=1.5cm,right=1.5cm,marginparwidth=2cm]{geometry}
@@ -20,6 +19,7 @@
 \usepackage{subfigure}
 \usepackage{wrapfig}
 
+%% Colour definitions
 \definecolor{BOLDBLUE}{RGB}{0,55,218}
 \definecolor{BOLDGREEN}{RGB}{0,128,0}
 \definecolor{BOLDYELLOW}{RGB}{252,127,0}
@@ -123,10 +123,12 @@ In the real world, all our transactions are monitored by a governing body and th
 \subsection{The implementation:}
 \subsubsection{High-level details:}
 
+There are two main executables in our implementation. First, we have a \verb|node| which presents the user with an interactive prompt, allowing them to mine $n$ blocks, make transactions and print out internal state for debugging purposes. Each \verb|node| stores a copy of their own blockchain, which contains a linke
+
 In order to create a blockchain network in C, we needed to implement several things:
 \begin{itemize}
-    \item Suitable data structures to model blocks, transactions, a variable length list of transactions and a blockchain. We were able to make use of some of our 
-    \item Functions to hash
+    \item Suitable data structures to model blocks, transactions, a variable length list of transactions and a blockchain. We were able to make use of some of our experiences and code in the assembler for this, especially in implementing linked data structures.
+    \item Functions to serialise 
 \end{itemize}
 
 \begin{figure}[htp]

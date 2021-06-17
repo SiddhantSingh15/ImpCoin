@@ -108,7 +108,7 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
   curr_lln = mempool->head;
   while (curr_lln != NULL) {
     transaction *trans = (transaction *) curr_lln->value;
-    printf("%s sent %ld to %s\n", trans->from, trans->amount, trans->to);
+    printf("%s sent %"PRIu64" to %s\n", trans->from, trans->amount, trans->to);
     if (strcmp(trans->to, tc->from) == 0) {
         amount += trans->amount;
       } else if (strcmp(trans->from, tc->from) == 0) {

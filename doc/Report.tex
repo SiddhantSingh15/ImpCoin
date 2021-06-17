@@ -92,7 +92,7 @@ Another interesting aspect of our assembler is how our tokenizer works. Before p
 \end{enumerate}
 A \verb|while| loop is used together with \verb|str_brk()|inside \verb|tokenizer()| to convert instruction strings into token lists. Any allocated memory is freed accordingly. When \verb|tokenizer()| is complete, the linked list will contain a token list in every node, each corresponding to an instruction in the source file in order.
 
-\subsubsection{Parser:}
+\subsubsection{Parser and Encoder:}
 We have decided to create multiple parser functions that handles different instructions. In order to access each function, we use a \verb|instr_func_map| datatype as mentioned in Figure \ref{fig:functional_pointers}. As mentioned earlier in sub-section \ref{The structure}, the symbol table is populated with these function mappings. This allows us to query the symbol table with an instruction name such as \verb|mov|, and have the symbol table return its corresponding \verb|instr_func_map| as shown in Figure \ref{fig:calling functions with func map}.
 
 
@@ -109,7 +109,7 @@ binary_instr = func_map->function(curr, func_map->code, labels);
 
 All token lists produced by reading the source file will always begin with a token containing its instruction name. This is used to query the symbol table. This is why \verb|tokens->list[0]| is used to query the symbol table.
 
-Once a parser function is called, it will read a token list and create a union data variable. Every parser is passed in with a \verb|code| parameter as well which is a 
+The parser works together with the encoder to produce a 32 bit binary value. This value will then be written to an output file.
 
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Real world usage:}
@@ -163,7 +163,9 @@ Although our group was efficient, there were some aspects that we could have inc
 
 Additionally, we could have managed our time more efficiently in order to get the project done well before the deadline. This would have left us enough time to incorporate some final refactoring and other minute details that were required for completion of the project. This management would have been possible if we had paced out our work during the initial part of the project, to avoid burn-out and a slower pace for the rest of the project. 
 
-Furthermore, the group could have
+Furthermore, the group could have spent a little more time researching about the best way to solve a problem or to pick between design choices, in order to avoid working out one implementation before changing it to another one. The research could have helped save more time. 
+
+Overall the project was fairly well-coordinated and we had numerous achievements and learning experiences along the way, which every member can take forward into future projects and into the work environment as well.
 
 \section{Individual Reflections}
 \subsection{Ashvin:}

@@ -185,6 +185,8 @@ nng_socket start_node(const char *our_url, struct worker *incoming[],
   int rv;
   int i;
 
+  printf("Starting ImpCoin node...\n");
+
   /*  Create the socket. */
   rv = nng_bus0_open(&sock);
   if (rv != 0) {
@@ -323,7 +325,7 @@ int main(int argc, char **argv) {
   nng_socket sock = start_node(input_buf, incoming, outgoing, bc_ptr, username);
   dial_address_server(sock, "tcp://127.0.0.1:8000");
   while (true) {
-    fprintf(stdout, "ASLTY> ");
+    fprintf(stdout, "Imp> ");
     read_line(input_buf, 511);
     if (*input_buf == 'm' && strlen(input_buf) == 1){
       printf("Proceeding to mine...\n");
@@ -332,7 +334,7 @@ int main(int argc, char **argv) {
       printf("Do transaction\n");
       perform_transaction(outgoing);
     } else {
-      printf("Input 'm' to mine, 't' to perform a transaction");
+      printf("Input 'm' to mine, 't' to perform a transaction.\n");
     }
     /*
     struct worker *out = find_idle_outgoing(outgoing);

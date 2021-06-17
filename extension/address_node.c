@@ -67,7 +67,7 @@ void address_callback(void *arg) {
       printf("I've received a transaction\n");
       transaction_msg *t_msg = deserialize_t_msg(buffer);
       printf(
-        "It is from %s, transferring %ld ASTLYCOINS to %s.\n",
+        "It is from %s, transferring %ld ImpCoin to %s.\n",
         t_msg->username,t_msg->amount, t_msg->to
       );
     }

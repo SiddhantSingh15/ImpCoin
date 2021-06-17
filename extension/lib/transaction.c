@@ -82,7 +82,7 @@ linked_list *deserialize_transactions(binn *transactions) {
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);
-  sprintf(buffer, "[%"PRIu64" ASTLY%s] %s -> %s @ %s", tr->amount,
+  sprintf(buffer, "[%"PRIu64" IMP%s] %s -> %s @ %s", tr->amount,
           (tr->amount > 1) ? "s" : "", tr->from, tr->to, fmtedtime);
   free(fmtedtime);
 }

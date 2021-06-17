@@ -20,8 +20,6 @@
 #include "lib/utils.h"
 #include "lib/messages.h"
 
-#define PARALLEL 32
-
 // We only dereference a bc_ptr when the lock is acquired
 pthread_mutex_t lock;
 
@@ -90,7 +88,7 @@ void incoming_callback(void *arg) {
   struct worker *w = arg;
   int rv;
   binn *buffer;
-  char type[10];
+  char type[MESSAGE_TYPE_SIZE];
 
   switch (w->state) {
   case INIT:
@@ -321,7 +319,7 @@ int main(int argc, char **argv) {
 
   struct worker *incoming[PARALLEL];
   struct worker *outgoing[PARALLEL];
-  char input[511];
+  char input[BUFFER_SIZE];
 
   if (pthread_mutex_init(&lock, NULL) != 0) {
     printf("\n mutex init has failed\n");
@@ -337,7 +335,7 @@ int main(int argc, char **argv) {
 
 
   printf("Please enter a local port to listen on: \n");
-  read_line(input, 511);
+  read_line(input, BUFFER_SIZE);
 
   const char *username = malloc(UID_LENGTH);
   printf("Please enter your username: \n");
@@ -347,7 +345,7 @@ int main(int argc, char **argv) {
   dial_address_server(sock, "tcp://127.0.0.1:8000");
   while (true) {
     fprintf(stdout, "Imp> ");
-    read_line(input, 511);
+    read_line(input, BUFFER_SIZE);
 
     if (is_command('m', input)){
       printf("Proceeding to mine...\n");
@@ -371,9 +369,5 @@ int main(int argc, char **argv) {
   free_blockchain(*bc_ptr);
   free(bc_ptr);
   free((char *)username);
-
-  // blockchain *bc = init_blockchain();
-  // print_block(bc->latest_block);
-  printf("Hello, blockchain!\n");
   return EXIT_SUCCESS;
 }

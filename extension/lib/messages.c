@@ -30,11 +30,12 @@ blockchain_msg *deserialize_bc_msg(binn *input) {
   blockchain_msg *bc_msg = calloc(1, sizeof(blockchain_msg));
   bc_msg->bc = deserialize_blockchain(binn_object_object(input, "blockchain"));
   strncpy(bc_msg->username, binn_object_str(input, "username"), UID_LENGTH);
-  strncpy(bc_msg->type, binn_object_str(input, "type"), 10);
+  strncpy(bc_msg->type, binn_object_str(input, "type"), MESSAGE_TYPE_SIZE);
   return bc_msg;
 }
 
-transaction_msg *init_transaction_msg(uint64 amount, const char *username, char *to) {
+transaction_msg *init_transaction_msg(uint64 amount,
+const char *username, char *to) {
   transaction_msg *new = calloc(1, sizeof(transaction_msg));
   new->amount = amount;
   new->timestamp = time(NULL);

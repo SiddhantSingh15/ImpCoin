@@ -18,6 +18,7 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{fancyvrb}
 \usepackage{subfigure}
+\usepackage{wrapfig}
 
 \definecolor{BOLDBLUE}{RGB}{0,55,218}
 \definecolor{BOLDGREEN}{RGB}{0,128,0}
@@ -111,11 +112,18 @@ All token lists produced by reading the source file will always begin with a tok
 
 The parser works together with the encoder to produce a 32 bit binary value. This value will then be written to an output file.
 
+
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
-\subsection{Real world usage:}
-\lipsum[1-1]
+\subsection{Description \& Real world usage:}
+
+For our extension, we simulated a decentralised blockchain cryptocurrency called \textbf{ImpCoin}. The simulation relies on a centralised \verb|address node|, this acts like the server in a client-server model. It is responsible for distribution of all information on the ``decentralised'' blockchain. The reason why we decided on this implementation is mainly due to time constraints, we found out quite early on that implementing a fully decentralised network in C would require a lot more hours than we could spare. Along with essential blockchain and transaction functions, we also implemented basic concurrency in the network to allow mining and transactions to occur at the same time between multiple clients.
+
+
+
 \subsection{The implementation:}
 \subsubsection{High-level details:}
+
+
 \lipsum[1-1]
 
 \begin{figure}[htp]
@@ -151,6 +159,7 @@ TEST - Blockchain is equal on both ends : \textcolor{BOLDRED}{FAIL}
 \label{fig:test-example}
 \end{figure}
 
+
 \section{Group Reflection}
 \subsection{Effectiveness of communication and division of work:}
 
@@ -167,6 +176,7 @@ Furthermore, the group could have spent a little more time researching about the
 
 Overall the project was fairly well-coordinated and we had numerous achievements and learning experiences along the way, which every member can take forward into future projects and into the work environment as well.
 
+% -------------------------------------
 \section{Individual Reflections}
 \subsection{Ashvin:}
 \lipsum[1-1]

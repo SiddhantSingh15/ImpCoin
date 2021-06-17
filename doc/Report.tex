@@ -125,12 +125,12 @@ In the real world, all our transactions are monitored by a governing body and th
 
 There are two main executables in our implementation. First, we have \verb|node| which presents the user with an interactive prompt, allowing them to mine blocks, make transactions and print out internal state for debugging purposes. Each \verb|node| stores a copy of their own blockchain, which contains a linked list of previously mined blocks and a list of pending transactions (\verb|mempool|). The second executable is \verb|address_node|, which simply listens for incoming traffic on a TCP socket, and relays this back to every connected node (Figure \ref{fig:network-types}a). This simplifies our network implementation significantly, as now each node does not have to keep track of which nodes to send messages to (Figure \ref{fig:network-types}b).
 
-There are 2 types of messages sent across the network. The first is a transaction, which allows a user to transfer ImpCoin out of their account. If the user's balance is high enough, this message is sent and other nodes will add this transaction to their \verb|mempool|. The second is a new block announcement, where if a node succesfully mines a new block, it sends its entire blockchain to everyone else. Here use the \verb|blockchain_valid| function, to reach consensus on how
+There are 2 types of messages sent across the network. The first is a transaction, which allows a user to transfer ImpCoin out of their account. If the user's balance is high enough, this message is sent and other nodes will add this transaction to their \verb|mempool|. The second is a new block announcement, where if a node succesfully mines a new block, it sends its entire blockchain to everyone else. At this point we use the \verb|blockchain_valid| function, to reach consensus on which blockchain is the most updated and valid to use. The node then continues operating continuing with new blockchain's \verb|mempool| and \verb|latest_block|. A user's account balance is calculated based on the blockchain, so when a new block is mined this is reflected automatically and in real time.
 
 In order to create a blockchain network in C, we needed to implement several things:
 \begin{itemize}
     \item Suitable data structures to model blocks, transactions, a variable length list of transactions and a blockchain. We were able to make use of some of our experiences and code in the assembler for this, especially in implementing linked data structures.
-    \item Functions to serialise 
+    \item Functions to serialize and deserialize these data structures. We needed this for sending data to other nodes across the netw
 \end{itemize}
 
 \begin{figure}[htp]

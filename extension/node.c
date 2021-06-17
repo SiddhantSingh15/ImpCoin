@@ -60,6 +60,7 @@ void send_mine_message(blockchain *bc, struct worker *w) {
   nng_msg_insert(nng_msg, binn_ptr(obj), binn_size(obj));
   nng_aio_set_msg(w->aio, nng_msg);
   nng_send_aio(w->sock, w->aio);
+  binn_free(obj);
 }
 
 void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
@@ -82,6 +83,7 @@ void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
 
   w->state = SEND;
   nng_send_aio(w->sock, w->aio);
+  binn_free(obj);
 }
 
 void incoming_callback(void *arg) {
@@ -149,6 +151,7 @@ void incoming_callback(void *arg) {
         printf("%sREJECTED. You do not have enough IMPs%s\n",
           BOLDRED, NOCOLOUR);
       }
+      free_transaction(tc);
       // unlock
       pthread_mutex_unlock(&lock);
     }
@@ -271,7 +274,9 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
     if (append_to_blockchain(*bc_ptr, valid)) {
       struct worker *out = find_idle_outgoing(outgoing);
       send_mine_message(*bc_ptr, out);
-      printf("Mined a block!\n%s\n", to_string_block(((*bc_ptr)->latest_block)));
+      char* block_str = to_string_block(((*bc_ptr)->latest_block));
+      printf("Mined a block!\n%s\n", block_str);
+      free(block_str);
     }
     pthread_mutex_unlock(&lock);
     i++;

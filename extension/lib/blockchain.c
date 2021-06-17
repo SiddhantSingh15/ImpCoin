@@ -73,7 +73,6 @@ block *genesis_block(void) {
   free_transaction(reward);
 
   // Create list and add transactions
-  genesis->transactions = ll_init();
   ll_append(genesis->transactions, t1);
   ll_append(genesis->transactions, t2);
   ll_append(genesis->transactions, t3);

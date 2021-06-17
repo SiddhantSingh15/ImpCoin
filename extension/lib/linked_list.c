@@ -158,6 +158,7 @@ char *ll_to_string(linked_list *list,
   int i = 0;
   char buf[511];
   char *out = calloc(list->size, sizeof(buf));
+  *out = '\0';
 
   ll_node *curr = list->head;
   while (curr != NULL) {

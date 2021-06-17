@@ -11,6 +11,7 @@
 #include <sodium/crypto_generichash.h>
 #include <sodium/utils.h>
 
+#include "../definitions.h"
 #include "utils.h"
 #include "linked_list.h"
 #include "transaction.h"
@@ -80,7 +81,7 @@ binn *serialize_block_no_hash(block *input) {
   binn_free(reward);
 
   binn_object_set_uint64(obj, "nonce", input->nonce);
-  binn_object_set_blob(obj, "prev_hash", input->prev_hash, 32);
+  binn_object_set_blob(obj, "prev_hash", input->prev_hash, HASH_SIZE);
 
   return obj;
 }
@@ -92,13 +93,12 @@ binn *serialize_block_w_hash(block *input) {
   binn *obj;
   obj = serialize_block_no_hash(input);
   // binn_object_set_str(obj, "hash", input->hash);
-  binn_object_set_blob(obj, "hash", input->hash, 32);
+  binn_object_set_blob(obj, "hash", input->hash, HASH_SIZE);
 
   return obj;
 }
 
 block *deserialize_block(binn *b) {
-  int blobsize = 32;
   block *new = calloc(1, sizeof(block));
 
   new->index = binn_object_uint32(b, "index");
@@ -107,14 +107,17 @@ block *deserialize_block(binn *b) {
   binn *transactions = binn_object_list(b, "transactions");
   new->transactions = deserialize_transactions(transactions);
 
-  transaction *reward = deserialize_transaction(binn_object_object(b, "reward"));
+  transaction *reward =
+      deserialize_transaction(binn_object_object(b, "reward"));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
   new->nonce = binn_object_uint64(b, "nonce");
 
-  memcpy(new->prev_hash, binn_object_blob(b, "prev_hash", &blobsize), 32);
-  memcpy(new->hash, binn_object_blob(b, "hash", &blobsize), 32);
+  int blobsize = HASH_SIZE;
+  memcpy(new->prev_hash, binn_object_blob(b, "prev_hash", &blobsize),
+         HASH_SIZE);
+  memcpy(new->hash, binn_object_blob(b, "hash", &blobsize), HASH_SIZE);
 
   return new;
 }

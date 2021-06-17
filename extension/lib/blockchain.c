@@ -9,24 +9,66 @@
 
 #include <binn.h>
 
+#include "../definitions.h"
 #include "linked_list.h"
 #include "transaction.h"
 #include "block.h"
 #include "utils.h"
 #include "blockchain.h"
 
+/**---------------------------------------------------------------------------
+ * Init and Free
+ *--------------------------------------------------------------------------*/
+
+blockchain *init_blockchain(void) {
+  blockchain *new = malloc(sizeof(blockchain));
+  new->latest_block = GENESIS_BLOCK;
+  new->mempool = init_mempool();
+  return new;
+}
+
+void free_blockchain(blockchain *chain){
+  assert(chain);
+
+  // Free the mempool
+  free_mempool(chain->mempool);
+
+  // Free the blocks one-by-one
+  block *curr = chain->latest_block;
+  while(curr != NULL){
+    block *temp = curr;
+    curr = curr->prev_block;
+    free_block(temp);
+  }
+  free(chain);
+}
+
+linked_list *init_mempool(void) {
+  return ll_init();
+}
+
+void free_mempool(linked_list *mempool) {
+  ll_free(mempool, free_transaction);
+}
+
+/**---------------------------------------------------------------------------
+ * Genesis Block
+ *--------------------------------------------------------------------------*/
+
+
 block *genesis_block(void) {
   block *genesis = init_block(NULL);
-  genesis->timestamp = -22118400; // 4/20/69, Unix Epoch Time
+  genesis->timestamp = GENESIS_TIME; // 4/20/69, Unix Epoch Time
   genesis->prev_block = NULL;
 
   // add transactions to give us free money
-  transaction *t1 = init_transaction("wjk", "ash", 1000, -22118400);
-  transaction *t2 = init_transaction("wjk", "sid", 1000, -22118400);
-  transaction *t3 = init_transaction("wjk", "kavya", 1000, -22118400);
-  transaction *t4 = init_transaction("wjk", "yelun", 1000, -22118400);
+  transaction *t1 = init_transaction("wjk", "ash", 1000, GENESIS_TIME);
+  transaction *t2 = init_transaction("wjk", "sid", 1000, GENESIS_TIME);
+  transaction *t3 = init_transaction("wjk", "kavya", 1000, GENESIS_TIME);
+  transaction *t4 = init_transaction("wjk", "yelun", 1000, GENESIS_TIME);
 
-  transaction *reward = init_transaction("docsoc", (char *)"wjk", 21000000, -22118400);
+  transaction *reward =
+      init_transaction("docsoc", (char *)"wjk", 21000000, GENESIS_TIME);
   memcpy(&genesis->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
@@ -38,25 +80,14 @@ block *genesis_block(void) {
   ll_append(genesis->transactions, t4);
 
   hash *genesis_hash = hash_block(genesis);
-  memcpy(genesis->hash, genesis_hash, 32);
+  memcpy(genesis->hash, genesis_hash, HASH_SIZE);
   free(genesis_hash);
   return genesis;
 }
 
-linked_list *init_mempool(void) {
-  return ll_init();
-}
-
-void free_mempool(linked_list *mempool) {
-  ll_free(mempool, free_transaction);
-}
-
-blockchain *init_blockchain(void) {
-  blockchain *new = malloc(sizeof(blockchain));
-  new->latest_block = GENESIS_BLOCK;
-  new->mempool = init_mempool();
-  return new;
-}
+/**---------------------------------------------------------------------------
+ * Adding and Traversing the Blockchain
+ *--------------------------------------------------------------------------*/
 
 bool append_to_blockchain(blockchain *chain, block *b){
   assert(chain && b);
@@ -68,8 +99,7 @@ bool append_to_blockchain(blockchain *chain, block *b){
     // Remove the transactions in the block from the mempool.
     // The transactions in the block are always taken from the head of the
     // mempool, so we can just drop that number of nodes from it.
-    ll_drop(chain->mempool, (b->transactions) ? b->transactions->size : 0,
-            free_transaction);
+    ll_drop(chain->mempool, b->transactions->size, free_transaction);
     return true;
   }
   return false;
@@ -87,9 +117,9 @@ block *traverse_blockchain(blockchain *chain, uint32_t block_num){
   return curr;
 }
 
-// ---------------------------------------------------------------------------
-// Serialize and deserialize functions
-//
+/**---------------------------------------------------------------------------
+ * Serialize / Deserialize Functions
+ *--------------------------------------------------------------------------*/
 
 binn *serialize_blockchain(blockchain *bc) {
   binn *obj;
@@ -131,9 +161,10 @@ blockchain *deserialize_blockchain(binn *input) {
   return bc;
 }
 
-// ---------------------------------------------------------------------------
-// Proof of work and mining
-//
+/**---------------------------------------------------------------------------
+ * Proof of work & Consensus
+ *--------------------------------------------------------------------------*/
+
 block *new_block(blockchain *bc, const char *username) {
   block *new = init_block(bc->latest_block);
 
@@ -148,7 +179,8 @@ block *new_block(blockchain *bc, const char *username) {
 
   new->timestamp = time(NULL);
 
-  transaction *reward = init_transaction("wjk", (char *)username, 69, time(NULL));
+  transaction *reward =
+      init_transaction("wjk", (char *)username, 69, time(NULL));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
@@ -156,7 +188,8 @@ block *new_block(blockchain *bc, const char *username) {
   return new;
 }
 
-block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mutex) {
+block *proof_of_work(blockchain *bc, const char *username,
+                     pthread_mutex_t *mutex) {
   block *new = NULL;
   int count = 0;
 
@@ -169,34 +202,48 @@ block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mute
     pthread_mutex_unlock(mutex);
 
     hash *new_hash = hash_block(new);
-    memcpy(new->hash, *new_hash, 32);
+    memcpy(new->hash, *new_hash, HASH_SIZE);
     free(new_hash);
     count++;
   } while (!is_valid_block(new));
   return new;
 }
 
-void free_blockchain(blockchain *chain){
-  assert(chain);
+bool blockchain_valid(blockchain *curr, blockchain *incoming) {
+  block *latest_curr = curr->latest_block;
 
-  // Free the mempool
-  free_mempool(chain->mempool);
-
-  // Free the blocks one-by-one
-  block *curr = chain->latest_block;
-  while(curr != NULL){
-    block *temp = curr;
-    curr = curr->prev_block;
-    free_block(temp);
+  if (curr->latest_block->index > incoming->latest_block->index) {
+    return false;
   }
-  free(chain);
+
+  block *new_b = incoming->latest_block;
+  while (new_b->index > 0) {
+
+    // If previous block's hash and prev hash don't match
+    if (memcmp(new_b->prev_hash, new_b->prev_block->hash, HASH_SIZE) != 0) {
+      return false;
+    }
+
+    // If curr exists within new
+    if (new_b->index == latest_curr->index &&
+        memcmp(new_b->hash, latest_curr->hash, HASH_SIZE) == 0) {
+      return true;
+    }
+
+    new_b = new_b->prev_block;
+  }
+  return true;
 }
+
+/**---------------------------------------------------------------------------
+ * To String and Print
+ *--------------------------------------------------------------------------*/
 
 char *blockchain_to_string(blockchain *chain) {
   assert(chain && chain->latest_block);
 
   block *curr = chain->latest_block;
-  char *out = calloc(curr->index + 1, 800);
+  char *out = calloc(curr->index + 1, LARGE_BUFFER_SIZE);
 
   while (curr != NULL) {
     char *block_string = to_string_block(curr);
@@ -218,29 +265,4 @@ void print_blockchain(blockchain *chain) {
   char *string = blockchain_to_string(chain);
   printf("%s", string);
   free(string);
-}
-
-bool blockchain_valid (blockchain *curr, blockchain *incoming) {
-  block *latest_curr = curr->latest_block;
-
-  if (curr->latest_block->index > incoming->latest_block->index) {
-    return false;
-  }
-
-  block *new_b = incoming->latest_block;
-  while (new_b->index > 0) {
-
-    if (memcmp(new_b->prev_hash, new_b->prev_block->hash, 32) != 0) {
-      return false;
-    }
-
-    // If curr exists within new
-    if (new_b->index == latest_curr->index &&
-        memcmp(new_b->hash, latest_curr->hash, 32) == 0) {
-      return true;
-    }
-
-    new_b = new_b->prev_block;
-  }
-  return true;
 }

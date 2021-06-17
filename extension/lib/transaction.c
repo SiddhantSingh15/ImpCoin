@@ -14,6 +14,7 @@
 #include "transaction.h"
 #include "block.h"
 #include "blockchain.h"
+#include "../definitions.h"
 
 transaction *init_transaction(char *from, char *to, uint64_t amount,
   time_t time) {
@@ -122,8 +123,8 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);
-  sprintf(buffer, "[%"PRIu64" IMP%s] %s -> %s @ %s", tr->amount,
-          (tr->amount > 1) ? "s" : "", tr->from, tr->to, fmtedtime);
+  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", BOLDYELLOW, tr->amount,
+          (tr->amount > 1) ? "s" : "", NOCOLOUR, tr->from, tr->to, fmtedtime);
   free(fmtedtime);
 }
 

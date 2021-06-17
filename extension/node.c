@@ -125,7 +125,7 @@ void incoming_callback(void *arg) {
         *w->bc_ptr = bc_msg->bc;
         // free_blockchain(to_free);
         // printf("%s\n", blockchain_to_string(*w->bc));
-        print_block((*(w->bc_ptr))->latest_block);
+        // print_block((*(w->bc_ptr))->latest_block);
       } else {
         free_blockchain(bc_msg->bc);
       }
@@ -144,10 +144,11 @@ void incoming_callback(void *arg) {
         printf("New transaction received: ");
         print_transaction(tc);
         ll_append((*(w->bc_ptr))->mempool, tc);
-        printf("Current state of mempool: ");
+        printf("Current state of mempool:\n");
         ll_print((*(w->bc_ptr))->mempool, to_string_transaction);
       } else {
-        printf("REJECTED\n");
+        printf("%sREJECTED. You do not have enough IMPs%s\n",
+          BOLDRED, NOCOLOUR);
       }
       // unlock
       pthread_mutex_unlock(&lock);
@@ -271,6 +272,7 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
     if (append_to_blockchain(*bc_ptr, valid)) {
       struct worker *out = find_idle_outgoing(outgoing);
       send_mine_message(*bc_ptr, out);
+      printf("Mined a block!\n%s\n", to_string_block(((*bc_ptr)->latest_block)));
     }
     pthread_mutex_unlock(&lock);
     i++;
@@ -306,7 +308,8 @@ void print_state(char *input, blockchain **bc_ptr, const char *username) {
   } else if (strcmp("name", input) == 0) {
     printf("Username: %s\n", username);
   } else if (strcmp("balance", input) == 0){
-    printf("Your balance is: %ld\n", get_balance(*bc_ptr, username));
+    printf("Your balance is: %s%ld%s\n",
+    BOLDYELLOW, get_balance(*bc_ptr, username), NOCOLOUR);
   } else {
     printf("Invalid command :/\n");
   }

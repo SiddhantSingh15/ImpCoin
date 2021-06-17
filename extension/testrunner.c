@@ -12,6 +12,7 @@
 #include "lib/block.h"
 #include "lib/blockchain.h"
 #include "test/test_utils.h"
+#include "definitions.h"
 
 pthread_mutex_t dummy_mutex;
 

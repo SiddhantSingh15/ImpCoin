@@ -13,6 +13,7 @@
 #include "../lib/block.h"
 #include "../lib/utils.h"
 #include "../lib/blockchain.h"
+#include "../definitions.h"
 #include "test_utils.h"
 
 bool test_bool(bool cond, char *testname) {

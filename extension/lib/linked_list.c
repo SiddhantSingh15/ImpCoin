@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "linked_list.h"
+#include "../definitions.h"
 
 linked_list *ll_init(void) {
   linked_list *new_list = calloc(1, sizeof(linked_list));
@@ -162,7 +163,7 @@ char *ll_to_string(linked_list *list,
   while (curr != NULL) {
     assert(curr->value);
     value_to_string(curr->value, buf);
-    sprintf(out + strlen(out), "[%i] --> {%s}\n", i, buf);
+    sprintf(out + strlen(out), "%s[%i]%s --> %s\n", BOLDBLUE, i, NOCOLOUR, buf);
 
     curr = curr->next;
     i++;

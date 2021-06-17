@@ -165,9 +165,11 @@ char *to_string_block(block *b) {
 
   char *hash_string = to_hex_string_hash(&b->hash[0]);
   if (b->index == 0) {
-    sprintf(out, "GENESIS BLOCK - 0x%s\n", hash_string);
+    sprintf(out, "%sGENESIS BLOCK%s - %s0x%s%s\n",
+    BOLDBLUE, NOCOLOUR, BOLDGREEN, hash_string, NOCOLOUR);
   } else {
-    sprintf(out, "Block %03d - 0x%s\n", b->index, hash_string);
+    sprintf(out, "%sBLOCK %03d%s - %s0x%s%s\n",
+    BOLDBLUE, b->index, NOCOLOUR, BOLDGREEN, hash_string, NOCOLOUR);
   }
   free(hash_string);
 
@@ -192,7 +194,7 @@ char *to_string_block(block *b) {
   sprintf(out + strlen(out), " |} nonce: %"PRIu64"\n", b->nonce);
 
   char *prev_hash_string = to_hex_string_hash(&b->prev_hash[0]);
-  sprintf(out + strlen(out), " |} previous hash: 0x%s\n", prev_hash_string);
+  sprintf(out + strlen(out), " |} previous hash: %s0x%s%s\n", BOLDGREEN, prev_hash_string, NOCOLOUR);
   free(prev_hash_string);
 
   out = realloc(out, strlen(out) + 1);

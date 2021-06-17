@@ -6,6 +6,7 @@
 #include <string.h>
 #include <binn.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "linked_list.h"
 #include "transaction.h"

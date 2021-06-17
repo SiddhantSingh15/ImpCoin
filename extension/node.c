@@ -1,3 +1,4 @@
+#include <stdint.h>
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <stdio.h>
@@ -308,8 +309,9 @@ void print_state(char *input, blockchain **bc_ptr, const char *username) {
   } else if (strcmp("name", input) == 0) {
     printf("Username: %s\n", username);
   } else if (strcmp("balance", input) == 0){
+    uint64_t balance = get_balance(*bc_ptr, username);
     printf("Your balance is: %s%ld%s\n",
-    BOLDYELLOW, get_balance(*bc_ptr, username), NOCOLOUR);
+    (balance == 0) ? BOLDRED : YELLOW, balance, NOCOLOUR);
   } else {
     printf("Invalid command :/\n");
   }

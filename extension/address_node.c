@@ -142,13 +142,11 @@ int run_address_node(const char *our_url, struct addr_worker *workers[]) {
 
 int main(int argc, char **argv) {
 
+  printf("ImpAddressServer, Version 0.1\n");
   struct addr_worker *workers[PARALLEL];
   const char *host_url = "tcp://127.0.0.1:8000";
   int rc = run_address_node(host_url, workers);
 
-  // blockchain *bc = init_blockchain();
-  // print_block(bc->latest_block);
-  printf("Hello, blockchain!\n");
   while (true);
   exit(rc == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }

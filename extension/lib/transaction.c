@@ -108,7 +108,6 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
   curr_lln = mempool->head;
   while (curr_lln != NULL) {
     transaction *trans = (transaction *) curr_lln->value;
-    printf("%s sent %ld to %s\n", trans->from, trans->amount, trans->to);
     if (strcmp(trans->to, tc->from) == 0) {
         amount += trans->amount;
       } else if (strcmp(trans->from, tc->from) == 0) {
@@ -117,13 +116,13 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
     curr_lln = curr_lln->next;
   }
 
-  return tc->amount < amount;
+  return tc->amount <= amount;
 }
 
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);
-  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", BOLDYELLOW, tr->amount,
+  sprintf(buffer, "%s[%"PRIu64" IMP%s]%s %s -> %s @ %s", YELLOW, tr->amount,
           (tr->amount > 1) ? "s" : "", NOCOLOUR, tr->from, tr->to, fmtedtime);
   free(fmtedtime);
 }

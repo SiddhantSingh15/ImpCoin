@@ -84,6 +84,29 @@ instr_func_map and = {
 \label{fig:functional_pointers}
 \end{figure}
 
+\subsubsection{Tokenizer:}
+Another interesting aspect of our assembler is how our tokenizer works. Before passing anything to \verb|tokenizer()|, we check that its not a label, it will always be an instruction line. Then we allocate contiguous memory to a \verb|token_list| which will store our tokenized instruction. Then, instead of using \verb|strtok_r()|, we used our own version - \verb|strbrk_r|. This choice was made due to two reasons:
+\begin{enumerate}
+    \item \verb|strtok_r()| isn't portable for pre-POSIX-2001 systems and it caused a lot of compilation issues on macOS.
+    \item Our \verb|strbrk_r()| functions returns the delimiters inside the returned tokens, which was important to identify pre-indexed and post-indexed instructions. For example, \verb|strtok_r()| wouldn't return the square brackets in \verb|ldr r1, [r0]| when they are required for parsing purposes later on in the assembler process.
+\end{enumerate}
+A \verb|while| loop is used together with \verb|str_brk()|inside \verb|tokenizer()| to convert instruction strings into token lists. Any allocated memory is freed accordingly. When \verb|tokenizer()| is complete, the linked list will contain a token list in every node, each corresponding to an instruction in the source file in order.
+
+\subsubsection{Parser:}
+We have decided to create multiple parser functions that handles different instructions. In order to access each function, we use a \verb|instr_func_map| datatype as mentioned in Figure \ref{fig:functional_pointers}. As mentioned earlier in sub-section \ref{The structure}, the symbol table is populated with these function mappings. This allows us to query the symbol table with an instruction name such as \verb|mov|, and have the symbol table return its corresponding \verb|instr_func_map| as shown in Figure \ref{fig:calling functions with func map}.
+
+
+\begin{figure}[htp]
+\centering
+\begin{BVerbatim}
+func_map = st_retrieve(labels, tokens->list[0].data.instr_name);
+...
+binary_instr = func_map->function(curr, func_map->code, labels);
+\end{BVerbatim}
+\caption{Retrieving func\_map data and calling the function through a function pointer}
+\label{fig:calling functions with func map}
+\end{figure}
+
 
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Real world usage:}

@@ -353,6 +353,8 @@ int main(int argc, char **argv) {
 
     } else if (is_command('p', input)) {
       print_state(&input[2], bc_ptr, username);
+    } else if (is_command('q', input)) {
+      break;
     }
 
   }

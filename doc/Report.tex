@@ -123,7 +123,9 @@ In the real world, all our transactions are monitored by a governing body and th
 \subsection{The implementation:}
 \subsubsection{High-level details:}
 
-There are two main executables in our implementation. First, we have a \verb|node| which presents the user with an interactive prompt, allowing them to mine $n$ blocks, make transactions and print out internal state for debugging purposes. Each \verb|node| stores a copy of their own blockchain, which contains a linke
+There are two main executables in our implementation. First, we have \verb|node| which presents the user with an interactive prompt, allowing them to mine blocks, make transactions and print out internal state for debugging purposes. Each \verb|node| stores a copy of their own blockchain, which contains a linked list of previously mined blocks, and a list of pending transactions. The second executable is \verb|address node|, which simply listens for incoming traffic on the network, and relays this back to every connected node. This simplifies our network implementation significantly, as now each node does not have to keep track of which nodes to send messages to.
+
+There are 2 types of messages sent across the network. The first is a transaction, which allows a user to transfer ImpCoin out of their account
 
 In order to create a blockchain network in C, we needed to implement several things:
 \begin{itemize}

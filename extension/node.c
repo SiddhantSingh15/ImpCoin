@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -133,7 +135,7 @@ void incoming_callback(void *arg) {
       if (strcmp(w->username, binn_object_str(buffer, "to")) == 0) {
         transaction_msg *t_msg = deserialize_t_msg(buffer);
         printf(
-          "Its for me! Specifically from %s, transferring %ld ASTLYCOINS to %s.\n",
+          "Its for me! Specifically from %s, transferring %"PRIu64" ASTLYCOINS to %s.\n",
           t_msg->username,t_msg->amount, t_msg->to
         );
       } else {

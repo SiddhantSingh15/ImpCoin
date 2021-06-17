@@ -4,6 +4,7 @@
 #include "linked_list.h"
 #include <stdint.h>
 #include <time.h>
+#include <pthread.h>
 
 #define GENESIS_BLOCK genesis_block()
 

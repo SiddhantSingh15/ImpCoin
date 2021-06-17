@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 #include <sodium/crypto_generichash.h>
 #include <sodium/utils.h>

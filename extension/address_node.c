@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -67,7 +69,7 @@ void address_callback(void *arg) {
       printf("I've received a transaction\n");
       transaction_msg *t_msg = deserialize_t_msg(buffer);
       printf(
-        "It is from %s, transferring %ld ImpCoin to %s.\n",
+        "It is from %s, transferring %"PRIu64" ImpCoin to %s.\n",
         t_msg->username,t_msg->amount, t_msg->to
       );
     }

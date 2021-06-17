@@ -263,9 +263,6 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
   int i = 1;
 
   while (limit == 0 || i <= limit) {
-    // lock
-    // pthread_mutex_lock(&lock);
-
     block *valid = proof_of_work(*bc_ptr, username, &lock);
 
     pthread_mutex_lock(&lock);
@@ -274,9 +271,6 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
       send_mine_message(*bc_ptr, out);
     }
     pthread_mutex_unlock(&lock);
-
-    // unlock
-    // pthread_mutex_unlock(&lock);
     i++;
   }
   printf("Mining complete.\n");
@@ -308,12 +302,12 @@ int main(int argc, char **argv) {
   blockchain **bc_ptr = malloc(sizeof(blockchain *));
   *bc_ptr = init_blockchain();
 
-  transaction *t1 = init_transaction("wjk", "george", 6240, 0);
+  transaction *t1 = init_transaction("wjk", "kgk", 6240, 0);
 
   ll_append((*bc_ptr)->mempool, t1);
 
 
-  printf("Please enter your local ip port thing: \n");
+  printf("Please enter a local port to listen on: \n");
   read_line(input_buf, 511);
 
   const char *username = malloc(511);
@@ -334,10 +328,6 @@ int main(int argc, char **argv) {
     } else {
       printf("Input 'm' to mine, 't' to perform a transaction.\n");
     }
-    /*
-    struct worker *out = find_idle_outgoing(outgoing);
-    send_input_message(input_buf, out);
-    */
   }
 
   free_blockchain(*bc_ptr);

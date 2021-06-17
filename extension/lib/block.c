@@ -16,6 +16,10 @@
 #include "transaction.h"
 #include "block.h"
 
+/**---------------------------------------------------------------------------
+ * Init, Duplicate and Free
+ *--------------------------------------------------------------------------*/
+
 block *init_block(block *prev){
   block *new = calloc(1, sizeof(block));
   new->index = (prev) ? prev->index + 1 : 0;
@@ -28,6 +32,37 @@ block *init_block(block *prev){
 
   return new;
 }
+
+block *dup_block(block *b) {
+  block *dup = init_block(b->prev_block);
+  dup->timestamp = b->timestamp;
+
+  if (b->transactions) {
+    dup->transactions = ll_init();
+    ll_node *curr = b->transactions->head;
+    while (curr != NULL) {
+      ll_append(dup->transactions, dup_transaction(curr->value));
+    }
+  }
+
+  transaction *reward = dup_transaction(&b->reward);
+  memcpy(&dup->reward, reward, sizeof(transaction));
+  free_transaction(reward);
+
+  dup->nonce = b->nonce;
+  memcpy(dup->hash, b->hash, sizeof(hash));
+
+  return dup;
+}
+
+void free_block(block *b) {
+  ll_free(b->transactions, free_transaction);
+  free(b);
+}
+
+/**---------------------------------------------------------------------------
+ * Serialize / Deserialize
+ *--------------------------------------------------------------------------*/
 
 binn *serialize_block_no_hash(block *input) {
   binn *obj;
@@ -62,42 +97,6 @@ binn *serialize_block_w_hash(block *input) {
   return obj;
 }
 
-hash *hash_block(block *b) {
-
-  binn *serialized = serialize_block_no_hash(b);
-
-  hash *hashed = malloc(sizeof(hash));
-  char *out = rand_hash(binn_ptr(serialized), binn_size(serialized));
-  memcpy(hashed, out, crypto_generichash_BYTES);
-  free(out);
-
-  binn_free(serialized);
-
-  return hashed;
-}
-
-block *dup_block(block *b) {
-  block *dup = init_block(b->prev_block);
-  dup->timestamp = b->timestamp;
-
-  if (b->transactions) {
-    dup->transactions = ll_init();
-    ll_node *curr = b->transactions->head;
-    while (curr != NULL) {
-      ll_append(dup->transactions, dup_transaction(curr->value));
-    }
-  }
-
-  transaction *reward = dup_transaction(&b->reward);
-  memcpy(&dup->reward, reward, sizeof(transaction));
-  free_transaction(reward);
-
-  dup->nonce = b->nonce;
-  memcpy(dup->hash, b->hash, sizeof(hash));
-
-  return dup;
-}
-
 block *deserialize_block(binn *b) {
   int blobsize = 32;
   block *new = calloc(1, sizeof(block));
@@ -120,6 +119,24 @@ block *deserialize_block(binn *b) {
   return new;
 }
 
+/**---------------------------------------------------------------------------
+ * Validity and Hashing
+ *--------------------------------------------------------------------------*/
+
+hash *hash_block(block *b) {
+
+  binn *serialized = serialize_block_no_hash(b);
+
+  hash *hashed = malloc(sizeof(hash));
+  char *out = rand_hash(binn_ptr(serialized), binn_size(serialized));
+  memcpy(hashed, out, crypto_generichash_BYTES);
+  free(out);
+
+  binn_free(serialized);
+
+  return hashed;
+}
+
 bool is_valid_block(block *b) {
   // pre: the hash has been calculated
   int mask = 0xf;
@@ -131,6 +148,11 @@ bool is_valid_block(block *b) {
   }
   return true;
 }
+
+/**---------------------------------------------------------------------------
+ * To String and Print
+ *--------------------------------------------------------------------------*/
+
 
 char *to_string_block(block *b) {
 
@@ -178,9 +200,4 @@ void print_block(block *b) {
   char *string = to_string_block(b);
   printf("%s", string);
   free(string);
-}
-
-void free_block(block *b) {
-  ll_free(b->transactions, free_transaction);
-  free(b);
 }

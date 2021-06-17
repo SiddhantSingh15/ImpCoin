@@ -298,7 +298,7 @@ void test_hash_equality(int *passing, int *total) {
 
 void test_proof_of_work_function(int *passing, int *total) {
   blockchain *bc = init_blockchain();
-  char *username = "rick";
+  char *username = "wjk";
   block *just_mined = proof_of_work(bc, username, &dummy_mutex);
   track_test(test_bool(is_valid(just_mined), "Latest block is valid"),
              passing, total);
@@ -356,7 +356,7 @@ void test_append_blocks(int *passing, int *total) {
   print_blockchain(second_bc);
 
   // Add 1 new node to both blockchains
-  char *username = "rick";
+  char *username = "wjk";
   block *just_mined = proof_of_work(first_bc, username, &dummy_mutex);
   block *just_mined_dup = dup_block(just_mined);
   just_mined_dup->prev_block = second_bc->latest_block;

@@ -21,10 +21,14 @@ block *genesis_block(void) {
   genesis->prev_block = NULL;
 
   // add transactions to give us free money
-  transaction *t1 = init_transaction("rick", "ash", 1000, -22118400);
-  transaction *t2 = init_transaction("rick", "sid", 1000, -22118400);
-  transaction *t3 = init_transaction("rick", "kavya", 1000, -22118400);
-  transaction *t4 = init_transaction("rick", "yelun", 1000, -22118400);
+  transaction *t1 = init_transaction("wjk", "ash", 1000, -22118400);
+  transaction *t2 = init_transaction("wjk", "sid", 1000, -22118400);
+  transaction *t3 = init_transaction("wjk", "kavya", 1000, -22118400);
+  transaction *t4 = init_transaction("wjk", "yelun", 1000, -22118400);
+
+  transaction *reward = init_transaction("imp_overlord", (char *)"wjk", 21000000, -22118400);
+  memcpy(&genesis->reward, reward, sizeof(transaction));
+  free_transaction(reward);
 
   // Create list and add transactions
   genesis->transactions = ll_init();
@@ -144,7 +148,7 @@ block *new_block(blockchain *bc, const char *username) {
 
   new->timestamp = time(NULL);
 
-  transaction *reward = init_transaction("rick", (char *)username, 69, time(NULL));
+  transaction *reward = init_transaction("wjk", (char *)username, 69, time(NULL));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 

@@ -275,10 +275,10 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
 void perform_transaction(struct worker *outgoing[]) {
   char buffer[10];
   uint64_t amount = 0;
-  printf("Please enter the amount you wish to transfer\n");
+  printf("Please enter the amount you wish to transfer: ");
   read_line(buffer, 10);
   amount = (uint64_t) atoi(buffer);
-  printf("Please input the username of the person you are transferring to:\n");
+  printf("Please input the username of the person you are transferring to: ");
   read_line(buffer, 10);
   struct worker *out = find_idle_outgoing(outgoing);
   send_transaction_message(buffer, amount, out);

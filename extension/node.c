@@ -64,24 +64,24 @@ void send_mine_message(blockchain *bc, struct worker *w) {
 }
 
 void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
+
   int rv;
   nng_msg *nng_msg;
-  transaction_msg *t_msg = malloc(sizeof(transaction_msg));
   binn *obj;
 
-  w->state = SEND;
+  transaction_msg *t_msg = init_transaction_msg(amount, w->username, to);
+  obj = serialize_t_msg(t_msg);
+
+  free(t_msg);
+
   if ((rv = nng_msg_alloc(&nng_msg, 0)) != 0) {
     fatal("nng_msg_alloc", rv);
   }
-  t_msg->amount = amount;
-  t_msg->timestamp = time(NULL);
-  strcpy(t_msg->to, to);
-  strcpy(t_msg->username, w->username);
-  strcpy(t_msg->type, "trans");
-  obj = serialize_t_msg(t_msg);
-  free(t_msg);
-  nng_msg_insert(nng_msg, binn_ptr(obj), binn_size(obj));
+
+  nng_msg_append(nng_msg, binn_ptr(obj), binn_size(obj));
   nng_aio_set_msg(w->aio, nng_msg);
+
+  w->state = SEND;
   nng_send_aio(w->sock, w->aio);
 }
 
@@ -277,13 +277,13 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
 }
 
 void perform_transaction(struct worker *outgoing[]) {
-  char buffer[10];
+  char buffer[511];
   uint64_t amount = 0;
   printf("Please enter the amount you wish to transfer: ");
-  read_line(buffer, 10);
+  read_line(buffer, 511);
   amount = (uint64_t) atoi(buffer);
   printf("Please input the username of the person you are transferring to: ");
-  read_line(buffer, 10);
+  read_line(buffer, 511);
   struct worker *out = find_idle_outgoing(outgoing);
   send_transaction_message(buffer, amount, out);
 }
@@ -330,9 +330,9 @@ int main(int argc, char **argv) {
   printf("Please enter a local port to listen on: \n");
   read_line(input, 511);
 
-  const char *username = malloc(511);
+  const char *username = malloc(UID_LENGTH);
   printf("Please enter your username: \n");
-  read_line((char *)username, 511);
+  read_line((char *)username, UID_LENGTH);
 
   nng_socket sock = start_node(input, incoming, outgoing, bc_ptr, username);
   dial_address_server(sock, "tcp://127.0.0.1:8000");

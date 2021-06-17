@@ -29,13 +29,25 @@ binn *serialize_bc_msg(blockchain_msg *bc_msg) {
 blockchain_msg *deserialize_bc_msg(binn *input) {
   blockchain_msg *bc_msg = calloc(1, sizeof(blockchain_msg));
   bc_msg->bc = deserialize_blockchain(binn_object_object(input, "blockchain"));
-  strncpy(bc_msg->username, binn_object_str(input, "username"), 40);
+  strncpy(bc_msg->username, binn_object_str(input, "username"), UID_LENGTH);
   strncpy(bc_msg->type, binn_object_str(input, "type"), 10);
   return bc_msg;
 }
 
+transaction_msg *init_transaction_msg(uint64 amount, const char *username, char *to) {
+  transaction_msg *new = calloc(1, sizeof(transaction_msg));
+  new->amount = amount;
+  new->timestamp = time(NULL);
+  strncpy(new->username, username, UID_LENGTH);
+  strncpy(new->to, to, UID_LENGTH);
+  strncpy(new->type, "trans", 10);
+
+  return new;
+}
+
 binn *serialize_t_msg(transaction_msg *t_msg) {
   binn *obj = binn_object();
+
   binn_object_set_uint64(obj, "amount", t_msg->amount);
   binn_object_set_uint64(obj, "timestamp", t_msg->timestamp);
   binn_object_set_str(obj, "username", t_msg->username);
@@ -47,9 +59,9 @@ binn *serialize_t_msg(transaction_msg *t_msg) {
 
 transaction_msg *deserialize_t_msg(binn *input) {
   transaction_msg *t_msg = calloc(1, sizeof(transaction_msg));
-  strncpy(t_msg->username, binn_object_str(input, "username"), 40);
+  strncpy(t_msg->username, binn_object_str(input, "username"), UID_LENGTH);
   strncpy(t_msg->type, binn_object_str(input, "type"), 10);
-  strncpy(t_msg->to, binn_object_str(input, "to"), 10);
+  strncpy(t_msg->to, binn_object_str(input, "to"), UID_LENGTH);
   t_msg->amount = binn_object_uint64(input, "amount");
   t_msg->timestamp = binn_object_uint64(input, "timestamp");
 

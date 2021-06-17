@@ -102,14 +102,16 @@ void incoming_callback(void *arg) {
     buffer = (binn *)nng_msg_body(w->msg);
     strcpy(type, binn_object_str(buffer, "type"));
 
-    if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
-      // This was sent by us, ignore
-      nng_recv_aio(w->sock, w->aio);
-      break;
-    }
-
     if (strcmp(type, "mine") == 0) {
-      printf("I received a block from %s\n", binn_object_str(buffer, "username"));
+
+      if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
+        // This was sent by us, ignore
+        nng_recv_aio(w->sock, w->aio);
+        break;
+      }
+
+      printf("I received a block from %s\n",
+             binn_object_str(buffer, "username"));
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
 
       // lock
@@ -129,15 +131,20 @@ void incoming_callback(void *arg) {
       pthread_mutex_unlock(&lock);
 
     } else if (strcmp(type, "trans") == 0) {
-      printf("Transaction! Is it for me?\n");
-      if (strcmp(w->username, binn_object_str(buffer, "to")) == 0) {
-        transaction_msg *t_msg = deserialize_t_msg(buffer);
-        printf(
-          "Its for me! Specifically from %s, transferring %ld ASTLYCOINS to %s.\n",
-          t_msg->username,t_msg->amount, t_msg->to
-        );
-      } else {
-        printf("Aw its not for us...\n");
+      transaction_msg *tc_msg = deserialize_t_msg(buffer);
+      transaction *tc = to_transaction(tc_msg);
+      free(tc_msg);
+
+      if (is_valid_transaction(tc)) {
+        // lock
+        pthread_mutex_lock(&lock);
+        printf("New transaction received: ");
+        print_transaction(tc);
+        ll_append((*(w->bc_ptr))->mempool, tc);
+        printf("Current state of mempool: ");
+        ll_print((*(w->bc_ptr))->mempool, to_string_transaction);
+        // unlock
+        pthread_mutex_unlock(&lock);
       }
     }
 
@@ -298,21 +305,9 @@ int main(int argc, char **argv) {
   blockchain **bc_ptr = malloc(sizeof(blockchain *));
   *bc_ptr = init_blockchain();
 
-  transaction *t1 = init_transaction("rick", "george", 420, 0);
-  transaction *t2 = init_transaction("rick", "george", 4200, 0);
-  transaction *t3 = init_transaction("rick", "george", 4220, 0);
-  transaction *t4 = init_transaction("rick", "george", 4240, 0);
-
-  transaction *t5 = init_transaction("rick", "george", 5220, 0);
-  transaction *t6 = init_transaction("rick", "george", 6240, 0);
+  transaction *t1 = init_transaction("wjk", "george", 6240, 0);
 
   ll_append((*bc_ptr)->mempool, t1);
-  ll_append((*bc_ptr)->mempool, t2);
-  ll_append((*bc_ptr)->mempool, t3);
-  ll_append((*bc_ptr)->mempool, t4);
-
-  ll_append((*bc_ptr)->mempool, t5);
-  ll_append((*bc_ptr)->mempool, t6);
 
 
   printf("Please enter your local ip port thing: \n");

@@ -35,7 +35,8 @@ blockchain_msg *deserialize_bc_msg(binn *input) {
 
 binn *serialize_t_msg(transaction_msg *t_msg) {
   binn *obj = binn_object();
-  binn_object_set_uint16(obj, "amount", t_msg->amount);
+  binn_object_set_uint64(obj, "amount", t_msg->amount);
+  binn_object_set_uint64(obj, "timestamp", t_msg->timestamp);
   binn_object_set_str(obj, "username", t_msg->username);
   binn_object_set_str(obj, "type", t_msg->type);
   binn_object_set_str(obj, "to", t_msg->to);
@@ -49,6 +50,13 @@ transaction_msg *deserialize_t_msg(binn *input) {
   strncpy(t_msg->type, binn_object_str(input, "type"), 10);
   strncpy(t_msg->to, binn_object_str(input, "to"), 10);
   t_msg->amount = binn_object_uint64(input, "amount");
+  t_msg->timestamp = binn_object_uint64(input, "timestamp");
 
   return t_msg;
+}
+
+transaction *to_transaction(transaction_msg *tc_msg) {
+  transaction *tc = init_transaction(tc_msg->username, tc_msg->to,
+                                     tc_msg->amount, tc_msg->timestamp);
+  return tc;
 }

@@ -26,7 +26,7 @@ block *genesis_block(void) {
   transaction *t3 = init_transaction("wjk", "kavya", 1000, -22118400);
   transaction *t4 = init_transaction("wjk", "yelun", 1000, -22118400);
 
-  transaction *reward = init_transaction("imp_overlord", (char *)"wjk", 21000000, -22118400);
+  transaction *reward = init_transaction("docsoc", (char *)"wjk", 21000000, -22118400);
   memcpy(&genesis->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
@@ -62,7 +62,7 @@ bool append_to_blockchain(blockchain *chain, block *b){
   assert(chain && b);
 
   // Append the new block to the blockchain
-  if (is_valid(b) && chain->latest_block == b->prev_block) {
+  if (is_valid_block(b) && chain->latest_block == b->prev_block) {
     chain->latest_block = b;
 
     // Remove the transactions in the block from the mempool.
@@ -172,7 +172,7 @@ block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mute
     memcpy(new->hash, *new_hash, 32);
     free(new_hash);
     count++;
-  } while (!is_valid(new));
+  } while (!is_valid_block(new));
   return new;
 }
 

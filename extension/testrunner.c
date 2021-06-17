@@ -300,7 +300,7 @@ void test_proof_of_work_function(int *passing, int *total) {
   blockchain *bc = init_blockchain();
   char *username = "wjk";
   block *just_mined = proof_of_work(bc, username, &dummy_mutex);
-  track_test(test_bool(is_valid(just_mined), "Latest block is valid"),
+  track_test(test_bool(is_valid_block(just_mined), "Latest block is valid"),
              passing, total);
   track_test(
       test_bool(just_mined != bc->latest_block, "Latest block is actually new"),

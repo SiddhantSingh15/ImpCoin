@@ -79,6 +79,10 @@ linked_list *deserialize_transactions(binn *transactions) {
   return new_ll;
 }
 
+bool is_valid_transaction(transaction *tc) {
+  return true;
+}
+
 void to_string_transaction(void *t, char *buffer) {
   transaction *tr = (transaction *)t;
   char *fmtedtime = formatted_time(&tr->timestamp);

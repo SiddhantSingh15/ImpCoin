@@ -38,7 +38,7 @@ block *dup_block(block *b);
 
 block *deserialize_block(binn *b);
 
-bool is_valid(block *b);
+bool is_valid_block(block *b);
 
 char *to_string_block(block *b);
 

@@ -17,8 +17,13 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{fancyvrb}
-\usepackage{tikz-network}
 \usepackage{subfigure}
+
+\definecolor{BOLDBLUE}{RGB}{0,55,218}
+\definecolor{BOLDGREEN}{RGB}{0,128,0}
+\definecolor{BOLDYELLOW}{RGB}{252,127,0}
+\definecolor{BOLDRED}{RGB}{205,49,49}
+
 
 \title{\textbf{ARM11 Final Report}}
 \author{
@@ -39,7 +44,7 @@
 \maketitle
 
 \section{Assembler}
-\subsection{The structure:}
+\subsection{The structure:}\label{The structure}
 \subsubsection{First Pass: }
 During the first pass, the assembler initialises the linked list and the symbol table using the \verb|init_linked_list()| and \verb|init_symbol_table()| respectively in \verb|assemble.c|. The linked list is initialised by setting the head to \verb|NULL| and allocating memory based on the size of the linked list. The symbol table is initialised by allocating contiguous memory, setting the capacity to \verb|64| and the key-value pairs to \verb|NULL|. Once the symbol table is initialised, we populate the table with function mappings for all pre-defined instructions mentioned in spec. The instruction function mappings are a combination of a \verb|union| code and a parse functional pointer pointing to the appropriate parse function. 
 
@@ -79,18 +84,12 @@ instr_func_map and = {
 \label{fig:functional_pointers}
 \end{figure}
 
-\subsubsection{Tokenizer:}
-Another interesting aspect of our assembler is how our tokenizer works. Before passing anything to \verb|tokenizer()|, we check that its not a label, it will always be an instruction line. Then we allocate contiguous memory to a \verb|token_list| which will store our tokenized instruction. Then, instead of using \verb|strtok_r()|, we used our own version - \verb|strbrk_r|. This choice was made due to 2 reasons:
-\begin{enumerate}
-    \item \verb|strtok_r()| isn't portable for pre-POSIX-2001 systems and it caused a lot of compilation issues on macOS.
-    \item Our \verb|strbrk_r| functions returns the delimiters inside the returned tokens, which was important to identify pre-indexed and post-indexed instructions. For example, \verb|strtok_r| wouldn't return the square brackets in \verb|ldr r1, [r0]| when they are required for parsing purposes later on in the assembler process.
-\end{enumerate}
-Once we ran a \verb|while| loop inside \verb|tokenizer()|, we freed any memory allocation we may have used and then passed the tokenized list of type \verb|token_list|. This token list is then parsed and encoded as mentioned before.
 
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Real world usage:}
 \lipsum[1-1]
 \subsection{The implementation:}
+\subsubsection{High-level details:}
 \lipsum[1-1]
 
 \begin{figure}[htp]
@@ -102,10 +101,29 @@ Once we ran a \verb|while| loop inside \verb|tokenizer()|, we freed any memory a
     \label{fig:network-types}
 \end{figure}
 
-\subsection{Testing:}
+\subsubsection{Issues we overcame: }
 \lipsum[1-1]
-\subsubsection{Effectiveness of testing:}
-\lipsum[1-1]
+
+\subsection{Testing and Effectiveness:}
+After setting up the basic skeleton of the extension, we also got started on our test suite. The constantly evolving test suite contains basic building blocks which are then used for more complex tests. For example, \verb|test_string()| (checks string equality) is used in \verb|test_hash()| (checks hash equality) which is utilised in \verb|test_hash_equality()| which checks whether the hashes of the passed in blocks are equal. We have tried to use this "ground up" approach wherever possible as it reduces code duplication. Figure \ref{fig:test-example} shows part of the command line output of the \verb|testrunner| when its run (the \texttt{\textcolor{BOLDRED}{FAIL}} is just an example, all our cases pass!). We use escape sequences to output colourful text in the terminal.
+
+Our test suite helped us catch a lot of obscure bugs which we hadn't thought of before, and it was also our first taste at Test Driven Development. A lot of really enjoyed the process of writing tests before typing code because it gave us a better idea on how to get started. Apart from the test suite, we also stress tested our system with multiple terminals mining at once to see if everything functions smoothly and relatively quickly. It was also satisfying to hit smaller goals more often as it boosted our enthusiasm throughout the journey.
+
+\begin{figure}[htp]
+\centering
+\begin{BVerbatim}[commandchars=\\\{\}]
+-----\textcolor{BOLDBLUE}{SERIALIZE/DESERIALIZE TESTS}-------------------------------------
+TEST - Transactions are equal on both ends : \textcolor{BOLDGREEN}{OK}
+TEST - Linked list of transactions is equal on both ends : \textcolor{BOLDGREEN}{OK}
+TEST - Genesis block is equal on both ends, with hash : \textcolor{BOLDGREEN}{OK}
+TEST - Blockchain is equal on both ends : \textcolor{BOLDRED}{FAIL}
+---------------------------------------------------------------------
+\textcolor{BOLDYELLOW}{PASSING: (3/4) tests}
+---------------------------------------------------------------------
+\end{BVerbatim}
+\caption{Example of our Test Suite}
+\label{fig:test-example}
+\end{figure}
 
 \section{Group Reflection}
 \subsection{Effectiveness of communication and division of work:}
@@ -116,7 +134,10 @@ In the assembler, we decided to split up larger parts of the project. Kavya was 
 
 \subsection{Future improvements:}
 Although our group was efficient, there were some aspects that we could have incorporated for a better result. For example, we could have utilized pair programming a little more during debugging sessions and larger aspects of the project that required design choices and second opinions. This would have sped up the process and also ensured a more optimal outcome.
-Additionally, we could have managed our time more efficiently in order to get the project done well before the deadline. This would have left us enough time to incorporate some final refactoring and other minute details that were required for completion of the project. 
+
+Additionally, we could have managed our time more efficiently in order to get the project done well before the deadline. This would have left us enough time to incorporate some final refactoring and other minute details that were required for completion of the project. This management would have been possible if we had paced out our work during the initial part of the project, to avoid burn-out and a slower pace for the rest of the project. 
+
+Furthermore, the group could have
 
 \section{Individual Reflections}
 \subsection{Ashvin:}

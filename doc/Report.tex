@@ -112,19 +112,17 @@ All token lists produced by reading the source file will always begin with a tok
 
 The parser works together with the encoder to produce a 32 bit binary value. This value will then be written to an output file.
 
-
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Description \& Real world usage:}
 
 For our extension, we simulated a decentralised blockchain cryptocurrency called \textbf{ImpCoin}. The simulation relies on a centralised \verb|address node|, this acts like the server in a client-server model. It is responsible for distribution of all information on the ``decentralised'' blockchain. The reason why we decided on this implementation is mainly due to time constraints, we found out quite early on that implementing a fully decentralised network in C would require a lot more hours than we could spare. Along with essential blockchain and transaction functions, we also implemented basic concurrency in the network to allow mining and transactions to occur at the same time between multiple clients.
 
-
+In the real world, all our transactions are monitored by a governing body and the majority of our money is regulated by regulatory bodies. This is not necessarily a good thing (that's a debate for another day !), this is where crypto fills the void in the market. Our system ensures a ``trustless'' system, this means that the uses on the network don't necessarily need to trust their peers; the consensus system ensures that the trust is built on the distributed ledger. Nobody is allowed to alter or delete anything form the shared ledger and any mining of blocks checks the transactions made on the network. The side-effect of having this shared currency is that transactions and transfers are lightning fast, easy and free of cost as \textbf{ImpCoin} has no middle man.
 
 \subsection{The implementation:}
 \subsubsection{High-level details:}
 
 
-\lipsum[1-1]
 
 \begin{figure}[htp]
     \centering
@@ -145,7 +143,7 @@ Our test suite helped us catch a lot of obscure bugs which we hadn't thought of 
 
 \begin{figure}[htp]
 \centering
-\begin{BVerbatim}[commandchars=\\\{\}]
+\begin{BVerbatim}[commandchars=\\\{\}, fontsize = \small]
 -----\textcolor{BOLDBLUE}{SERIALIZE/DESERIALIZE TESTS}-------------------------------------
 TEST - Transactions are equal on both ends : \textcolor{BOLDGREEN}{OK}
 TEST - Linked list of transactions is equal on both ends : \textcolor{BOLDGREEN}{OK}
@@ -158,7 +156,6 @@ TEST - Blockchain is equal on both ends : \textcolor{BOLDRED}{FAIL}
 \caption{Example of our Test Suite}
 \label{fig:test-example}
 \end{figure}
-
 
 \section{Group Reflection}
 \subsection{Effectiveness of communication and division of work:}

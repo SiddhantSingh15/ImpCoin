@@ -17,6 +17,8 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage{fancyvrb}
+\usepackage{tikz-network}
+\usepackage{subfigure}
 
 \title{\textbf{ARM11 Final Report}}
 \author{
@@ -52,7 +54,7 @@ Once the parse operations have been performed, the parsed instruction will be se
 
 \begin{figure}[htp]
     \centering
-    \includegraphics[width=15cm, frame]{assembler_flow.jpg}
+    \includegraphics[width=15cm]{assembler_flow.jpg}
     \caption{Our 2-pass assembly process}
     \label{fig:assembler}
 \end{figure}
@@ -81,15 +83,25 @@ instr_func_map and = {
 Another interesting aspect of our assembler is how our tokenizer works. Before passing anything to \verb|tokenizer()|, we check that its not a label, it will always be an instruction line. Then we allocate contiguous memory to a \verb|token_list| which will store our tokenized instruction. Then, instead of using \verb|strtok_r()|, we used our own version - \verb|strbrk_r|. This choice was made due to 2 reasons:
 \begin{enumerate}
     \item \verb|strtok_r()| isn't portable for pre-POSIX-2001 systems and it caused a lot of compilation issues on macOS.
-    \item Our \verb|strbrk_r| functions returns the delimiters inside the returned tokens, which was important to identify pre-indexed and post-indexed instructions. For example, \verb|strtok_r| wouldn't return the \verb|[]| in \verb|ldr r1, [r0]| and our program required that identification later on in the assembler process.
+    \item Our \verb|strbrk_r| functions returns the delimiters inside the returned tokens, which was important to identify pre-indexed and post-indexed instructions. For example, \verb|strtok_r| wouldn't return the square brackets in \verb|ldr r1, [r0]| when they are required for parsing purposes later on in the assembler process.
 \end{enumerate}
 Once we ran a \verb|while| loop inside \verb|tokenizer()|, we freed any memory allocation we may have used and then passed the tokenized list of type \verb|token_list|. This token list is then parsed and encoded as mentioned before.
 
-\section{Extension: Modelling a Distributed Ledger Cryptocurrency with a Concurrent Centralised Network}
+\section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Real world usage:}
 \lipsum[1-1]
 \subsection{The implementation:}
 \lipsum[1-1]
+
+\begin{figure}[htp]
+    \centering
+    \subfigure[Centralised]{\includegraphics[width=30mm]{centralised.png}}
+    \qquad
+    \subfigure[Decentralised]{\includegraphics[width=30mm]{decentralised.png}}
+    \caption{Network types}
+    \label{fig:network-types}
+\end{figure}
+
 \subsection{Testing:}
 \lipsum[1-1]
 \subsubsection{Effectiveness of testing:}
@@ -103,21 +115,25 @@ As discussed in the Emulator Interim Checkpoint, we have been using our Discord 
 In the assembler, we decided to split up larger parts of the project. Kavya was in charge of creating the linked list which is essentially the backbone of the assembler, Yelun was in charge of the symbol table and Ashvin and Siddhant were in charge of the tokenizer. This way, we could essentially branch out from \verb|master| and then merge all branches together and fill any cracks we neglected. This method saved us a lot of time as everyone was independently coding at their own pace (which also allowed everyone to make suitable unit test cases in \verb|testrunner.c|). Another effective technique we used was making meaningful commit messages and merge request descriptions which come handy when we want to clarify a merge conflict or any gaps in understanding. Overall, we are all very happy with how well we have done in the project and the amount of progress we have made both as a team and personally.
 
 \subsection{Future improvements:}
-\lipsum[1-1]
+Although our group was efficient, there were some aspects that we could have incorporated for a better result. For example, we could have utilized pair programming a little more during debugging sessions and larger aspects of the project that required design choices and second opinions. This would have sped up the process and also ensured a more optimal outcome.
+Additionally, we could have managed our time more efficiently in order to get the project done well before the deadline. This would have left us enough time to incorporate some final refactoring and other minute details that were required for completion of the project. 
 
 \section{Individual Reflections}
 \subsection{Ashvin:}
 \lipsum[1-1]
 \subsection{Kavya:}
-\lipsum[1-1]
+The group project was rather well coordinated and organized compared to the ones I've done before. Every member of the group has come a long way since the beginning of the project, with new perspectives and skills that we would not have thought we would acquire. Every member had their own opinions that were portrayed in such a way that they came together to find the most optimal solutions to a problem instead drowning other opinions out. The work was efficiently split and the pace was flexible depending on every team member's requirements. Despite the time zone differences and lack of in-person communication, the communication was handled professionally yet informally, allowing us to work in an environment of comfort and mutual respect.
+
+I certainly learnt the importance of division of work and concurrent individual working, and when it should be used as opposed to pair programming. Every member was very self-motivated and eager to help which was a major factor that contributed to our efficiency. The willingness to listen, consider, suggest and help is something I would like to take forward from this group project and my teammates.  We recognized our strengths and weaknesses and used them to compliment each other and build the project. I was personally stronger with building data structures and Overall I am proud of how far we have come and the achievements and learning experiences we've had along the way. We learnt not only from the project but also from each other. The importance of communication, passion and respect truly came to light through the project and I will certainly incorporate these experiences in future projects.
+
 \subsection{Siddhant:}
 Overall, I am very satisfied with our project as it is the product of self motivated and guided work. Recalling back to the first 2 days of the project, some of us didn't know how to handle git branches and merge requests; so to see how far we have come since then is very rewarding. Not only did we finish the ARM emulator and assembler in time but we also incorporated the optional test cases. Our chemistry as a group worked very well because we set aside enough time in the day to bond as friends and not just teammates. This allowed free flowing conversations during brainstorming meetings and also enabled everyone to speak their mind freely without feeling anxious especially in a time like this where none of us have ever met each other in person.
 
 As some members of our team had previous experience in industrial programming, they imparted that knowledge with the rest of us which encouraged good coding and git practices (like properly formatted git commit messages which convey suitable amounts of information within 1 sentence). I will definitely be carrying forward these valuable soft skills in future projects and hopefully in the workplace. If I were to do this project again, I would probably further divide the work for Assembler as pair programming held us back in terms of time, on the other hand, pair programming reduced the number of bugs we had during testing as there were 2 pairs of eyeballs on 1 piece of code.
 
 \subsection{Ye Lun:}
-I have participated in group projects for development in the past. These were all with supervisors, observing my work consistently and guiding me, to the point of hand holding. This C group project was one without such a supervisor. Most of the guidance from our mentor centered around improving what we already had accomplished. The initial project structure, and many other aspects were decided by ourselves. Making these decisions was a difficult yet fulfilling experience as we did not know what was optimal or not. Eventually, I understood that it is better to attempt to do rather than contemplate about hypothetical situations, since ultimately anything can happen.
+I have participated in group projects for development in the past with supervisors who observed my work consistently and guided me to the point of hand holding. This C group project was different, where most of our guidance from our mentor centered around improving what we already had accomplished. The initial project structure, and many other aspects were decided by ourselves after multiple discussions. Making these decisions was a difficult yet fulfilling experience since we were unaware of what is optimal, which enabled us to generate a large number of ideas and methods to approach the problem.
 
-Throughout the project, I learned to work better in group form. Our work in the emulator is rather segmented, we discussed the work we will do, and each member will proceed to work on their own isolated segment. In the end we put everything together to produce a result. When we worked on the assembler, we initiated more pair and group programming sessions so we could understand what one another is doing in real time, rather than when we were reviewing code. Our group cohesiveness improved and this carried over into building our extension. I will certainly bring this practice into future group projects and recommend it to others.
+Our group coordination started great, and kept improving over time. Initially, We discussed the work that we planned to do and each member would proceed to work on their own segment, before presenting their code to everyone else. These code reviews were useful as it helped us understand why the code is written a specific way, and more people can catch any undetected bugs. This then gave us the idea to do some pair and group programming sessions for when we worked on the assembler. We therefore initiated pair and group programming sessions when working on the assembler so we could understand what one another is doing in real time. These were more spontaneous and it helped to further improve our group cohesiveness. This practice carried over into building our extension as well. These sessions do come at a cost of time, but I feel that the benefit of being on the same page as a small group outweighs the time loss, and I hope to bring this practice into future projects.
 
 \end{document}

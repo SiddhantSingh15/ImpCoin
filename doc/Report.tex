@@ -107,6 +107,9 @@ binary_instr = func_map->function(curr, func_map->code, labels);
 \label{fig:calling functions with func map}
 \end{figure}
 
+All token lists produced by reading the source file will always begin with a token containing its instruction name. This is used to query the symbol table. This is why \verb|tokens->list[0]| is used to query the symbol table.
+
+Once a parser function is called, it will read a token list and create a union data variable. Every parser is passed in with a \verb|code| parameter as well which is a 
 
 \section{Extension: Modelling a Distributed Ledger Cryptocurrency (ImpCoin) with a Concurrent Centralised Network}
 \subsection{Real world usage:}

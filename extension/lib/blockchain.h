@@ -26,7 +26,7 @@ blockchain *deserialize_blockchain(binn *input);
 
 block *new_block(blockchain *bc, const char *username);
 
-block *proof_of_work(blockchain *bc, const char *username);
+block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mutex);
 
 void print_blockchain(blockchain *chain);
 

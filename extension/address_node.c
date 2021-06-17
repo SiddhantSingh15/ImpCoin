@@ -59,7 +59,6 @@ void address_callback(void *arg) {
 
     w->msg = msg;
     buffer = (binn *)nng_msg_body(w->msg);
-    printf("%s", binn_object_str(buffer, "type"));
     strcpy(type, binn_object_str(buffer, "type"));
     if (strcmp(type, "mine") == 0) {
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);

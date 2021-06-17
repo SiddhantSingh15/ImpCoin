@@ -6,6 +6,7 @@
 
 #include <nng/nng.h>
 #include <nng/protocol/bus0/bus.h>
+#include <nng/supplemental/util/platform.h>
 #include <binn.h>
 #include <sodium.h>
 
@@ -102,14 +103,16 @@ void incoming_callback(void *arg) {
     }
 
     if (strcmp(type, "mine") == 0) {
+      printf("I received a block from %s\n", binn_object_str(buffer, "username"));
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
 
       // lock
       pthread_mutex_lock(&lock);
 
       if (blockchain_valid(*w->bc_ptr, bc_msg->bc)) {
-        free_blockchain(*w->bc_ptr);
+        // blockchain *to_free = *w->bc_ptr;
         *w->bc_ptr = bc_msg->bc;
+        // free_blockchain(to_free);
         // printf("%s\n", blockchain_to_string(*w->bc));
         print_block((*(w->bc_ptr))->latest_block);
       } else {
@@ -235,18 +238,19 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
 
   while (limit == 0 || i <= limit) {
     // lock
+    // pthread_mutex_lock(&lock);
+
+    block *valid = proof_of_work(*bc_ptr, username, &lock);
+
     pthread_mutex_lock(&lock);
-
-    block *valid = proof_of_work(*bc_ptr, username);
-
     if (append_to_blockchain(*bc_ptr, valid)) {
       struct worker *out = find_idle_outgoing(outgoing);
       send_mine_message(*bc_ptr, out);
     }
-
-    // unlock
     pthread_mutex_unlock(&lock);
 
+    // unlock
+    // pthread_mutex_unlock(&lock);
     i++;
   }
 }
@@ -291,12 +295,11 @@ int main(int argc, char **argv) {
 
   nng_socket sock = start_node(input_buf, incoming, outgoing, bc_ptr, username);
   dial_address_server(sock, "tcp://127.0.0.1:8000");
-
   while (true) {
     fprintf(stdout, "ASLTY> ");
     read_line(input_buf, 511);
 
-    mine(bc_ptr, username, 5, outgoing);
+    mine(bc_ptr, username, 10, outgoing);
     /*
     struct worker *out = find_idle_outgoing(outgoing);
     send_input_message(input_buf, out);

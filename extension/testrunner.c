@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include <binn.h>
 #include <string.h>
@@ -11,6 +12,8 @@
 #include "lib/block.h"
 #include "lib/blockchain.h"
 #include "test/test_utils.h"
+
+pthread_mutex_t dummy_mutex;
 
 void dummy_free(void *unused) {}
 
@@ -296,7 +299,7 @@ void test_hash_equality(int *passing, int *total) {
 void test_proof_of_work_function(int *passing, int *total) {
   blockchain *bc = init_blockchain();
   char *username = "rick";
-  block *just_mined = proof_of_work(bc, username);
+  block *just_mined = proof_of_work(bc, username, &dummy_mutex);
   track_test(test_bool(is_valid(just_mined), "Latest block is valid"),
              passing, total);
   track_test(
@@ -354,7 +357,7 @@ void test_append_blocks(int *passing, int *total) {
 
   // Add 1 new node to both blockchains
   char *username = "rick";
-  block *just_mined = proof_of_work(first_bc, username);
+  block *just_mined = proof_of_work(first_bc, username, &dummy_mutex);
   block *just_mined_dup = dup_block(just_mined);
   just_mined_dup->prev_block = second_bc->latest_block;
 
@@ -375,7 +378,7 @@ void test_append_blocks(int *passing, int *total) {
   print_blockchain(second_bc);
 
   // Add 1 more node to both blockchains
-  block *next_mined = proof_of_work(first_bc, username);
+  block *next_mined = proof_of_work(first_bc, username, &dummy_mutex);
   block *next_mined_dup = dup_block(next_mined);
   next_mined_dup->prev_block = second_bc->latest_block;
 
@@ -426,6 +429,11 @@ void test_blockchain_append(int *passing, int *total) {
 int main(void) {
   int passing = 0;
   int total = 0;
+
+  if (pthread_mutex_init(&dummy_mutex, NULL) != 0) {
+    printf("\n mutex init has failed\n");
+    return EXIT_FAILURE;
+  }
 
   test_linked_list_functions(&passing, &total);
   test_serialize_deserialize(&passing, &total);

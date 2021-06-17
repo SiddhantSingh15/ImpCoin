@@ -30,7 +30,6 @@ blockchain_msg *deserialize_bc_msg(binn *input) {
   bc_msg->bc = deserialize_blockchain(binn_object_object(input, "blockchain"));
   strncpy(bc_msg->username, binn_object_str(input, "username"), 40);
   strncpy(bc_msg->type, binn_object_str(input, "type"), 10);
-  printf("I finished deserialization\n");
   return bc_msg;
 }
 
@@ -49,7 +48,7 @@ transaction_msg *deserialize_t_msg(binn *input) {
   strncpy(t_msg->username, binn_object_str(input, "username"), 40);
   strncpy(t_msg->type, binn_object_str(input, "type"), 10);
   strncpy(t_msg->to, binn_object_str(input, "to"), 10);
-  t_msg->amount = binn_object_uint16(input, "amount");
+  t_msg->amount = binn_object_uint64(input, "amount");
 
   return t_msg;
 }

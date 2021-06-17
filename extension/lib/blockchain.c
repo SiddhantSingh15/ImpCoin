@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
+#include <pthread.h>
 
 #include <binn.h>
 
@@ -150,21 +152,23 @@ block *new_block(blockchain *bc, const char *username) {
   return new;
 }
 
-block *proof_of_work(blockchain *bc, const char *username) {
-  block *new = new_block(bc, username);
+block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mutex) {
+  block *new = NULL;
+  int count = 0;
 
-  hash *new_hash = hash_block(new);
-  memcpy(new->hash, *new_hash, 32);
-  free(new_hash);
-
-  while (!is_valid(new)) {
-    free_block(new);
+  do {
+    if (new != NULL){
+      free_block(new);
+    }
+    pthread_mutex_lock(mutex);
     new = new_block(bc, username);
+    pthread_mutex_unlock(mutex);
 
     hash *new_hash = hash_block(new);
     memcpy(new->hash, *new_hash, 32);
     free(new_hash);
-  }
+    count++;
+  } while (!is_valid(new));
   return new;
 }
 

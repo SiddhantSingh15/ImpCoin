@@ -8,7 +8,7 @@
 #include "linked_list.h"
 
 linked_list *ll_init(void) {
-  linked_list *new_list = malloc(sizeof(linked_list));
+  linked_list *new_list = calloc(1, sizeof(linked_list));
   new_list->head = NULL;
   new_list->last = NULL;
   new_list->size = 0;

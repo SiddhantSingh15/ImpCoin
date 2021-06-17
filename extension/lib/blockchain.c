@@ -13,8 +13,8 @@
 #include "linked_list.h"
 #include "transaction.h"
 #include "block.h"
-#include "utils.h"
 #include "blockchain.h"
+#include "utils.h"
 
 /**---------------------------------------------------------------------------
  * Init and Free
@@ -235,6 +235,29 @@ bool blockchain_valid(blockchain *curr, blockchain *incoming) {
   return true;
 }
 
+/**---------------------------------------------------------------------------
+ * Balance
+ *--------------------------------------------------------------------------*/
+uint64_t get_balance(blockchain *bc, const char *username) {
+  uint64_t amount = 0;
+  block *curr_b = bc->latest_block;
+  ll_node *curr_lln;
+  while (curr_b != NULL) {
+    curr_lln = (curr_b->transactions) ? curr_b->transactions->head : NULL;
+    while (curr_lln != NULL) {
+      transaction *trans = (transaction *) curr_lln->value;
+      if (strcmp(trans->to, username) == 0) {
+        amount += trans->amount;
+      } else if (strcmp(trans->from, username) == 0) {
+        amount -= trans->amount;
+      }
+      curr_lln = curr_lln->next;
+    }
+    amount += strcmp(curr_b->reward.to, username) == 0 ? curr_b->reward.amount : 0;
+    curr_b = curr_b->prev_block;
+  }
+  return amount;
+}
 /**---------------------------------------------------------------------------
  * To String and Print
  *--------------------------------------------------------------------------*/

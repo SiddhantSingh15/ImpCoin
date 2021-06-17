@@ -138,17 +138,19 @@ void incoming_callback(void *arg) {
       transaction *tc = to_transaction(tc_msg);
       free(tc_msg);
 
-      if (is_valid_transaction(tc)) {
-        // lock
-        pthread_mutex_lock(&lock);
+      // lock
+      pthread_mutex_lock(&lock);
+      if (is_valid_transaction(tc, *(w->bc_ptr))) {
         printf("New transaction received: ");
         print_transaction(tc);
         ll_append((*(w->bc_ptr))->mempool, tc);
         printf("Current state of mempool: ");
         ll_print((*(w->bc_ptr))->mempool, to_string_transaction);
-        // unlock
-        pthread_mutex_unlock(&lock);
+      } else {
+        printf("REJECTED\n");
       }
+      // unlock
+      pthread_mutex_unlock(&lock);
     }
 
     nng_recv_aio(w->sock, w->aio);
@@ -303,6 +305,8 @@ void print_state(char *input, blockchain **bc_ptr, const char *username) {
     pthread_mutex_unlock(&lock);
   } else if (strcmp("name", input) == 0) {
     printf("Username: %s\n", username);
+  } else if (strcmp("balance", input) == 0){
+    printf("Your balance is: %ld\n", get_balance(*bc_ptr, username));
   } else {
     printf("Invalid command :/\n");
   }

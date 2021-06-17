@@ -26,7 +26,7 @@ transaction *deserialize_transaction(binn *trn);
 
 linked_list *deserialize_transactions(binn *transactions);
 
-bool is_valid_transaction(transaction *tc);
+bool is_valid_transaction(transaction *tc, void *bc_ptr);
 
 void to_string_transaction(void *t, char *buf);
 

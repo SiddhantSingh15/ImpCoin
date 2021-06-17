@@ -34,6 +34,8 @@ block *new_block(blockchain *bc, const char *username);
 
 block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mutex);
 
+uint64_t get_balance(blockchain *bc, const char *username);
+
 bool blockchain_valid (blockchain *curr, blockchain *incoming);
 
 void print_blockchain(blockchain *chain);

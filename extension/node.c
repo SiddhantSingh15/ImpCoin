@@ -25,21 +25,21 @@ pthread_mutex_t lock;
 
 typedef enum { IDLE, INIT, RECV, WAIT, SEND } state;
 
-struct worker {
+typedef struct {
   state state;
   nng_aio *aio;
   nng_msg *msg;
   nng_socket sock;
   blockchain **bc_ptr;
   const char *username;
-};
+} worker_t;
 
 void fatal(const char *func, int rv) {
   fprintf(stderr, "%s: %s\n", func, nng_strerror(rv));
   exit(1);
 }
 
-void send_mine_message(blockchain *bc, struct worker *w) {
+void send_mine_message(blockchain *bc, worker_t *w) {
   int rv;
   nng_msg *nng_msg;
   blockchain_msg *bc_msg = malloc(sizeof(blockchain_msg));
@@ -63,7 +63,7 @@ void send_mine_message(blockchain *bc, struct worker *w) {
   binn_free(obj);
 }
 
-void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
+void send_transaction_message(char *to, uint64_t amount, worker_t *w) {
 
   int rv;
   nng_msg *nng_msg;
@@ -87,7 +87,7 @@ void send_transaction_message(char *to, uint64_t amount, struct worker *w) {
 }
 
 void incoming_callback(void *arg) {
-  struct worker *w = arg;
+  worker_t *w = arg;
   int rv;
   binn *buffer;
   char type[MESSAGE_TYPE_SIZE];
@@ -99,7 +99,11 @@ void incoming_callback(void *arg) {
     break;
   case RECV:
     if ((rv = nng_aio_result(w->aio)) != 0) {
-      fatal("nng_recv_aio", rv);
+      if (strcmp(nng_strerror(rv), "Object closed") != 0) {
+        fatal("nng_recv_aio", rv);
+      } else {
+        break;
+      }
     }
     w->state = RECV;
     w->msg = nng_aio_get_msg(w->aio);
@@ -164,12 +168,17 @@ void incoming_callback(void *arg) {
 }
 
 void outgoing_callback(void *arg) {
-  struct worker *w = arg;
+  worker_t *w = arg;
+  int rv;
 
   switch (w->state) {
   case IDLE:
     break;
   case SEND:
+    if ((rv = nng_aio_result(w->aio)) != 0) {
+      nng_msg_free(w->msg);
+      fatal("nng_send_aio", rv);
+    }
     w->state = IDLE;
     break;
   default:
@@ -177,8 +186,8 @@ void outgoing_callback(void *arg) {
   }
 }
 
-struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
-  struct worker *w;
+worker_t *alloc_worker(nng_socket sock, void (* callback)(void *)) {
+  worker_t *w;
   int rv;
 
   if ((w = nng_alloc(sizeof(*w))) == NULL) {
@@ -193,8 +202,8 @@ struct worker *alloc_worker(nng_socket sock, void (* callback)(void *)) {
   return w;
 }
 
-nng_socket start_node(const char *our_url, struct worker *incoming[],
-                      struct worker *outgoing[], blockchain **bc_ptr,
+nng_socket start_node(const char *our_url, worker_t *incoming[],
+                      worker_t *outgoing[], blockchain **bc_ptr,
                       const char *username) {
   nng_socket sock;
   int rv;
@@ -250,7 +259,7 @@ void dial_address_server(nng_socket sock, const char *peer_url) {
   }
 }
 
-struct worker *find_idle_outgoing(struct worker *outgoing[]) {
+worker_t *find_idle_outgoing(worker_t *outgoing[]) {
   for (int i = 0; i < PARALLEL; ++i) {
     if (outgoing[i]->state == IDLE) {
       return outgoing[i];
@@ -261,7 +270,7 @@ struct worker *find_idle_outgoing(struct worker *outgoing[]) {
 }
 
 void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
-          struct worker *outgoing[]) {
+          worker_t *outgoing[]) {
 
   // This function will mine `limit` number of blocks.
   // If the limit given is 0, it will mine indefinitely.
@@ -272,7 +281,7 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
 
     pthread_mutex_lock(&lock);
     if (append_to_blockchain(*bc_ptr, valid)) {
-      struct worker *out = find_idle_outgoing(outgoing);
+      worker_t *out = find_idle_outgoing(outgoing);
       send_mine_message(*bc_ptr, out);
       char* block_str = to_string_block(((*bc_ptr)->latest_block));
       printf("Mined a block!\n%s\n", block_str);
@@ -284,7 +293,7 @@ void mine(blockchain **bc_ptr, const char *username, uint32_t limit,
   printf("Mining complete.\n");
 }
 
-void perform_transaction(struct worker *outgoing[]) {
+void perform_transaction(worker_t *outgoing[]) {
   char buffer[511];
   uint64_t amount = 0;
   printf("Please enter the amount you wish to transfer: ");
@@ -292,7 +301,7 @@ void perform_transaction(struct worker *outgoing[]) {
   amount = (uint64_t) atoi(buffer);
   printf("Please input the username of the person you are transferring to: ");
   read_line(buffer, 511);
-  struct worker *out = find_idle_outgoing(outgoing);
+  worker_t *out = find_idle_outgoing(outgoing);
   send_transaction_message(buffer, amount, out);
 }
 
@@ -320,10 +329,25 @@ void print_state(char *input, blockchain **bc_ptr, const char *username) {
   }
 }
 
+void free_and_close_worker(worker_t *w) {
+  w->state = IDLE;
+  nng_aio_stop(w->aio);
+  nng_aio_free(w->aio);
+  nng_close(w->sock);
+  nng_free(w, sizeof(worker_t));
+}
+
+void quit_program(worker_t *incoming[], worker_t *outgoing[]) {
+  for (int i = 0; i < PARALLEL; i++) {
+    free_and_close_worker(incoming[i]);
+    free_and_close_worker(outgoing[i]);
+  }
+}
+
 int main(int argc, char **argv) {
 
-  struct worker *incoming[PARALLEL];
-  struct worker *outgoing[PARALLEL];
+  worker_t *incoming[PARALLEL];
+  worker_t *outgoing[PARALLEL];
   char input[BUFFER_SIZE];
 
   if (pthread_mutex_init(&lock, NULL) != 0) {
@@ -366,6 +390,8 @@ int main(int argc, char **argv) {
     } else if (is_command('p', input)) {
       print_state(&input[2], bc_ptr, username);
     } else if (is_command('q', input)) {
+      quit_program(incoming, outgoing);
+      nng_close(sock);
       break;
     }
 

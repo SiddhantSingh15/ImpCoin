@@ -372,7 +372,7 @@ int main(int argc, char **argv) {
 
     if (is_command('m', input)){
       printf("Proceeding to mine...\n");
-      mine(bc_ptr, username, 3, outgoing);
+      mine(bc_ptr, username, 10, outgoing);
 
     } else if (is_command('t', input)) {
       printf("Do transaction\n");

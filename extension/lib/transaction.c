@@ -128,7 +128,7 @@ void to_string_transaction(void *t, char *buffer) {
 }
 
 void print_transaction(transaction *t) {
-  char buffer[511];
+  char buffer[BUFFER_SIZE];
   to_string_transaction(t, buffer);
   printf("%s\n", buffer);
 }

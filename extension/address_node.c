@@ -18,8 +18,6 @@
 #include "lib/blockchain.h"
 #include "lib/messages.h"
 
-#define PARALLEL 32
-
 typedef enum { IDLE, INIT, RECV, WAIT, SEND } state;
 
 struct addr_worker {
@@ -40,7 +38,7 @@ void address_callback(void *arg) {
   int rv;
   nng_msg *msg;
   binn *buffer;
-  char type[10];
+  char type[MESSAGE_TYPE_SIZE];
 
   switch (w->state) {
   case INIT:

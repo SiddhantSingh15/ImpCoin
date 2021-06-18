@@ -179,7 +179,7 @@ block *new_block(blockchain *bc, const char *username) {
   new->timestamp = time(NULL);
 
   transaction *reward =
-      init_transaction("wjk", (char *)username, 69, time(NULL));
+      init_transaction("wjk", (char *)username, 42, time(NULL));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 

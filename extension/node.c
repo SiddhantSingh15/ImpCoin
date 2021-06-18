@@ -150,8 +150,8 @@ void incoming_callback(void *arg) {
       } else {
         printf("%sREJECTED. You do not have enough IMPs%s\n",
           BOLDRED, NOCOLOUR);
+        free_transaction(tc);
       }
-      free_transaction(tc);
       // unlock
       pthread_mutex_unlock(&lock);
     }

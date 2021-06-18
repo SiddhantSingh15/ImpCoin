@@ -156,7 +156,7 @@ char *ll_to_string(linked_list *list,
   assert(list);
 
   int i = 0;
-  char buf[511];
+  char buf[511] = "\0";
   char *out = calloc(list->size, sizeof(buf));
   *out = '\0';
 

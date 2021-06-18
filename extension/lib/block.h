@@ -102,8 +102,13 @@ block *deserialize_block(binn *b);
 hash *hash_block(block *b);
 
 /**
- * TODO
+ * @brief Checks if the block passed in is a valid block by checking if the 
+ *        first n hex digits are 0. n is determined by the difficulty calculated
+ *        using the length of the blockchain.
  * 
+ * @param b The block to check.
+ * 
+ * @return Returns true if the block is valid.
  */
 bool is_valid_block(block *b);
 

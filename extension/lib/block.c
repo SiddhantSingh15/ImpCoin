@@ -142,7 +142,7 @@ hash *hash_block(block *b) {
 
 bool is_valid_block(block *b) {
   // pre: the hash has been calculated
-  int difficulty = 4 + b->index / 7;
+  int difficulty = 2 + b->index / 7;
   int mask = 0xf;
   for (int i = 0; i < difficulty; i++) {
     mask = (i % 2 == 0) ? mask << 4 : 0xf;

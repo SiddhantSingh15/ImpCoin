@@ -285,6 +285,6 @@ char *blockchain_to_string(blockchain *chain) {
 
 void print_blockchain(blockchain *chain) {
   char *string = blockchain_to_string(chain);
-  printf("%s", string);
+  printf("%s\n", string);
   free(string);
 }

@@ -64,7 +64,9 @@ void address_callback(void *arg) {
     strcpy(type, binn_object_str(buffer, "type"));
     if (strcmp(type, "mine") == 0) {
       blockchain_msg *bc_msg = deserialize_bc_msg(buffer);
-      printf("%s", blockchain_to_string(bc_msg->bc));
+      print_blockchain(bc_msg->bc);
+      free_blockchain(bc_msg->bc);
+      free(bc_msg);
     } else if (strcmp(type, "trans") == 0) {
       printf("I've received a transaction\n");
       transaction_msg *t_msg = deserialize_t_msg(buffer);
@@ -72,11 +74,13 @@ void address_callback(void *arg) {
         "It is from %s, transferring %"PRIu64" ImpCoin to %s.\n",
         t_msg->username,t_msg->amount, t_msg->to
       );
+      free(t_msg);
     }
     nng_aio_set_msg(w->aio, w->msg);
     w->msg = NULL;
     w->state = SEND;
     nng_send_aio(w->sock, w->aio);
+    nng_msg_free(w->msg);
     break;
   case SEND:
     // If message is sent successfuly, nng_aio_result returns 0

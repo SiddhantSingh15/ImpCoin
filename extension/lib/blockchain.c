@@ -73,7 +73,6 @@ block *genesis_block(void) {
   free_transaction(reward);
 
   // Create list and add transactions
-  genesis->transactions = ll_init();
   ll_append(genesis->transactions, t1);
   ll_append(genesis->transactions, t2);
   ll_append(genesis->transactions, t3);
@@ -180,7 +179,7 @@ block *new_block(blockchain *bc, const char *username) {
   new->timestamp = time(NULL);
 
   transaction *reward =
-      init_transaction("wjk", (char *)username, 69, time(NULL));
+      init_transaction("wjk", (char *)username, 42, time(NULL));
   memcpy(&new->reward, reward, sizeof(transaction));
   free_transaction(reward);
 
@@ -286,6 +285,6 @@ char *blockchain_to_string(blockchain *chain) {
 
 void print_blockchain(blockchain *chain) {
   char *string = blockchain_to_string(chain);
-  printf("%s", string);
+  printf("%s\n", string);
   free(string);
 }

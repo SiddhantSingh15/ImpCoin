@@ -108,9 +108,9 @@ bool is_valid_transaction(transaction *tc, void *bc_ptr) {
   curr_lln = mempool->head;
   while (curr_lln != NULL) {
     transaction *trans = (transaction *) curr_lln->value;
-    if (strcmp(trans->to, tc->from) == 0) {
+    if (strncmp(trans->to, tc->from, UID_LENGTH) == 0) {
         amount += trans->amount;
-      } else if (strcmp(trans->from, tc->from) == 0) {
+      } else if (strncmp(trans->from, tc->from, UID_LENGTH) == 0) {
         amount -= trans->amount;
       }
     curr_lln = curr_lln->next;
@@ -128,7 +128,7 @@ void to_string_transaction(void *t, char *buffer) {
 }
 
 void print_transaction(transaction *t) {
-  char buffer[511];
+  char buffer[BUFFER_SIZE];
   to_string_transaction(t, buffer);
   printf("%s\n", buffer);
 }

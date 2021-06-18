@@ -129,11 +129,6 @@ void ll_delete(linked_list *list, uint32_t index, void (*value_free)(void *)) {
 
 void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
 
-  if (number >= list->size) {
-    ll_clear(list);
-    return;
-  }
-
   int i = 0;
   ll_node *curr = list->head;
   while (i < number) {
@@ -142,6 +137,12 @@ void ll_drop(linked_list *list, uint32_t number, void (*value_free)(void *)) {
     ll_free_node(temp, value_free);
     i++;
   }
+  
+  if (number >= list->size) {
+    ll_clear(list);
+    return;
+  }
+
   list->head = curr;
 }
 
@@ -156,8 +157,9 @@ char *ll_to_string(linked_list *list,
   assert(list);
 
   int i = 0;
-  char buf[511];
-  char *out = calloc(list->size, sizeof(buf));
+  char buf[511] = "\0";
+  char *out = calloc((list->size) ? list->size : 1, sizeof(buf));
+  *out = '\0';
 
   ll_node *curr = list->head;
   while (curr != NULL) {

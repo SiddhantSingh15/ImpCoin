@@ -46,28 +46,6 @@ uint32_t append_to_linked_list(linked_list *list, void *val) {
   return append_via_node(list->head, val);
 }
 
-node *traverse_linked_list(linked_list *list) {
-  assert(list);
-
-  node *curr;
-  curr = list->head;
-
-  while (curr != NULL) {
-    curr = curr->next;
-  }
-  return curr;
-}
-
-void change_node(linked_list *list, uint32_t address, void *val) {
-  assert(list);
-  assert(address % WORD_SIZE_IN_BYTES == 0);
-
-  node *node_to_change = traverse_linked_list(list);
-  if (node_to_change != NULL) {
-    node_to_change->value = val;
-  }
-}
-
 void free_linked_list(linked_list *list, void (*value_free)(void *)) {
   assert(list);
 

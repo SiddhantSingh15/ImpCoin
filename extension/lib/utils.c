@@ -31,6 +31,7 @@ char *to_hex_string_hash(char *in) {
 }
 
 char *formatted_time(time_t *t) {
+  assert(t);
   char *fmttime = calloc(1, 100);
   strftime(fmttime, 100, "%m/%d/%y %X %Z", gmtime(t));
   fmttime = realloc(fmttime, strlen(fmttime) + 1);

@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// All parsing functions should look like this
-// void parse_function (void* ll_node, union instr_code code, symbol_table* st);
-
 uint32_t encode_dataproc_binary(dataproc_t *instr) {
   // Base - 0000 0000 0000 0000 0000 0000 0000 0000
   uint32_t dataproc_base = 0x00000000;

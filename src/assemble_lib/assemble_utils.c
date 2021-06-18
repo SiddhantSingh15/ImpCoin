@@ -143,7 +143,7 @@ void populate_st_instructions(symbol_table *st) {
     .code.branch_cond = AL,
     .function = &parse_branch
   };
-  st_insert(st, "bal", &bal, vsize); // b and bal do the same thing
+  st_insert(st, "bal", &bal, vsize); 
 
   instr_func_map beq = {
     .code.branch_cond = EQ,

@@ -151,8 +151,10 @@ void incoming_callback(void *arg) {
         printf("Current state of mempool:\n");
         ll_print((*(w->bc_ptr))->mempool, to_string_transaction);
       } else {
-        printf("%sREJECTED. You do not have enough IMPs%s\n",
-          BOLDRED, NOCOLOUR);
+        if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
+          printf("%sREJECTED. You do not have enough IMPs%s\n",
+            BOLDRED, NOCOLOUR);
+        }
         free_transaction(tc);
       }
       // unlock

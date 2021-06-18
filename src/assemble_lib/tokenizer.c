@@ -109,7 +109,6 @@ void free_token_list(void *ptr) {
     default:
       break;
     }
-    // free(&tl->list[i]);
   }
 }
 

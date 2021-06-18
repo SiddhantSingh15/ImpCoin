@@ -65,26 +65,6 @@ uint32_t append_via_node(node *entry, void *val);
 uint32_t append_to_linked_list(linked_list *list, void *val);
 
 /**
- * @brief Traverses the given linked list and returns the node at a specified
- * address.
- *
- * @param list The linked list to be traversed.
- *
- * @return A pointer to node at specified address.
- */
-node *traverse_linked_list(linked_list *list);
-
-/**
- * @brief Changes the value of the node in the given linked list at a specified
- * address.
- *
- * @param list The linked list to where the node to be changed is present.
- * @param pos The address of the node to be changed.
- * @param val The new value to be assigned to the node.
- */
-void change_node(linked_list *list, uint32_t address, void *val);
-
-/**
  * @brief Frees the allocated memory of given list, all nodes contained in it
  * and the components associated to each node.
  *

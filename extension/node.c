@@ -109,7 +109,6 @@ void incoming_callback(void *arg) {
     w->msg = nng_aio_get_msg(w->aio);
     buffer = (binn *)nng_msg_body(w->msg);
     strcpy(type, binn_object_str(buffer, "type"));
-
     if (strcmp(type, "mine") == 0) {
 
       if (strcmp(w->username, binn_object_str(buffer, "username")) == 0) {
@@ -134,7 +133,7 @@ void incoming_callback(void *arg) {
       } else {
         free_blockchain(bc_msg->bc);
       }
-
+      free(bc_msg);
       // unlock
       pthread_mutex_unlock(&lock);
 
@@ -159,7 +158,7 @@ void incoming_callback(void *arg) {
       // unlock
       pthread_mutex_unlock(&lock);
     }
-
+    nng_msg_free(w->msg);
     nng_recv_aio(w->sock, w->aio);
     break;
   default:
@@ -169,16 +168,11 @@ void incoming_callback(void *arg) {
 
 void outgoing_callback(void *arg) {
   worker_t *w = arg;
-  int rv;
 
   switch (w->state) {
   case IDLE:
     break;
   case SEND:
-    if ((rv = nng_aio_result(w->aio)) != 0) {
-      nng_msg_free(w->msg);
-      fatal("nng_send_aio", rv);
-    }
     w->state = IDLE;
     break;
   default:
@@ -400,5 +394,6 @@ int main(int argc, char **argv) {
   free_blockchain(*bc_ptr);
   free(bc_ptr);
   free((char *)username);
+  printf("Successfully terminated.\n");
   return EXIT_SUCCESS;
 }

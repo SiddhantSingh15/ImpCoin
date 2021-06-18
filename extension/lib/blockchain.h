@@ -97,17 +97,17 @@ binn *serialize_blockchain(blockchain *bc);
  */
 blockchain *deserialize_blockchain(binn *input);
 
-/** TODO
+/** 
  * @brief Creates a new block 
  *
- * @param bc
- * @param username
+ * @param bc The pointer to the blockchain.
+ * @param username The username of the user making the new block.
  *
- * @return
+ * @return Returns the new block created in the new blockchain.
  */
 block *new_block(blockchain *bc, const char *username);
 
-/**TODO
+/**
  * @brief
  *
  * @param bc
@@ -129,11 +129,14 @@ block *proof_of_work(blockchain *bc, const char *username, pthread_mutex_t *mute
  */
 uint64_t get_balance(blockchain *bc, const char *username);
 
-/** TODO
- * @brief Checks if the given current blockchain is valid by ensuring 
+/**
+ * @brief Checks if the given current blockchain is valid by ensuring the 
+ *        previous hash of the block matches with the hash of the previous 
+ *        block. This is done by traversing the linked list. The index of the 
+ *        the blocks are also checked (to make sure theyre in the correct order)
  *
- * @param curr The 
- * @param incoming
+ * @param curr The current blockchain.
+ * @param incoming The blockchain with the latest block.
  *
  * @return Returns true if the blockchain is valid and false otherwise.
  */

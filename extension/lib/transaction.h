@@ -9,7 +9,7 @@
 /**
  * @brief A struct to store a certain transaction that occurs between accounts.
  *  It stores the account from which transaction occurs, the account to which
- *  transaction is occuring and the amount that is transferred between 
+ *  transaction is occuring and the amount that is transferred between
  *  accounts.
  */
 typedef struct transaction {
@@ -20,7 +20,7 @@ typedef struct transaction {
 } transaction;
 
 /**
- * @brief Creates a new transaction (using calloc) and initializes its 
+ * @brief Creates a new transaction (using calloc) and initializes its
  *  attributes using the parameters passed into the method.
  *
  * @param from The username of the account from which transaction occurs.
@@ -43,7 +43,7 @@ transaction *init_transaction(char *from, char *to, uint64_t amount,
 transaction *dup_transaction(transaction *t);
 
 /**
- * @brief Returns the serialized version (binn object) of the given 
+ * @brief Returns the serialized version (binn object) of the given
  *  transaction.
  *
  * @param t The transaction to be serialized.
@@ -58,7 +58,7 @@ binn *serialize_transaction(transaction *t);
  *
  * @param ts The linked list of transactions to be serialized.
  *
- * @return The binn object (serialized version) of the given linked list of 
+ * @return The binn object (serialized version) of the given linked list of
  *  transactions.
  */
 binn *serialize_transactions(linked_list *ts);
@@ -86,13 +86,14 @@ linked_list *deserialize_transactions(binn *transactions);
  * @brief Checks if a transaction is valid and returns true if so.
  *
  * @param tc The transaction to be checked for validity.
+ * @param bc_ptr The blockchain to check the transaction against.
  *
  * @return True if the transaction is valid and false otherwise.
  */
-bool is_valid_transaction(transaction *tc);
+bool is_valid_transaction(transaction *tc, void *bc_ptr);
 
 /**
- * @brief Converts a given transaction to readable form as a string that 
+ * @brief Converts a given transaction to readable form as a string that
  *  contains the attributes of the transaction in a comprehensible way.
  *
  * @param t The transaction to be converted to string.
@@ -101,7 +102,7 @@ bool is_valid_transaction(transaction *tc);
 void to_string_transaction(void *t, char *buf);
 
 /**
- * @brief Prints the given transaction and its attributes in a readable form 
+ * @brief Prints the given transaction and its attributes in a readable form
  *  that is useful to the user.
  *
  * @param t The transaction to be printed.

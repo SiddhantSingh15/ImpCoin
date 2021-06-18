@@ -125,12 +125,14 @@ In the real world, all our transactions are monitored by a governing body and th
 
 There are two main executables in our implementation. First, we have \verb|node| which presents the user with an interactive prompt, allowing them to mine blocks, make transactions and print out internal state for debugging purposes. Each \verb|node| stores a copy of their own blockchain, which contains a linked list of previously mined blocks and a list of pending transactions (\verb|mempool|). The second executable is \verb|address_node|, which simply listens for incoming traffic on a TCP socket, and relays this back to every connected node (Figure \ref{fig:network-types}a). This simplifies our network implementation significantly, as now each node does not have to keep track of which nodes to send messages to (Figure \ref{fig:network-types}b).
 
-There are 2 types of messages sent across the network. The first is a transaction, which allows a user to transfer ImpCoin out of their account. If the user's balance is high enough, this message is sent and other nodes will add this transaction to their \verb|mempool|. The second is a new block announcement, where if a node succesfully mines a new block, it sends its entire blockchain to everyone else. At this point we use the \verb|blockchain_valid| function, to reach consensus on which blockchain is the most updated and valid to use. The node then continues operating continuing with new blockchain's \verb|mempool| and \verb|latest_block|. A user's account balance is calculated based on the blockchain, so when a new block is mined this is reflected automatically and in real time.
+There are two types of messages sent across the network. The first is a transaction, which allows a user to transfer ImpCoin out of their account. If the user's balance allows for it, this message is sent to other nodes and they will add this transaction to their \verb|mempool|. The second is a new block announcement, where if a node succesfully mines a new block, it sends its entire blockchain to everyone else. Other nodes will use the \verb|blockchain_valid| function, to reach consensus on which blockchain is the most updated and valid to use. The node then continues operation with new blockchain's \verb|mempool| and \verb|latest_block|. A user's account balance is calculated based on the blockchain, so when a new block is mined this is reflected automatically and in real time.
 
-In order to create a blockchain network in C, we needed to implement several things:
+In order to write a blockchain network in C, we needed to implement several things:
 \begin{itemize}
-    \item Suitable data structures to model blocks, transactions, a variable length list of transactions and a blockchain. We were able to make use of some of our experiences and code in the assembler for this, especially in implementing linked data structures.
-    \item Functions to serialize and deserialize these data structures. We needed this for sending data to other nodes across the netw
+    \item Suitable data structures to model messages, blocks, transactions, a variable length list of transactions and a blockchain. We were able to make use of some of our experiences and code in the assembler for this, especially in implementing linked data structures.
+    \item Functions to serialize and deserialize these data structures. We needed this for sending data to other nodes across the network, and for passing to hashing functions. The format we used was \textbf{Binn}, a binary serialization format provided by an external library of the same name.
+    \item Function to generate hashes and random numbers. We needed this for the proof of work algorithm, which required randomized \verb|nonce| values, and miners to calculate valid hashes for each block. For this, we made use of \textbf{Libsodium}, a library which provides cryptography related functionality.
+    \item The \verb|address_node| and \verb|node| executables, as described previously. The \verb|node| executable makes use of a number of parallel \verb|incoming| threads, which asynchronously listen for messages and execute a callback function on receipt, as well some \verb|outgoing| threads that remain idle until they are needed to asynchronously send messages. The main thread handles user input, in the form of transaction and mine commands. The \verb|address_node| executable is much simpler, as it only has to listen for messages and execute a callback which relays them to other nodes. We made use of the \textbf{NNG} library to implement socket programming and network related functionality.
 \end{itemize}
 
 \begin{figure}[htp]
@@ -143,12 +145,23 @@ In order to create a blockchain network in C, we needed to implement several thi
 \end{figure}
 
 \subsubsection{Issues we overcame: }
-\lipsum[1-1]
+We first identified the foundation of our code. Generally, the blockchain network was be segmented into two main parts:
+
+\begin{itemize}
+    \item The blockchain, proof of work, transactions and test suite.
+    \item The network architecture and concurrency implementation
+\end{itemize}
+
+Both segments were worked on at the same time by different group members and were combined together once they were developed enough. This combination process was a point of difficulty the merging process was not straightforward. Occasionally, we would encounter undefined behaviour in the program as well, complicating things further.
+
+A critical problem we had to solve was to develop a concurrent solution to each node's mining process. If a node is in the midst of mining and a new blockchain is propagated to it, the node needs to update its own blockchain before continuing with its mining. Our solution to solving this is through the combination of mutexes and our asynchronous network, which listens for blockchain updates on listener threads while the main thread does the mining. This mutex was reused when we implemented asynchronous mempool appending when nodes conduct transactions.
+
+Another difficult situation was 
 
 \subsection{Testing and Effectiveness:}
 After setting up the basic skeleton of the extension, we also got started on our test suite. The constantly evolving test suite contains basic building blocks which are then used for more complex tests. For example, \verb|test_string()| (checks string equality) is used in \verb|test_hash()| (checks hash equality) which is utilised in \verb|test_hash_equality()| which checks whether the hashes of the passed in blocks are equal. We have tried to use this "ground up" approach wherever possible as it reduces code duplication. Figure \ref{fig:test-example} shows part of the command line output of the \verb|testrunner| when its run (the \texttt{\textcolor{BOLDRED}{FAIL}} is just an example, all our cases pass!). We use escape sequences to output colourful text in the terminal.
 
-Our test suite helped us catch a lot of obscure bugs which we hadn't thought of before, and it was also our first taste at Test Driven Development. A lot of really enjoyed the process of writing tests before typing code because it gave us a better idea on how to get started. Apart from the test suite, we also stress tested our system with multiple terminals mining at once to see if everything functions smoothly and relatively quickly. It was also satisfying to hit smaller goals more often as it boosted our enthusiasm throughout the journey.
+Our test suite helped us catch a lot of obscure bugs which we hadn't thought of before, and it was also our first taste at Test Driven Development. A lot of us really enjoyed the process of writing tests before typing code because it gave us a better idea on how to get started. Apart from the test suite, we also stress tested our system with multiple terminals mining at once to see if everything functions smoothly and relatively quickly. It was also satisfying to hit smaller goals more often as it boosted our enthusiasm throughout the journey.
 
 \begin{figure}[htp]
 \centering
@@ -180,14 +193,17 @@ Although our group was efficient, there were some aspects that we could have inc
 
 Additionally, we could have managed our time more efficiently in order to get the project done well before the deadline. This would have left us enough time to incorporate some final refactoring and other minute details that were required for completion of the project. This management would have been possible if we had paced out our work during the initial part of the project, to avoid burn-out and a slower pace for the rest of the project. 
 
-Furthermore, the group could have spent a little more time researching about the best way to solve a problem or to pick between design choices, in order to avoid working out one implementation before changing it to another one. The research could have helped save more time. 
+Furthermore, the group could have spent a little more time researching about the best way to solve a problem or to pick between design choices, in order to avoid working out one implementation before changing it to another one. The research could have helped save more time.
 
 Overall the project was fairly well-coordinated and we had numerous achievements and learning experiences along the way, which every member can take forward into future projects and into the work environment as well.
 
 % -------------------------------------
 \section{Individual Reflections}
 \subsection{Ashvin:}
-\lipsum[1-1]
+This was my first experience programming in a group and the largest codebase I've work on to date, overall I'm very happy with what we have accomplished. I find the progress we have made remarkable;  we went from having no prior knowledge of C programming, to implementing a concurrent blockchain application in just a few weeks. This has been a great learning experience not only in terms of technical skills, but also for learning how to work remotely and as a group. I think a key takeaway has been that a good setup for communication matters very much in group projects. While our work time was more scheduled in the beginning, as time went on it became more free-form and we learnt to use time-zones to our advantage. This was done by leaving some to-dos on our planning channel on Discord at the end of the day, for whoever happened to work on the project next. This, and the spontaneous conversations we had during breaks while group programming meant that we were able to work more fluidly, which personally helped make the project enjoyable and fun for me, as opposed to strictly daunting. Apart from this, I'm grateful for learning new things from my peers, such as making better use of tools like git, gdb and Latex.
+
+Another key skill I improved on during the project, and especially during the extension, is the process of breaking down a large idea into smaller functional sub-parts which can then be implemented individually. All of us had a different approach when it came to solving problems, and being acquainted with these approaches helps me personally perform better. I think pair programming was useful for this, as it helped us question each other's line of thinking and refine our solutions in real time. If I had to change one thing about how we completed this, it would probably be thinking more about edge cases for Assembler, particularly the parse functions. This would have helped us to move faster and possibly resulted in a cleaner solution or time for more ambitious refactoring.
+
 \subsection{Kavya:}
 The group project was rather well coordinated and organized compared to the ones I've done before. Every member of the group has come a long way since the beginning of the project, with new perspectives and skills that we would not have thought we would acquire. Every member had their own opinions that were portrayed in such a way that they came together to find the most optimal solutions to a problem instead drowning other opinions out. The work was efficiently split and the pace was flexible depending on every team member's requirements. Despite the time zone differences and lack of in-person communication, the communication was handled professionally yet informally, allowing us to work in an environment of comfort and mutual respect.
 

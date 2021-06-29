@@ -25,10 +25,9 @@
 *.d
 *.dSYM
 *.bin
-emulate
-assemble
+address_node
+node
 testrunner
-exec_utils
 
 #ignore junk files from compiling Haskell code
 *.hi
